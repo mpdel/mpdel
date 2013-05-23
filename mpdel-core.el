@@ -182,7 +182,7 @@ return at the end of a request.")
 
 (defun mpdel-try (message)
   (mpdel-add-files-to-playlist
-   (mpdel-extractor message "file: ")))
+   (mapcar #'mpdel-file-field (mpdel-extract-data message))))
 
 (defun mpdel-add-files-to-playlist (files)
   (dolist (file files)
@@ -238,6 +238,9 @@ return at the end of a request.")
 
 (defun mpdel-artist-field (data)
   (mpdel-data-field data 'Artist))
+
+(defun mpdel-file-field (data)
+  (mpdel-data-field data 'file))
 
 (defun mpdel-album-field (data)
   (mpdel-data-field data 'Album))
