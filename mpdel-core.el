@@ -116,10 +116,14 @@ return at the end of a request.")
 
 (defun mpdel-message-filter (proc message)
   "Automatically called when the server sends a message."
-  (mpdel-log message "<-")
-  (if (string= (substring message 0 3) "ACK")
-      (mpdel-log "ACK message" "ko")
-    (mpdel-msghandlers-call message)))
+  (condition-case error
+      (progn
+        (mpdel-log message "<-")
+        (if (string= (substring message 0 3) "ACK")
+            (mpdel-log "ACK message" "ko")
+          (mpdel-msghandlers-call message)))
+    (error (mpdel-log error "ko"))))
+
 
 (defvar mpdel-msghandlers nil)
 
