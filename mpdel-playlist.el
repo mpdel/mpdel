@@ -72,8 +72,8 @@
 (defun mpdel-playlist-play ()
   (interactive)
   (let* ((button (button-at (point)))
-         (id (button-get button 'id)))
-    (mpdel-send-command-ignore-result "playid" id)))
+         (id (button-get button 'Id)))
+    (mpdel-send-command-ignore-result "playid %s" id)))
 
 (defun mpdel-playlist-refresh ()
   (interactive)
