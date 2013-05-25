@@ -158,7 +158,15 @@ return at the end of a request.")
         (append mpdel-msghandlers
                 (list #'mpdel-msghandler-status)))
   (mpdel-raw-send-command "idle\n")
-  (mpdel-log message "st"))
+  (mpdel-log message "st")
+  (mpdel-dispatch-status-update (mpdel-extract-data message)))
+
+(defun mpdel-dispatch-status-update (changes)
+  (loop
+   for each in changes
+   for change = (mpdel-changed-field each)
+   do (case change
+        ('playlist (message "playlist change")))))
 
 (defun mpdel-msghandler-welcome (message)
   (mpdel-log message "hi"))
@@ -247,5 +255,8 @@ return at the end of a request.")
 
 (defun mpdel-title-field (data)
   (mpdel-data-field data 'Title))
+
+(defun mpdel-changed-field (data)
+  (intern (mpdel-data-field data 'changed)))
 
 (provide 'mpdel-core)
