@@ -73,6 +73,9 @@
   "Regexp that matches the valid status strings that MusicPD can
 return at the end of a request.")
 
+(defvar mpdel-msghandlers nil)
+(defvar mpdel-statushandlers nil)
+
 (defun mpdel-connect ()
   (setq mpdel-msghandlers
         (list #'mpdel-msghandler-welcome
@@ -124,9 +127,6 @@ return at the end of a request.")
           (mpdel-msghandlers-call message)))
     (error (mpdel-log error "ko"))))
 
-
-(defvar mpdel-msghandlers nil)
-
 (defun mpdel-msghandlers-call (message)
   "Call the first handler in `mpdel-msghandlers'."
   (if (null mpdel-msghandlers)
@@ -158,15 +158,19 @@ return at the end of a request.")
         (append mpdel-msghandlers
                 (list #'mpdel-msghandler-status)))
   (mpdel-raw-send-command "idle\n")
-  (mpdel-log message "st")
-  (mpdel-dispatch-status-update (mpdel-extract-data message)))
+  (let ((changes (mapcar
+                  #'mpdel-changed-field
+                  (mpdel-extract-data message))))
+    (mpdel-dispatch-status-update changes)))
 
 (defun mpdel-dispatch-status-update (changes)
-  (loop
-   for each in changes
-   for change = (mpdel-changed-field each)
-   do (case change
-        ('playlist (message "playlist change")))))
+  (mapc (lambda (handler) (funcall handler changes))
+        mpdel-statushandlers))
+
+(defun mpdel-statushandler-message (changes)
+  (message "[%s] Handler: %s" (time-stamp-string) changes))
+
+(push #'mpdel-statushandler-message mpdel-statushandlers)
 
 (defun mpdel-msghandler-welcome (message)
   (mpdel-log message "hi"))
