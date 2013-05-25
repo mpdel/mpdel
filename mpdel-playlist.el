@@ -45,7 +45,7 @@
     (define-key map (kbd "n") #'next-line)
     (define-key map (kbd "o") #'mpdel-navigator)
     (define-key map (kbd "p") #'previous-line)
-    (define-key map (kbd "g")   #'mpdel-playlist-refresh)
+    (define-key map (kbd "g") #'mpdel-playlist-refresh)
     map))
 
 (defvar mpdel-playlist-button-map
@@ -78,6 +78,14 @@
 (defun mpdel-playlist-refresh ()
   (interactive)
   (mpdel-playlist))
+
+(defun mpdel-playlist-statushandler-refresh (changes)
+  (when (member 'playlist changes)
+    (message "Playlist updated")
+    (mpdel-playlist-refresh)))
+
+(push #'mpdel-playlist-statushandler-refresh
+      mpdel-statushandlers)
 
 (defun mpdel-playlist-create-buffer (message)
   (with-current-buffer (get-buffer-create "*mpdel-playlist*")
