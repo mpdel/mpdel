@@ -246,6 +246,9 @@ return at the end of a request.")
                   do (forward-line 1)
                   until (looking-at first-field-type)))))))
 
+(defun mpdel-extract-data1 (message)
+  (car (mpdel-extract-data message)))
+
 (defun mpdel-data-field (data field)
   (cdr (assoc field data)))
 
@@ -255,6 +258,9 @@ return at the end of a request.")
 (defun mpdel-file-field (data)
   (mpdel-data-field data 'file))
 
+(defun mpdel-id-field (data)
+  (mpdel-data-field data 'Id))
+
 (defun mpdel-album-field (data)
   (mpdel-data-field data 'Album))
 
@@ -263,5 +269,8 @@ return at the end of a request.")
 
 (defun mpdel-changed-field (data)
   (intern (mpdel-data-field data 'changed)))
+
+(defun mpdel-state-field (data)
+  (intern (mpdel-data-field data 'state)))
 
 (provide 'mpdel-core)
