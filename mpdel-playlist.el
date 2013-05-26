@@ -79,12 +79,12 @@
   (interactive)
   (mpdel-playlist))
 
-(defun mpdel-playlist-statushandler-refresh (changes)
+(defun mpdel-playlist-changehandler-refresh (changes)
   (when (member 'playlist changes)
     (message "Playlist updated")
     (mpdel-playlist-refresh)))
 
-(mpdel-add-statushandler #'mpdel-playlist-statushandler-refresh)
+(mpdel-add-changehandler #'mpdel-playlist-changehandler-refresh)
 
 (defun mpdel-playlist-create-buffer (message)
   (with-current-buffer (get-buffer-create "*mpdel-playlist*")

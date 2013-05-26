@@ -40,7 +40,7 @@
 (defvar mpdel-header-current-song nil)
 (defvar mpdel-header-buffers nil)
 
-(defun mpdel-header-statushandler-update (changes)
+(defun mpdel-header-changehandler-update (changes)
   (when (member 'player changes)
     (mpdel-send-command
      "currentsong"
@@ -49,7 +49,7 @@
              (car (mpdel-extract-data message)))
        (mpdel-header-refresh)))))
 
-(mpdel-add-statushandler #'mpdel-header-statushandler-update)
+(mpdel-add-changehandler #'mpdel-header-changehandler-update)
 
 (defun mpdel-header-content ()
   (format "Currently playing: %s - %s"

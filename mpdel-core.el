@@ -74,7 +74,7 @@
 return at the end of a request.")
 
 (defvar mpdel-msghandlers nil)
-(defvar mpdel-statushandlers nil)
+(defvar mpdel-changehandlers nil)
 
 (defun mpdel-connect ()
   (setq mpdel-msghandlers
@@ -165,15 +165,13 @@ return at the end of a request.")
 
 (defun mpdel-dispatch-status-update (changes)
   (mapc (lambda (handler) (funcall handler changes))
-        mpdel-statushandlers))
+        mpdel-changehandlers))
 
-(defun mpdel-statushandler-message (changes)
+(defun mpdel-changehandler-message (changes)
   (message "[%s] Handler: %s" (time-stamp-string) changes))
 
-(defun mpdel-add-statushandler (fn)
-  (add-to-list 'mpdel-statushandlers fn))
-
-(mpdel-add-statushandler #'mpdel-statushandler-message)
+(defun mpdel-add-changehandler (fn)
+  (add-to-list 'mpdel-changehandlers fn))
 
 (defun mpdel-msghandler-welcome (message)
   (mpdel-log message "hi"))
