@@ -151,6 +151,8 @@
       (search-forward gotoEntity nil t)
       (move-beginning-of-line nil))
     (mpdel-nav-mode)
+    (when (require 'mpdel-header nil t)
+      (mpdel-header-add-buffer (current-buffer)))
     (mpdel-nav-add-buffer-properties
      'currentTerm currentTerm
      'ancestorTerms ancestorTerms

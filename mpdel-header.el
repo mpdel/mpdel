@@ -1,5 +1,5 @@
 ;; -*- lexical-binding: t; -*-
-;;; mpdel.el --- TODO
+;;; mpdel-header.el --- TODO
 ;;
 ;; Copyright (C) 2013 Damien Cassou
 ;;
@@ -7,7 +7,7 @@
 ;; Url: https://github.com/DamienCassou/mpdel
 ;; GIT: https://github.com/DamienCassou/mpdel
 ;; Version: 0.1
-;; Created: 2013-05-23
+;; Created: 2013-05-25
 ;; Keywords: emacs package elisp mpd musicpd music
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -32,11 +32,40 @@
 ;;
 ;;; code:
 ;;
+;;; http://www.musicpd.org/doc/protocol/ch01s03.html
 
 
 (require 'mpdel-core)
-(require 'mpdel-header)
-(require 'mpdel-nav)
-(require 'mpdel-playlist)
 
-(provide 'mpdel)
+(defvar mpdel-header-current-song nil)
+(defvar mpdel-header-buffers nil)
+
+(defun mpdel-header-statushandler-update (changes)
+  (when (member 'player changes)
+    (mpdel-send-command
+     "currentsong"
+     (lambda (message)
+       (setq mpdel-header-current-song
+             (car (mpdel-extract-data message)))
+       (mpdel-header-refresh)))))
+
+(mpdel-add-statushandler #'mpdel-header-statushandler-update)
+
+(defun mpdel-header-content ()
+  (format "Currently playing: %s - %s"
+          (mpdel-artist-field mpdel-header-current-song)
+          (mpdel-title-field mpdel-header-current-song)))
+
+(defun mpdel-header-refresh ()
+  (dolist (buffer mpdel-header-buffers)
+    (mpdel-header-set-headerline buffer)))
+
+(defun mpdel-header-set-headerline (buffer)
+  (with-current-buffer buffer
+    (setq header-line-format (mpdel-header-content))))
+
+(defun mpdel-header-add-buffer (buffer)
+  (add-to-list 'mpdel-header-buffers buffer)
+  (mpdel-header-set-headerline buffer))
+
+(provide 'mpdel-header)

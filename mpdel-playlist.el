@@ -99,7 +99,9 @@
                 'type 'mpdel-playlist-button)
           (mpdel-flatten-data title)))
         (insert "\n"))
-      (mpdel-playlist-mode))
+      (mpdel-playlist-mode)
+      (when (require 'mpdel-header nil t)
+        (mpdel-header-add-buffer (current-buffer))))
     (switch-to-buffer "*mpdel-playlist*")))
 
 (defun mpdel-flatten-data (data)
