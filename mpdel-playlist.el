@@ -81,6 +81,12 @@
   (interactive)
   (mpdel-playlist))
 
+(defun mpdel-playlist-delete ()
+  (interactive)
+  (mpdel-send-command-ignore-result
+   "deleteid %s"
+   (mpdel-id-field (mpdel-playlist-song-at-point))))
+
 (defun mpdel-playlist-changehandler-refresh (changes)
   (when (member 'playlist changes)
     (message "Playlist updated")
