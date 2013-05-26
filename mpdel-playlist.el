@@ -68,11 +68,14 @@
    (lambda (message)
      (mpdel-playlist-create-buffer message))))
 
+(defun mpdel-playlist-song-at-point ()
+  (button-get (button-at (point)) 'data))
+
 (defun mpdel-playlist-play ()
   (interactive)
-  (let* ((button (button-at (point)))
-         (id (button-get button 'Id)))
-    (mpdel-send-command-ignore-result "playid %s" id)))
+  (mpdel-send-command-ignore-result
+   "playid %s"
+   (mpdel-id-field (mpdel-playlist-song-at-point))))
 
 (defun mpdel-playlist-refresh ()
   (interactive)
@@ -93,10 +96,9 @@
       (dolist (title (mpdel-extract-data message))
         (apply
          'insert-text-button
-         (append
-          (list (mpdel-playlist-title-label title)
-                'type 'mpdel-playlist-button)
-          (mpdel-flatten-data title)))
+         (list (mpdel-playlist-title-label title)
+               'type 'mpdel-playlist-button
+               'data title))
         (insert "\n"))
       (mpdel-playlist-mode)
       (when (require 'mpdel-header nil t)
