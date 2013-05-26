@@ -137,12 +137,14 @@ return at the end of a request.")
 
 (defun mpdel-send-command (command &optional handler)
   (mpdel-ensure-connection)
+  (when (eql (car (last mpdel-msghandlers))
+             #'mpdel-msghandler-status)
+    (mpdel-raw-send-command "noidle\n"))
   (setq mpdel-msghandlers
         (append
          mpdel-msghandlers
          (list
           (or handler #'mpdel-msghandler-ignore))))
-  (mpdel-raw-send-command "noidle\n")
   (mpdel-raw-send-command (format "%s\n" command)))
 
 (defun mpdel-send-command-ignore-result (string objects)
