@@ -38,25 +38,41 @@
 (require 'mpdel-core)
 
 (defvar mpdel-header-current-song nil)
+(defvar mpdel-header-status nil)
 (defvar mpdel-header-buffers nil)
 
 (defun mpdel-header-changehandler-update (changes)
   (when (member 'player changes)
-    (mpdel-send-command
-     "currentsong"
-     (lambda (message)
-       (setq mpdel-header-current-song
-             (car (mpdel-extract-data message)))
-       (mpdel-header-refresh)))))
+    (mpdel-header-fetch-data)))
+
+(defun mpdel-header-fetch-data ()
+  (mpdel-send-command
+   "currentsong"
+   (lambda (message)
+     (setq mpdel-header-current-song
+           (mpdel-extract-data1 message))))
+  (mpdel-send-command
+   "status"
+   (lambda (message)
+     (setq mpdel-header-status
+           (mpdel-extract-data1 message))
+     (mpdel-header-update-buffers))))
 
 (mpdel-add-changehandler #'mpdel-header-changehandler-update)
 
 (defun mpdel-header-content ()
-  (format "Currently playing: %s - %s"
-          (mpdel-artist-field mpdel-header-current-song)
-          (mpdel-title-field mpdel-header-current-song)))
+  (if (null mpdel-header-current-song)
+      (progn (mpdel-header-fetch-data)
+             nil)
+    (case (mpdel-state-field mpdel-header-status)
+      (stop "Stopped")
+      (pause "Paused")
+      (play
+       (format "Currently playing: %s - %s"
+               (mpdel-artist-field mpdel-header-current-song)
+               (mpdel-title-field mpdel-header-current-song))))))
 
-(defun mpdel-header-refresh ()
+(defun mpdel-header-update-buffers ()
   (dolist (buffer mpdel-header-buffers)
     (mpdel-header-set-headerline buffer)))
 
