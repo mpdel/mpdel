@@ -39,13 +39,13 @@
 
 (defvar mpdel-playlist-mode-map
   (let ((map (make-keymap)))
-    (define-key map (kbd "q") #'mpdel-kill-buffer)
     (define-key map (kbd "<tab>") #'forward-button)
     (define-key map (kbd "<backtab>") #'backward-button)
-    (define-key map (kbd "n") #'next-line)
-    (define-key map (kbd "o") #'mpdel-navigator)
-    (define-key map (kbd "p") #'previous-line)
     (define-key map (kbd "g") #'mpdel-playlist-refresh)
+    (define-key map (kbd "o") #'mpdel-navigator)
+    (define-key map (kbd "n") #'next-line)
+    (define-key map (kbd "p") #'previous-line)
+    (define-key map (kbd "q") #'mpdel-kill-buffer)
     map))
 
 (defvar mpdel-playlist-button-map
