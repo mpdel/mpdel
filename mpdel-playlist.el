@@ -97,7 +97,8 @@
 (defun mpdel-playlist-create-buffer (message)
   (with-current-buffer (get-buffer-create "*mpdel-playlist*")
     (let ((inhibit-read-only t)
-          (buffer-undo-list t))
+          (buffer-undo-list t)
+          (oldPos (point)))
       (erase-buffer)
       (dolist (title (mpdel-extract-data message))
         (apply
@@ -108,13 +109,9 @@
         (insert "\n"))
       (mpdel-playlist-mode)
       (when (require 'mpdel-header nil t)
-        (mpdel-header-add-buffer (current-buffer))))
-    (switch-to-buffer "*mpdel-playlist*")))
-
-(defun mpdel-flatten-data (data)
-  (loop
-   for (field-type . field-value) in data
-   append (list field-type field-value)))
+        (mpdel-header-add-buffer (current-buffer)))
+      (goto-char oldPos)))
+    (switch-to-buffer "*mpdel-playlist*"))
 
 (defun mpdel-playlist-title-label (title)
   (format "%s - %s"
