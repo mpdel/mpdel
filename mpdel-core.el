@@ -122,18 +122,11 @@ return at the end of a request.")
   (condition-case error
       (progn
         (mpdel-log message "<-")
-        (if (string= (substring message 0 3) "ACK")
-            (mpdel-log "ACK message" "ko")
-          (mpdel-msghandlers-call message)))
+        (let ((handler (pop mpdel-msghandlers)))
+          (if (string= (substring message 0 3) "ACK")
+              (mpdel-log "ACK message" "ko")
+            (funcall handler message))))
     (error (mpdel-log error "ko"))))
-
-(defun mpdel-msghandlers-call (message)
-  "Call the first handler in `mpdel-msghandlers'."
-  (if (null mpdel-msghandlers)
-      (mpdel-log
-       (format"mpdel: no handler for new message: %s" message)
-       "ko")
-    (funcall (pop mpdel-msghandlers) message)))
 
 (defun mpdel-send-command (command &optional handler)
   (mpdel-ensure-connection)
