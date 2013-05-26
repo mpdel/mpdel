@@ -51,7 +51,6 @@
 (defvar mpdel-playlist-button-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "SPC") #'mpdel-playlist-play)
-    (define-key map (kbd "RET") #'mpdel-playlist-browse)
     (define-key map (kbd "k")   #'mpdel-playlist-delete)
     map))
 
