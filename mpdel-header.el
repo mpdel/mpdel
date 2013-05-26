@@ -77,8 +77,11 @@
     (mpdel-header-set-headerline buffer)))
 
 (defun mpdel-header-set-headerline (buffer)
-  (with-current-buffer buffer
-    (setq header-line-format (mpdel-header-content))))
+  (if (buffer-live-p buffer)
+      (with-current-buffer buffer
+        (setq header-line-format (mpdel-header-content)))
+    (setq mpdel-header-buffers
+          (remove buffer mpdel-header-buffers))))
 
 (defun mpdel-header-add-buffer (buffer)
   (add-to-list 'mpdel-header-buffers buffer)
