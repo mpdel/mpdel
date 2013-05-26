@@ -170,7 +170,10 @@ return at the end of a request.")
 (defun mpdel-statushandler-message (changes)
   (message "[%s] Handler: %s" (time-stamp-string) changes))
 
-(push #'mpdel-statushandler-message mpdel-statushandlers)
+(defun mpdel-add-statushandler (fn)
+  (add-to-list 'mpdel-statushandlers fn))
+
+(mpdel-add-statushandler #'mpdel-statushandler-message)
 
 (defun mpdel-msghandler-welcome (message)
   (mpdel-log message "hi"))

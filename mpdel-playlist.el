@@ -84,8 +84,7 @@
     (message "Playlist updated")
     (mpdel-playlist-refresh)))
 
-(push #'mpdel-playlist-statushandler-refresh
-      mpdel-statushandlers)
+(mpdel-add-statushandler #'mpdel-playlist-statushandler-refresh)
 
 (defun mpdel-playlist-create-buffer (message)
   (with-current-buffer (get-buffer-create "*mpdel-playlist*")
