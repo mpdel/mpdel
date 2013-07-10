@@ -262,7 +262,7 @@ return at the end of a request.")
 (defun mpdel-format-time (seconds)
   (let ((seconds (string-to-number seconds)))
     (format
-     "%s:%s"
+     "%02d:%02d"
      (floor (/ seconds 60))
      (round (mod seconds 60)))))
 
