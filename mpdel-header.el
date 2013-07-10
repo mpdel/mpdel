@@ -50,7 +50,11 @@
    "currentsong"
    (lambda (message)
      (setq mpdel-header-current-song
-           (mpdel-extract-data1 message))))
+           (or
+            (mpdel-extract-data1 message)
+            ;; if the variable keeps on being null, we have an
+            ;; infinite loop. So we use "" instead.
+            ""))))
   (mpdel-send-command
    "status"
    (lambda (message)
