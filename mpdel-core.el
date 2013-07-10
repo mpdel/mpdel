@@ -36,6 +36,7 @@
 
 
 (require 'time-stamp)
+(require 'tq)
 
 ;; Some examples of commands:
 ;; (mpdel-send-command "rescan")
