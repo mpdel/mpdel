@@ -259,6 +259,13 @@ return at the end of a request.")
 (defun mpdel-extract-data1 (message)
   (car (mpdel-extract-data message)))
 
+(defun mpdel-format-time (seconds)
+  (let ((seconds (string-to-number seconds)))
+    (format
+     "%s:%s"
+     (floor (/ seconds 60))
+     (round (mod seconds 60)))))
+
 (defun mpdel-data-field (data field)
   (cdr (assoc field data)))
 
@@ -282,5 +289,11 @@ return at the end of a request.")
 
 (defun mpdel-state-field (data)
   (intern (mpdel-data-field data 'state)))
+
+(defun mpdel-elapsed-field (data)
+  (mpdel-data-field data 'elapsed))
+
+(defun mpdel-time-field (data)
+  (mpdel-data-field data 'Time))
 
 (provide 'mpdel-core)
