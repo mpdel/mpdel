@@ -72,9 +72,21 @@
       (stop "Stopped")
       (pause "Paused")
       (play
-       (format "Currently playing: %s - %s"
-               (mpdel-artist-field mpdel-header-current-song)
-               (mpdel-title-field mpdel-header-current-song))))))
+       (format
+        "Currently playing: %s - %s (%s-%s)"
+        (mpdel-artist-field mpdel-header-current-song)
+        (mpdel-title-field mpdel-header-current-song)
+        (mpdel-format-time
+         (mpdel-elapsed-field mpdel-header-status))
+        (mpdel-format-time
+         (mpdel-time-field mpdel-header-current-song)))))))
+
+(defun mpdel-header-force-update ()
+  (when mpdel-header-buffers
+    (mpdel-header-fetch-data)
+    (mpdel-header-update-buffers)))
+
+(run-at-time nil 1 #'mpdel-header-force-update)
 
 (defun mpdel-header-update-buffers ()
   (dolist (buffer mpdel-header-buffers)
