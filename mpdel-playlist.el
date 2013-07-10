@@ -46,6 +46,7 @@
     (define-key map (kbd "n") #'next-line)
     (define-key map (kbd "p") #'previous-line)
     (define-key map (kbd "q") #'mpdel-kill-buffer)
+    (define-key map (kbd "C") #'mpdel-playlist-clear)
     map))
 
 (defvar mpdel-playlist-button-map
@@ -70,6 +71,10 @@
 
 (defun mpdel-playlist-song-at-point ()
   (button-get (button-at (point)) 'data))
+
+(defun mpdel-playlist-clear ()
+  (interactive)
+  (mpdel-send-command-ignore-result "clear"))
 
 (defun mpdel-playlist-play ()
   (interactive)
