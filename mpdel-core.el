@@ -79,8 +79,8 @@ return at the end of a request.")
 
 (defun mpdel-connect ()
   (setq mpdel-msghandlers
-        (list #'mpdel-msghandler-welcome
-              #'mpdel-msghandler-status))
+        (list (cons "welcome" #'mpdel-msghandler-welcome)
+              (cons "idle" #'mpdel-msghandler-status)))
   (with-current-buffer (get-buffer-create "*mpd*")
     (erase-buffer))
   (setq mpdel-connection
@@ -122,8 +122,11 @@ return at the end of a request.")
   "Automatically called when the server sends a message."
   (condition-case error
       (progn
-        (mpdel-log message "<-")
-        (let ((handler (pop mpdel-msghandlers)))
+        (let* ((data (pop mpdel-msghandlers))
+               (command (car data))
+               (handler (cdr data)))
+          (mpdel-log (format "%s (as answer to %s)" message command)
+                     "<-")
           (if (string= (substring message 0 3) "ACK")
               (mpdel-log "ACK message" "ko")
             (funcall handler message))))
@@ -131,17 +134,20 @@ return at the end of a request.")
 
 (defun mpdel-send-command (command &optional handler)
   (mpdel-ensure-connection)
-  (when (eql (car (last mpdel-msghandlers))
+  (when (eql (cdr (car (last mpdel-msghandlers)))
              #'mpdel-msghandler-status)
+    (mpdel-log "Sending noidle to handle next command" " i")
     (mpdel-raw-send-command "noidle\n"))
   (setq mpdel-msghandlers
         (append
          mpdel-msghandlers
          (list
-          (or handler #'mpdel-msghandler-ignore))))
+          (cons
+           command
+           (or handler #'mpdel-msghandler-ignore)))))
   (mpdel-raw-send-command (format "%s\n" command)))
 
-(defun mpdel-send-command-ignore-result (string objects)
+(defun mpdel-send-command-ignore-result (string &optional objects)
   (mpdel-send-command
    (format string objects)
    (lambda (message))))
@@ -152,7 +158,7 @@ return at the end of a request.")
 (defun mpdel-msghandler-status (message)
   (setq mpdel-msghandlers
         (append mpdel-msghandlers
-                (list #'mpdel-msghandler-status)))
+                (list (cons "idle" #'mpdel-msghandler-status))))
   (mpdel-raw-send-command "idle\n")
   (let ((changes (mapcar
                   #'mpdel-changed-field
