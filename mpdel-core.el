@@ -172,6 +172,14 @@ return at the end of a request.")
 (defun mpdel-msghandler-welcome (message)
   (mpdel-log message "hi"))
 
+(defvar mpdel-general-mode-map
+  (let ((map (make-keymap)))
+    (define-key map (kbd "space") #'mpdel-toggle-play-pause)
+    map))
+
+(defun mpdel-toggle-play-pause ()
+  )
+
 (defun mpdel-log (string direction)
   (when (buffer-live-p (process-buffer mpdel-connection))
     (with-current-buffer (process-buffer mpdel-connection)

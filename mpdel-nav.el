@@ -38,8 +38,7 @@
 (require 'mpdel-core)
 
 (defvar mpdel-nav-mode-map
-  (let ((map (make-keymap)))
-    (define-key map (kbd "q") #'mpdel-kill-buffer)
+  (let ((map (copy-keymap mpdel-general-mode-map)))
     (define-key map (kbd "<tab>") #'forward-button)
     (define-key map (kbd "<backtab>") #'backward-button)
     (define-key map (kbd "u") #'mpdel-nav-up)
