@@ -1,5 +1,5 @@
 ;; -*- lexical-binding: t; -*-
-;;; mpdel-core.el --- TODO
+;;; mpdel-core.el --- A simple MPD client for Emacs
 ;;
 ;; Copyright (C) 2013 Damien Cassou
 ;;
@@ -29,40 +29,19 @@
 ;;
 ;;; commentary:
 ;;
-;;
 ;;; code:
 ;;
-;;; http://www.musicpd.org/doc/protocol/ch01s03.html
 
 
 (require 'time-stamp)
 (require 'tq)
 
-;; Some examples of commands:
-;; (mpdel-send-command "rescan")
-;; (mpdel-send-command "status")
-;; (mpdel-send-command "idle")
-;; (mpdel-send-command "noidle")
-;; (mpdel-send-command "currentsong")
-;; (mpdel-send-command "setvol 50")
-;; (mpdel-send-command "play")
-;; (mpdel-send-command "play 259")
-;; (mpdel-send-command "pause 1")
-;; (mpdel-send-command "pause 0")
-;; (mpdel-send-command "next")
-;; (mpdel-send-command "playlistinfo")
-;; (mpdel-send-command "count")
-;; (mpdel-send-command "list file artist \"Eloy\"")
-;; (mpdel-send-command "list track artist \"Eloy\" album \"Dawn\"")
-;; (mpdel-send-command "searchadd track artist \"Eloy\" album \"Dawn\"")
-;; (mpdel-send-command "list album")
-;; (mpdel-send-command "list artist")
-;; (mpdel-send-command "tagtypes")
-;; (mpdel-send-command "count album \"\"")
-;; (mpdel-send-command "search album \"\"")
+(defvar mpdel-connection nil
+  "Keep track of the current connection to the MPD server.
+The logs of this connection are accessible in the *mpd* buffer.")
 
-(defvar mpdel-connection nil)
-(defvar mpdel-connection-queue nil)
+(defvar mpdel-connection-queue nil
+  "Interface with the `tq' library")
 
 ;; Copy-paste from emms-player-mpd.el
 ;; Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
@@ -74,30 +53,89 @@
   "Regexp that matches the valid status strings that MusicPD can
 return at the end of a request.")
 
-(defvar mpdel-msghandlers nil)
-(defvar mpdel-changehandlers nil)
+(defvar mpdel-msghandlers nil
+  "Keep track of the current commands sent to the server.
+Each element in the queue is of the form (COMMAND . HANDLER).
+
+COMMAND is the string representing the query sent to the server.
+Even though this information is not necessary, it is useful to
+better understand the log.
+
+HANDLER is a function that will be executed when the answers to
+COMMAND comes back. The function must accept one
+parameter (usually named MESSAGE) that will contain the answer.
+
+An invariant of this MPD client is that there is always an IDLE
+command sent to the server (and its corresponding handler in this
+variable). This means our client is always registered to
+notifications in the server. When we want to send a command to
+the server (for example to change the current song), we always
+have to cancel the IDLE first (with a NO IDLE command), to send the
+command we want, and to finally send the IDLE command again.
+Cancelling the current IDLE command is done in
+`mpdel-send-command'. Sending IDLE again is done in the
+handler for IDLE that will be triggered when the empty answer for
+the cancelled IDLE arrives.
+
+Because MPD answers in the order the commands are sent, we know
+that the first handler of the queue is the one to execute when we
+receive a message from the server.")
+
+(defvar mpdel-changehandlers nil
+  "Functions to call when a server notification is received.
+Each function will be passed a list of symbols as parameter. Each
+symbol in this list represents something that changed in the
+server.
+
+All possible symbols are listed on
+http://www.musicpd.org/doc/protocol/ch03.html as the description
+of the IDLE command.")
 
 (defun mpdel-connect ()
-  (setq mpdel-msghandlers
-        (list (cons "welcome" #'mpdel-msghandler-welcome)
-              (cons "idle" #'mpdel-msghandler-status)))
+  "Creates a new connection with the MPD server."
+  ;; the *mpd* buffer will contain all the communication logs
   (with-current-buffer (get-buffer-create "*mpd*")
     (erase-buffer))
   (setq mpdel-connection
         (open-network-stream
          "mpd" "*mpd*"
+         ;; should use defcustom for that at some point :-)
          "localhost" 6600
          :type 'plain))
-  ;; Because Emacs is single-threaded, Emacs will only take care of
-  ;; server's answers when he is done with everything else (this
-  ;; includes executing all the call stack).
-  ;; (set-process-filter mpdel-connection 'mpdel-message-filter)
   (setq mpdel-connection-queue (tq-create mpdel-connection))
   (set-process-coding-system mpdel-connection
                              'utf-8-unix 'utf-8-unix)
-  (mpdel-raw-send-command "idle\n"))
+  ;; As an invariant of the MPD client, there is always an IDLE
+  ;; command sent to the server. This acts like a registration to the
+  ;; server's n otifications. See `mpdel-msghandlers' for more
+  ;; information.
+  (mpdel-raw-send-command "idle\n")
+  ;; We have to specify the first 2 handlers
+  (setq mpdel-msghandlers
+        (list
+         ;; the server always starts by saying hello, so we add a
+         ;; handler for that.
+         (cons "welcome" #'mpdel-msghandler-welcome)
+         ;; then, we need the handler to answer to the IDLE command we
+         ;; just sent.
+         (cons "idle" #'mpdel-msghandler-status))))
+
+(defun mpdel-ensure-connection ()
+  "Make sure there is an active connection to the server."
+  (when (or (not (processp mpdel-connection))
+            (not (process-live-p mpdel-connection)))
+    (mpdel-connect)))
+
+(defun mpdel-disconnect ()
+  "Make sure there is no active connection to the server."
+  (when (not (null mpdel-connection))
+    (tq-close mpdel-connection-queue)
+    (delete-process mpdel-connection))
+  (setq mpdel-connection-queue nil)
+  (setq mpdel-connection nil))
 
 (defun mpdel-raw-send-command (command)
+  "Send COMMAND to the server and log that."
   (mpdel-log command "->")
   (tq-enqueue
    mpdel-connection-queue
@@ -106,34 +144,37 @@ return at the end of a request.")
    nil
    #'mpdel-message-filter))
 
-(defun mpdel-ensure-connection ()
-  (when (or (not (processp mpdel-connection))
-            (not (process-live-p mpdel-connection)))
-    (mpdel-connect)))
 
-(defun mpdel-disconnect ()
-  (when (not (null mpdel-connection))
-    (tq-close mpdel-connection-queue)
-    (delete-process mpdel-connection))
-  (setq mpdel-connection-queue nil)
-  (setq mpdel-connection nil))
-
-(defun mpdel-message-filter (proc message)
-  "Automatically called when the server sends a message."
+(defun mpdel-message-filter (server message)
+  "Take care of the MESSAGE sent by the SERVER.
+SERVER is ignored. MESSAGE contains a string representing the
+answer from the server."
+  ;; Because errors in handlers are not raised by Emacs, we log them.
   (condition-case error
       (progn
+        ;; because answers arrive in the same order we sent the
+        ;; commands, we are sure that the first handler is the one to
+        ;; use.
         (let* ((data (pop mpdel-msghandlers))
+               ;; COMMAND is the original query sent to the server
                (command (car data))
+               ;; HANDLER is the function to call with MESSAGE are argument
                (handler (cdr data)))
           (mpdel-log (format "%s (as answer to %s)" message command)
                      "<-")
+          ;; if answer is a ACK, then there was a problem. We log it as such.
           (if (string= (substring message 0 3) "ACK")
               (mpdel-log "ACK message" "ko")
+            ;; else, we just execute the handler.
             (funcall handler message))))
+    ;; in case of an error in one handler, we log it.
     (error (mpdel-log error "ko"))))
 
 (defun mpdel-send-command (command &optional handler)
+  "Send COMMAND to server and register HANDLER for the answer."
   (mpdel-ensure-connection)
+  ;; if current command is IDLE, we have to cancel it. See
+  ;; `mpdel-msghandlers' for more information.
   (when (eql (cdr (car (last mpdel-msghandlers)))
              #'mpdel-msghandler-status)
     (mpdel-log "Sending noidle to handle next command" " i")
