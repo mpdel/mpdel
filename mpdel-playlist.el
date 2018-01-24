@@ -1,125 +1,225 @@
-;; -*- lexical-binding: t; -*-
-;;; mpdel-playlist.el --- TODO
-;;
-;; Copyright (C) 2013 Damien Cassou
-;;
-;; Author: Damien Cassou <damien.cassou@gmail.com>
+;;; mpdel-playlist.el --- Display and manipulate current MPD playlist  -*- lexical-binding: t; -*-
+
+;; Copyright (C) 2017  Damien Cassou
+
+;; Author: Damien Cassou <damien@cassou.me>
+;; Keywords: multimedia
 ;; Url: https://github.com/DamienCassou/mpdel
-;; GIT: https://github.com/DamienCassou/mpdel
-;; Version: 0.1
-;; Created: 2013-05-23
-;; Keywords: emacs package elisp mpd musicpd music
-;;
-;; This file is NOT part of GNU Emacs.
-;;
-;; This program is free software; you can redistribute it and/or
-;; modify it under the terms of the GNU General Public License as
-;; published by the Free Software Foundation; either version 2, or (at
-;; your option) any later version.
-;;
-;; This program is distributed in the hope that it will be useful, but
-;; WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-;; General Public License for more details.
-;;
+;; Package-requires: ((emacs "25"))
+;; Version: 0.1.0
+
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
 ;; You should have received a copy of the GNU General Public License
-;; along with this program ; see the file COPYING.  If not, write to
-;; the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
-;;
-;;; commentary:
-;;
-;;
-;;; code:
-;;
-;;; http://www.musicpd.org/doc/protocol/ch01s03.html
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; Let the user view and manipulate the current MPD playlist.
+
+;;; Code:
+(require 'libmpdel)
+
 
+;;; Customization
 
-(require 'mpdel-core)
+(defgroup mpdel-playlist nil
+  "Current MPD playlist."
+  :group 'libmpdel)
 
-(defvar mpdel-playlist-mode-map
-  (let ((map (copy-keymap mpdel-general-mode-map)))
-    (define-key map (kbd "<tab>") #'forward-button)
-    (define-key map (kbd "<backtab>") #'backward-button)
-    (define-key map (kbd "g") #'mpdel-playlist-refresh)
-    (define-key map (kbd "o") #'mpdel-navigator)
-    (define-key map (kbd "n") #'next-line)
-    (define-key map (kbd "p") #'previous-line)
-    (define-key map (kbd "C") #'mpdel-playlist-clear)
-    map))
+(defface mpdel-playlist--current-song-face
+  '((t . (:inherit font-lock-keyword-face)))
+  "Face to highlight current song in playlist."
+  :group 'mpdel-playlist)
 
-(defvar mpdel-playlist-button-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "RET") #'mpdel-playlist-play)
-    (define-key map (kbd "k")   #'mpdel-playlist-delete)
-    map))
+
+;;; Helper functions
 
-(define-derived-mode mpdel-playlist-mode nil "MPDel"
-  "..."
-  (setq buffer-read-only t))
+(defun mpdel-playlist--buffer ()
+  "Return playlist buffer."
+  (get-buffer-create "*MPDEL Playlist*"))
 
-(define-button-type 'mpdel-playlist-button
-  'keymap mpdel-playlist-button-map)
+(defun mpdel-playlist--song-to-list-entry (song)
+  "Convert SONG to a format suitable for the tabulated list."
+  (list (libmpdel-song-id song)
+        (vector
+         (libmpdel-entity-name song)
+         (libmpdel-song-track song)
+         (libmpdel-album-name song)
+         (libmpdel-artist-name song))))
 
-(defun mpdel-playlist ()
-  (interactive)
-  (mpdel-send-command
-   "playlistinfo"
-   (lambda (message)
-     (mpdel-playlist-create-buffer message))))
+(defvar mpdel-playlist--songs nil
+  "Hashtable mapping song ids to songs.")
 
-(defun mpdel-playlist-song-at-point ()
-  (button-get (button-at (point)) 'data))
+(defun mpdel-playlist--song-id-at-point (&optional pos)
+  "Return song ID at POS, point if nil."
+  (let* ((pos (or pos (point))))
+    (tabulated-list-get-id pos)))
 
-(defun mpdel-playlist-clear ()
-  (interactive)
-  (mpdel-send-command-ignore-result "clear"))
+(defun mpdel-playlist--song-at-point (&optional pos)
+  "Return song at POS, point if nil."
+  (let* ((song-id (mpdel-playlist--song-id-at-point pos)))
+    (gethash song-id mpdel-playlist--songs)))
 
-(defun mpdel-playlist-play ()
-  (interactive)
-  (mpdel-send-command-ignore-result
-   "playid %s"
-   (mpdel-id-field (mpdel-playlist-song-at-point))))
+(defun mpdel-playlist--points-in-region (start end)
+  "Return a list of points for lines between START and END."
+  (save-excursion
+    (let (points)
+      (goto-char start)
+      (while (and (<= (point) end) (< (point) (point-max)))
+        (push (line-beginning-position) points)
+        (forward-line 1))
+      (reverse points))))
+
+(defun mpdel-playlist--selected-songs ()
+  "Return songs within active region or the song at point."
+  (cond
+   ((use-region-p)
+    (mapcar #'mpdel-playlist--song-at-point (mpdel-playlist--points-in-region (region-beginning) (region-end))))
+   ((= (point) (point-max)) nil)
+   (t (list (mpdel-playlist--song-at-point)))))
+
+(defun mpdel-playlist-go-to-song (&optional song-id)
+  "Move point to SONG-ID, current song if nil.
+Return non-nil if SONG-ID is found, nil otherwise."
+  (let ((song-id (or song-id (libmpdel-song-id (libmpdel-current-song)))))
+    (goto-char (point-min))
+    (while (and (not (= (point) (point-max)))
+                (not (equal (libmpdel-song-id (mpdel-playlist--song-at-point)) song-id)))
+      (forward-line 1))
+    (not (= (point) (point-max)))))
+
+(defun mpdel-playlist-highlight-song (&optional song-id)
+  "Highlight SONG-ID, current song if nil."
+  (save-excursion
+    (when (mpdel-playlist-go-to-song song-id)
+      (let ((inhibit-read-only t))
+        (put-text-property (line-beginning-position) (line-end-position)
+                           'face 'mpdel-playlist--current-song-face)))))
+
+(defun mpdel-playlist--save-playlist-status ()
+  "Return an object representing selection.
+Restore selection with `mpdel-playlist--restore-playlist-status'."
+  (cons
+   (mpdel-playlist--song-id-at-point (point))
+   (mpdel-playlist--song-id-at-point (mark t))))
+
+(defun mpdel-playlist--restore-playlist-status (status)
+  "Restore playlist selection STATUS.
+STATUS has been returned by `mpdel-playlist--save-playlist-status'."
+  (mpdel-playlist-go-to-song (cdr status))
+  (push-mark)
+  (mpdel-playlist-go-to-song (car status)))
+
+(defun mpdel-playlist--imenu-prev-index-position ()
+  "Move point to previous line in playlist buffer.
+This function is used as a value for
+`imenu-prev-index-position-function'."
+  (unless (bobp)
+    (forward-line -1)))
+
+(defun mpdel-playlist--imenu-extract-index-name ()
+  "Return imenu name for line at point.
+This function is used as a value for
+`imenu-extract-index-name-function'.  Point should be at the
+beginning of the line."
+  (let ((song (mpdel-playlist--song-at-point)))
+    (format "%s/%s/%s"
+            (libmpdel-artist-name song)
+            (libmpdel-album-name song)
+            (libmpdel-entity-name song))))
+
+
+;;; Commands
 
 (defun mpdel-playlist-refresh ()
+  "Clear and re-populate the playlist buffer."
   (interactive)
-  (mpdel-playlist))
+  (libmpdel-list
+   (libmpdel-current-playlist)
+   (lambda (songs)
+     (with-current-buffer (mpdel-playlist--buffer)
+       (let ((playlist-status (mpdel-playlist--save-playlist-status)))
+         (setq mpdel-playlist--songs (make-hash-table :test #'equal))
+         (mapc (lambda (song) (puthash (libmpdel-song-id song) song mpdel-playlist--songs)) songs)
+         (setq tabulated-list-entries (mapcar #'mpdel-playlist--song-to-list-entry songs))
+         (tabulated-list-print)
+         (mpdel-playlist--restore-playlist-status playlist-status)
+         (unless (libmpdel-stopped-p)
+           (mpdel-playlist-highlight-song)))))))
 
 (defun mpdel-playlist-delete ()
+  "Delete selected songs from current playlist."
   (interactive)
-  (mpdel-send-command-ignore-result
-   "deleteid %s"
-   (mpdel-id-field (mpdel-playlist-song-at-point))))
+  (let ((songs (mpdel-playlist--selected-songs)))
+    (when songs
+      (libmpdel-playlist-delete songs)
+      ;; Move point to the closest non-deleted song
+      (forward-line 1)
+      (when (= (point) (point-max))
+        (forward-line -2)))))
 
-(defun mpdel-playlist-changehandler-refresh (changes)
-  (when (member 'playlist changes)
-    (message "Playlist updated")
-    (mpdel-playlist-refresh)))
+(defun mpdel-playlist-play ()
+  "Start playing the song at point."
+  (interactive)
+  (libmpdel-play-song (mpdel-playlist--song-at-point)))
 
-(mpdel-add-changehandler #'mpdel-playlist-changehandler-refresh)
+(defun mpdel-playlist-move-up ()
+  "Move selected songs up in the current playlist."
+  (interactive)
+  (let ((songs (mpdel-playlist--selected-songs)))
+    (when songs
+      (libmpdel-playlist-move-up songs))))
 
-(defun mpdel-playlist-create-buffer (message)
-  (with-current-buffer (get-buffer-create "*mpdel-playlist*")
-    (let ((inhibit-read-only t)
-          (buffer-undo-list t)
-          (oldPos (point)))
-      (erase-buffer)
-      (dolist (title (mpdel-extract-data message))
-        (apply
-         'insert-text-button
-         (list (mpdel-playlist-title-label title)
-               'type 'mpdel-playlist-button
-               'data title))
-        (insert "\n"))
-      (mpdel-playlist-mode)
-      (when (require 'mpdel-header nil t)
-        (mpdel-header-add-buffer (current-buffer)))
-      (goto-char oldPos)))
-    (switch-to-buffer "*mpdel-playlist*"))
+(defun mpdel-playlist-move-down ()
+  "Move selected songs down in the current playlist."
+  (interactive)
+  (let ((songs (mpdel-playlist--selected-songs)))
+    (when songs
+      (libmpdel-playlist-move-down songs))))
 
-(defun mpdel-playlist-title-label (title)
-  (format "%s - %s"
-          (mpdel-artist-field title)
-          (mpdel-title-field title)))
+;;;###autoload
+(defun mpdel-playlist-open ()
+  "Open a buffer with the current MPD playlist."
+  (interactive)
+  (with-current-buffer (mpdel-playlist--buffer)
+    (mpdel-playlist-mode)
+    (mpdel-playlist-refresh))
+  (switch-to-buffer (mpdel-playlist--buffer))
+  (add-hook 'libmpdel-playlist-changed-hook #'mpdel-playlist-refresh)
+  (add-hook 'libmpdel-current-song-changed-hook #'mpdel-playlist-refresh)
+  (add-hook 'libmpdel-player-changed-hook #'mpdel-playlist-refresh))
+
+
+;;; Major mode
+
+(define-derived-mode mpdel-playlist-mode tabulated-list-mode "Playlist"
+  "Display and manipulate the current MPD playlist."
+  (setq tabulated-list-format
+        (vector (list "Title" 30 t)
+                (list "#" 6 t)
+                (list "Album" 30 t)
+                (list "Artist" 20 t)))
+  (tabulated-list-init-header)
+  (setq imenu-prev-index-position-function #'mpdel-playlist--imenu-prev-index-position)
+  (setq imenu-extract-index-name-function #'mpdel-playlist--imenu-extract-index-name))
+
+(define-key mpdel-playlist-mode-map (kbd "g") #'mpdel-playlist-refresh)
+(define-key mpdel-playlist-mode-map (kbd "k") #'mpdel-playlist-delete)
+(define-key mpdel-playlist-mode-map (kbd "RET") #'mpdel-playlist-play)
+(define-key mpdel-playlist-mode-map (kbd "SPC") #'libmpdel-playback-play-pause)
+(define-key mpdel-playlist-mode-map (kbd "[") #'libmpdel-playback-previous)
+(define-key mpdel-playlist-mode-map (kbd "]") #'libmpdel-playback-next)
+(define-key mpdel-playlist-mode-map (kbd "<M-up>") #'mpdel-playlist-move-up)
+(define-key mpdel-playlist-mode-map (kbd "<M-down>") #'mpdel-playlist-move-down)
 
 (provide 'mpdel-playlist)
+;;; mpdel-playlist.el ends here
