@@ -1,4 +1,4 @@
-SRCS = libmpdel.el
+SRCS = libmpdel.el mpdel-playlist.el
 TESTS = test/libmpdel-test.el
 
 LOAD_PATH = -L .
