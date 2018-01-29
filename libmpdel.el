@@ -50,6 +50,11 @@
   :type 'hook
   :group 'libmpdel)
 
+(defcustom libmpdel-stored-playlist-changed-hook nil
+  "Functions to call when a stored playlist is modified."
+  :type 'hook
+  :group 'libmpdel)
+
 (defcustom libmpdel-player-changed-hook nil
   "Functions to call when the player status changes.
 This includes starting, stopping and seeking music."
@@ -223,7 +228,8 @@ command."
   (libmpdel--raw-send-command-with-handler "idle" #'libmpdel--msghandler-idle)
   (mapc (lambda (changed-subsystem)
           (cl-case (intern (cdr changed-subsystem))
-            (playlist (run-hooks 'libmpdel-playlist-changed-hook))))
+            (playlist (run-hooks 'libmpdel-current-playlist-changed-hook))
+            (stored_playlist (run-hooks 'libmpdel-stored-playlist-changed-hook))))
         data))
 
 (defun libmpdel--msghandler-status (data)
