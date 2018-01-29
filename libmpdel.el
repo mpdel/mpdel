@@ -162,7 +162,7 @@ message from the server.")
 If HANDLER is nil, response will be ignored.
 
 If command is a string, send that.  Otherwise, it must be a list
-that will be passed to `format' before being sent"
+that will be passed to `format' before being sent."
   (let ((command (if (listp command)
                      (apply #'format command)
                    command)))
