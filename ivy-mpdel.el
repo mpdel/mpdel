@@ -121,7 +121,7 @@
     ivy-caller
     `(("a" ,(ivy-mpdel--apply-unwrapped #'ivy-mpdel--playlist-add-entity) "Add to current playlist")
       ("r" ,(ivy-mpdel--apply-unwrapped #'libmpdel-playlist-replace) "Replace current playlist")
-      ("l" ,(ivy-mpdel--apply-unwrapped #'ivy-mpdel--stored-playlist-add-entity) "Add to stored playlist"))))
+      ("P" ,(ivy-mpdel--apply-unwrapped #'ivy-mpdel--stored-playlist-add-entity) "Add to stored playlist"))))
  '(ivy-mpdel-artists ivy-mpdel-albums ivy-mpdel-stored-playlists ivy-mpdel-songs))
 
 (ivy-add-actions

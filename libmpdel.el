@@ -45,8 +45,13 @@
   "MPD server port to connect to.  Also see `libmpdel-hostname'."
   :type 'string)
 
-(defcustom libmpdel-playlist-changed-hook nil
+(defcustom libmpdel-current-playlist-changed-hook nil
   "Functions to call when the current playlist is modified."
+  :type 'hook
+  :group 'libmpdel)
+
+(defcustom libmpdel-stored-playlist-changed-hook nil
+  "Functions to call when a stored playlist is modified."
   :type 'hook
   :group 'libmpdel)
 
@@ -162,7 +167,7 @@ message from the server.")
 If HANDLER is nil, response will be ignored.
 
 If command is a string, send that.  Otherwise, it must be a list
-that will be passed to `format' before being sent"
+that will be passed to `format' before being sent."
   (let ((command (if (listp command)
                      (apply #'format command)
                    command)))
@@ -190,7 +195,7 @@ representing the answer from the server."
           ;; if answer is a ACK, then there was a problem. We log it as such.
           (if (string= (substring message 0 3) "ACK")
               (libmpdel--log "ACK message" "ko")
-            (with-current-buffer (or buffer (current-buffer))
+            (with-current-buffer (if (buffer-live-p buffer) buffer (current-buffer))
               (funcall handler (libmpdel--extract-data message))))))
     (error (libmpdel--log error "ko"))))
 
@@ -223,7 +228,8 @@ command."
   (libmpdel--raw-send-command-with-handler "idle" #'libmpdel--msghandler-idle)
   (mapc (lambda (changed-subsystem)
           (cl-case (intern (cdr changed-subsystem))
-            (playlist (run-hooks 'libmpdel-playlist-changed-hook))))
+            (playlist (run-hooks 'libmpdel-current-playlist-changed-hook))
+            (stored_playlist (run-hooks 'libmpdel-stored-playlist-changed-hook))))
         data))
 
 (defun libmpdel--msghandler-status (data)
@@ -623,11 +629,28 @@ If HANDLER is nil, ignore response."
   "Remove all songs from current playlist."
   (libmpdel-send-command "clear"))
 
-(defun libmpdel-playlist-delete (songs)
-  "Remove SONGS from current playlist."
+(cl-defgeneric libmpdel-playlist-delete (songs playlist)
+  "Remove SONGS from PLAYLIST.")
+
+(cl-defmethod libmpdel-playlist-delete (songs (_ libmpdel-current-playlist))
   (libmpdel-send-commands
    (mapcar (lambda (song) (format "deleteid %s" (libmpdel-song-id song)))
            songs)))
+
+(cl-defmethod libmpdel-playlist-delete (songs (stored-playlist libmpdel-stored-playlist))
+  (libmpdel-list
+   stored-playlist
+   (lambda (all-playlist-songs)
+     (let ((song-positions (cl-sort (mapcar (lambda (song)
+                                              (cl-position song all-playlist-songs :test #'equal))
+                                            songs)
+                                    #'>)))
+       (libmpdel-send-commands
+        (mapcar
+         (lambda (song-position) (format "playlistdelete %S %s"
+                                    (libmpdel-entity-name stored-playlist)
+                                    song-position))
+         song-positions))))))
 
 (defun libmpdel-playlist-move-up (songs)
   "Move up SONGS in current playlist."

@@ -1,4 +1,4 @@
-;;; mpdel-playlist.el --- Display and manipulate current MPD playlist  -*- lexical-binding: t; -*-
+;;; mpdel-playlist.el --- Display and manipulate MPD playlists  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2017  Damien Cassou
 
@@ -23,16 +23,20 @@
 
 ;;; Commentary:
 
-;; Let the user view and manipulate the current MPD playlist.
+;; Let the user view and manipulate MPD's current playlist and stored
+;; playlists.
 
 ;;; Code:
+(require 'cl-lib)
+(require 'subr-x)
+
 (require 'libmpdel)
 
 
 ;;; Customization
 
 (defgroup mpdel-playlist nil
-  "Current MPD playlist."
+  "Display and manipulate MPD playlists."
   :group 'libmpdel)
 
 (defface mpdel-playlist--current-song-face
@@ -41,23 +45,47 @@
   :group 'mpdel-playlist)
 
 
+;;; Private variables
+(defvar-local mpdel-playlist--songs nil
+  "Hashtable mapping identifiers to songs.")
+
+(defvar-local mpdel-playlist-playlist nil
+  "Playlist displayed in the buffer.")
+
+
 ;;; Helper functions
 
-(defun mpdel-playlist--buffer ()
-  "Return playlist buffer."
-  (get-buffer-create "*MPDEL Playlist*"))
+(cl-defgeneric mpdel-playlist--buffer (playlist)
+  "Return buffer displaying PLAYLIST.")
 
-(defun mpdel-playlist--song-to-list-entry (song)
-  "Convert SONG to a format suitable for the tabulated list."
-  (list (libmpdel-song-id song)
-        (vector
-         (libmpdel-entity-name song)
-         (libmpdel-song-track song)
-         (libmpdel-album-name song)
-         (libmpdel-artist-name song))))
+(cl-defmethod mpdel-playlist--buffer ((_ libmpdel-current-playlist))
+  (get-buffer-create "*MPDEL Current Playlist*"))
 
-(defvar mpdel-playlist--songs nil
-  "Hashtable mapping song ids to songs.")
+(cl-defmethod mpdel-playlist--buffer ((stored-playlist libmpdel-stored-playlist))
+  (get-buffer-create (format "*MPDEL Playlist: %s*"
+                             (libmpdel-entity-name stored-playlist))))
+
+(defun mpdel-playlist--song-to-list-entry (song-id)
+  "Convert SONG-ID to a format suitable for the tabulated list."
+  (let ((song (gethash song-id mpdel-playlist--songs)))
+    (list song-id
+          (vector
+           (libmpdel-entity-name song)
+           (libmpdel-song-track song)
+           (libmpdel-album-name song)
+           (libmpdel-artist-name song)))))
+
+(defun mpdel-playlist--populate-hashtable (songs)
+  "Save SONGS in `mpdel-playlist--songs'."
+  (setq mpdel-playlist--songs (make-hash-table :test #'equal))
+  (let ((use-song-id (not (cl-find-if-not #'libmpdel-song-id songs)))
+        (fallback-id 1))
+    (mapc
+     (lambda (song)
+       (puthash (if use-song-id (libmpdel-song-id song) (cl-incf fallback-id))
+                song
+                mpdel-playlist--songs))
+     songs)))
 
 (defun mpdel-playlist--song-id-at-point (&optional pos)
   "Return song ID at POS, point if nil."
@@ -140,28 +168,30 @@ beginning of the line."
 
 ;;; Commands
 
-(defun mpdel-playlist-refresh ()
-  "Clear and re-populate the playlist buffer."
+(defun mpdel-playlist-refresh (&optional buffer)
+  "Clear and re-populate the playlist BUFFER.
+Use current buffer if BUFFER is nil."
   (interactive)
-  (libmpdel-list
-   (libmpdel-current-playlist)
-   (lambda (songs)
-     (with-current-buffer (mpdel-playlist--buffer)
-       (let ((playlist-status (mpdel-playlist--save-playlist-status)))
-         (setq mpdel-playlist--songs (make-hash-table :test #'equal))
-         (mapc (lambda (song) (puthash (libmpdel-song-id song) song mpdel-playlist--songs)) songs)
-         (setq tabulated-list-entries (mapcar #'mpdel-playlist--song-to-list-entry songs))
-         (tabulated-list-print)
-         (mpdel-playlist--restore-playlist-status playlist-status)
-         (unless (libmpdel-stopped-p)
-           (mpdel-playlist-highlight-song)))))))
+  (let ((buffer (or buffer (current-buffer))))
+    (when (buffer-live-p buffer)
+      (with-current-buffer buffer
+        (libmpdel-list
+         mpdel-playlist-playlist
+         (lambda (songs)
+           (let ((playlist-status (mpdel-playlist--save-playlist-status)))
+             (mpdel-playlist--populate-hashtable songs)
+             (setq tabulated-list-entries (mapcar #'mpdel-playlist--song-to-list-entry (hash-table-keys mpdel-playlist--songs)))
+             (tabulated-list-print)
+             (mpdel-playlist--restore-playlist-status playlist-status)
+             (when (and (not (libmpdel-stopped-p)) (libmpdel-current-playlist-p mpdel-playlist-playlist))
+               (mpdel-playlist-highlight-song)))))))))
 
 (defun mpdel-playlist-delete ()
   "Delete selected songs from current playlist."
   (interactive)
   (let ((songs (mpdel-playlist--selected-songs)))
     (when songs
-      (libmpdel-playlist-delete songs)
+      (libmpdel-playlist-delete songs mpdel-playlist-playlist)
       ;; Move point to the closest non-deleted song
       (forward-line 1)
       (when (= (point) (point-max))
@@ -186,17 +216,42 @@ beginning of the line."
     (when songs
       (libmpdel-playlist-move-down songs))))
 
+(defun mpdel-playlist--register-to-hooks (buffer)
+  "Register to several hooks to refresh BUFFER."
+  (with-current-buffer buffer
+    (let* ((refresh-fn (lambda () (mpdel-playlist-refresh buffer)))
+           (playlist mpdel-playlist-playlist)
+           (hooks (if (libmpdel-stored-playlist-p playlist)
+                      '(libmpdel-stored-playlist-changed-hook)
+                    '(libmpdel-current-playlist-changed-hook
+                      libmpdel-current-song-changed-hook
+                      libmpdel-player-changed-hook))))
+      (mapc (lambda (hook) (add-hook hook refresh-fn)) hooks)
+      (add-hook 'kill-buffer-hook
+                (lambda ()
+                  (mapc (lambda (hook) (remove-hook hook refresh-fn)) hooks))
+                nil t))))
+
 ;;;###autoload
-(defun mpdel-playlist-open ()
-  "Open a buffer with the current MPD playlist."
+(defun mpdel-playlist-open (&optional playlist)
+  "Open a buffer with PLAYLIST, current playlist if nil."
   (interactive)
-  (with-current-buffer (mpdel-playlist--buffer)
-    (mpdel-playlist-mode)
-    (mpdel-playlist-refresh))
-  (switch-to-buffer (mpdel-playlist--buffer))
-  (add-hook 'libmpdel-playlist-changed-hook #'mpdel-playlist-refresh)
-  (add-hook 'libmpdel-current-song-changed-hook #'mpdel-playlist-refresh)
-  (add-hook 'libmpdel-player-changed-hook #'mpdel-playlist-refresh))
+  (let* ((playlist (or playlist (libmpdel-current-playlist)))
+         (buffer (mpdel-playlist--buffer playlist)))
+    (with-current-buffer buffer
+      (mpdel-playlist-mode)
+      (setq mpdel-playlist-playlist playlist)
+      (mpdel-playlist-refresh buffer))
+    (switch-to-buffer buffer)
+    (mpdel-playlist--register-to-hooks buffer)))
+
+(defun mpdel-playlist-open-stored-playlist ()
+  "Ask for a stored playlist and open it."
+  (interactive)
+  (libmpdel-list-stored-playlists
+   (lambda (playlists)
+     (let ((playlist (libmpdel-completing-read "Playlist: " playlists)))
+       (mpdel-playlist-open playlist)))))
 
 
 ;;; Major mode
