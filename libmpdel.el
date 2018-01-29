@@ -195,7 +195,7 @@ representing the answer from the server."
           ;; if answer is a ACK, then there was a problem. We log it as such.
           (if (string= (substring message 0 3) "ACK")
               (libmpdel--log "ACK message" "ko")
-            (with-current-buffer (or buffer (current-buffer))
+            (with-current-buffer (if (buffer-live-p buffer) buffer (current-buffer))
               (funcall handler (libmpdel--extract-data message))))))
     (error (libmpdel--log error "ko"))))
 
