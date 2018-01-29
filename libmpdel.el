@@ -240,7 +240,8 @@ command."
             (cl-case status-key
               (state (libmpdel--set-play-state status-value))
               (songid (libmpdel--set-current-song status-value))
-              (playlistlength (libmpdel--set-playlist-length status-value)))))
+              (playlistlength (libmpdel--set-playlist-length status-value))
+              (volume (libmpdel--set-volume status-value)))))
         data))
 
 (defun libmpdel--msghandler-ignore (_)
@@ -315,6 +316,17 @@ Value is play, pause or stop.")
 (defun libmpdel--set-playlist-length (length)
   "Save LENGTH of current playlist."
   (setq libmpdel--playlist-length (string-to-number length)))
+
+(defvar libmpdel--volume "0"
+  "Current volume, between 0 and 100.")
+
+(defun libmpdel-volume ()
+  "Return current volume."
+  libmpdel--volume)
+
+(defun libmpdel--set-volume (volume)
+  "Save VOLUME."
+  (setq libmpdel--volume volume))
 
 (defun libmpdel-time-to-string (time)
   "Return a string represeting TIME, a number in a string."
@@ -676,6 +688,13 @@ If HANDLER is nil, ignore response."
 
 
 ;;; Playback queries
+
+(defun libmpdel-playback-set-volume (volume)
+  "Set volume to VOLUME."
+  (interactive (list
+                (read-string (format "Current volume is %s. New volume [0-100]: "
+                                     (libmpdel-volume)))))
+  (libmpdel-send-command `("setvol %s" ,volume)))
 
 (defun libmpdel-playback-next ()
   "Play next song in the playlist."
