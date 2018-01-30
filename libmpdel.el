@@ -274,59 +274,60 @@ command."
   (let ((comp (compare-strings str1 nil nil str2 nil nil t)))
     (or (eq comp t) (< comp 0))))
 
-(defvar libmpdel--play-state nil
-  "Current play state of MPD server.
-Value is play, pause or stop.")
+(defmacro libmpdel--define-state (name value-desc &rest set-body)
+  "Generate code to set and get state for NAME.
 
-(defun libmpdel--set-play-state (state)
-  "Save current play STATE."
-  (let ((old-state libmpdel--play-state))
-    (unless (equal old-state state)
-      (setq libmpdel--play-state (intern state))
+Name is a symbol (e.g., `volume' or `play-state') naming the
+state to generate code for.
+
+VALUE-DESC is a string describing the kind of value accepted for
+this state.
+
+SET-BODY is a list of forms to put in the generated setter
+function.  During executiong of SET-BODY, a variable NEW-VALUE is
+bound containing the value to set."
+  (declare (indent 1))
+  `(progn
+     (defvar ,(intern (format "libmpdel--%s" name)) nil
+       ,(format "Current %s of MPD server.\n%s" name value-desc))
+
+     (defun ,(intern (format "libmpdel--set-%s" name)) (new-value)
+       ,(format "Save NEW-VALUE as current %s.\n%s" name value-desc)
+       ,@set-body)
+
+     (defun ,(intern (format "libmpdel-%s" name)) ()
+       ,(format "Return current value of %s.\n%s" name value-desc)
+       ,(intern (format "libmpdel--%s" name)))))
+
+(libmpdel--define-state play-state
+  "Value is `play', `pause' or `stop'."
+  (let ((new-state (intern new-value))
+        (old-state libmpdel--play-state))
+    (unless (equal old-state new-state)
+      (setq libmpdel--play-state new-state)
       (run-hooks 'libmpdel-player-changed-hook))))
-
-(defun libmpdel-play-state ()
-  "Return either `play', `pause' or `stop'."
-  libmpdel--play-state)
 
 (defun libmpdel-stopped-p ()
   "Return non-nil if player is stopped, nil otherwise."
   (eq 'stop (libmpdel-play-state)))
 
-(defvar libmpdel--current-song nil
-  "Currently played song.")
-
-(defun libmpdel--set-current-song (song-id)
-  "Save current song with id SONG-ID."
+(libmpdel--define-state current-song
+  "An object representing currently played song."
   (let ((old-song libmpdel--current-song))
-    (when (or (not old-song) (not (equal song-id (libmpdel-song-id old-song))))
+    (when (or (not old-song) (not (equal new-value (libmpdel-song-id old-song))))
       (libmpdel-send-command
        "currentsong"
        (lambda (data)
          (setq libmpdel--current-song (libmpdel--create-song-from-data data))
          (run-hooks 'libmpdel-current-song-changed-hook))))))
 
-(defun libmpdel-current-song ()
-  "Return currently played song."
-  libmpdel--current-song)
+(libmpdel--define-state playlist-length
+  "Number of songs in current playlist."
+  (setq libmpdel--playlist-length (string-to-number new-value)))
 
-(defvar libmpdel--playlist-length 0
-  "Length of current playlist.")
-
-(defun libmpdel--set-playlist-length (length)
-  "Save LENGTH of current playlist."
-  (setq libmpdel--playlist-length (string-to-number length)))
-
-(defvar libmpdel--volume "0"
-  "Current volume, between 0 and 100.")
-
-(defun libmpdel-volume ()
-  "Return current volume."
-  libmpdel--volume)
-
-(defun libmpdel--set-volume (volume)
-  "Save VOLUME."
-  (setq libmpdel--volume volume))
+(libmpdel--define-state volume
+  "Value is a string representing a number between 0 and 100."
+  (setq libmpdel--volume new-value))
 
 (defun libmpdel-time-to-string (time)
   "Return a string represeting TIME, a number in a string."
@@ -659,9 +660,10 @@ If HANDLER is nil, ignore response."
                                     #'>)))
        (libmpdel-send-commands
         (mapcar
-         (lambda (song-position) (format "playlistdelete %S %s"
-                                    (libmpdel-entity-name stored-playlist)
-                                    song-position))
+         (lambda (song-position)
+           (format "playlistdelete %S %s"
+                   (libmpdel-entity-name stored-playlist)
+                   song-position))
          song-positions))))))
 
 (defun libmpdel-playlist-move-up (songs)
