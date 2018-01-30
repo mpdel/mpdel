@@ -24,6 +24,7 @@
 ;;; Code:
 
 (require 'ert)
+(require 'cl-lib)
 
 (require 'libmpdel)
 
@@ -62,6 +63,33 @@
   (should (string= (libmpdel-time-to-string "2.230") "00:02"))
   (should (string= (libmpdel-time-to-string "84.450") "01:24"))
   (should (string= (libmpdel-time-to-string "3623.23") "60:23")))
+
+(ert-deftest libmpdel-getting-and-setting-play-state ()
+  (libmpdel--set-play-state "play")
+  (should (equal (libmpdel-play-state) 'play)))
+
+(ert-deftest libmpdel-setting-play-state-run-hook ()
+  (let* ((fn-executed 0)
+         (fn (lambda () (cl-incf fn-executed))))
+    (add-hook 'libmpdel-player-changed-hook fn)
+    (setq libmpdel--play-state nil)
+    (libmpdel--set-play-state "play")
+    (libmpdel--set-play-state "pause")
+    (should (equal fn-executed 2))))
+
+(ert-deftest libmpdel-setting-play-state-run-hook-only-once ()
+  (let* ((fn-executed 0)
+         (fn (lambda () (cl-incf fn-executed))))
+    (setq libmpdel-player-changed-hook nil)
+    (add-hook 'libmpdel-player-changed-hook fn)
+    (setq libmpdel--play-state nil)
+    (libmpdel--set-play-state "play")
+    (libmpdel--set-play-state "play")
+    (should (equal fn-executed 1))))
+
+(ert-deftest libmpdel-getting-and-setting-volume ()
+  (libmpdel--set-volume "50")
+  (should (string= (libmpdel-volume) "50")))
 
 
 ;;; Public functions
