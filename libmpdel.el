@@ -659,9 +659,10 @@ If HANDLER is nil, ignore response."
                                     #'>)))
        (libmpdel-send-commands
         (mapcar
-         (lambda (song-position) (format "playlistdelete %S %s"
-                                    (libmpdel-entity-name stored-playlist)
-                                    song-position))
+         (lambda (song-position)
+           (format "playlistdelete %S %s"
+                   (libmpdel-entity-name stored-playlist)
+                   song-position))
          song-positions))))))
 
 (defun libmpdel-playlist-move-up (songs)
