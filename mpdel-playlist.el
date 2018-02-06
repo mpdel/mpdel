@@ -72,8 +72,8 @@
           (vector
            (libmpdel-entity-name song)
            (libmpdel-song-track song)
-           (libmpdel-album-name song)
-           (libmpdel-artist-name song)))))
+           (or (libmpdel-album-name song) "")
+           (or (libmpdel-artist-name song) "")))))
 
 (defun mpdel-playlist--populate-hashtable (songs)
   "Save SONGS in `mpdel-playlist--songs'."
@@ -161,8 +161,8 @@ This function is used as a value for
 beginning of the line."
   (let ((song (mpdel-playlist--song-at-point)))
     (format "%s/%s/%s"
-            (libmpdel-artist-name song)
-            (libmpdel-album-name song)
+            (or (libmpdel-artist-name song) "??")
+            (or (libmpdel-album-name song) "??")
             (libmpdel-entity-name song))))
 
 
