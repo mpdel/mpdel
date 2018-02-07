@@ -45,6 +45,12 @@
   "MPD server port to connect to.  Also see `libmpdel-hostname'."
   :type 'string)
 
+(defcustom libmpdel-music-directory "~/Music"
+  "MPD `music_directory' variable's value.
+
+This is used to map MPD's music files to the filesystem."
+  :type 'directory)
+
 (defcustom libmpdel-current-playlist-changed-hook nil
   "Functions to call when the current playlist is modified."
   :type 'hook
@@ -542,6 +548,16 @@ If HANDLER is nil, ignore response."
             data)
       (push (reverse group) result)
       (reverse result))))
+
+(cl-defgeneric libmpdel-dired (entity)
+  "Open `dired' on ENTITY.")
+
+(eval-when-compile
+  (declare-function dired-jump "dired-x"))
+
+(cl-defmethod libmpdel-dired ((song libmpdel-song))
+  (require 'dired-x)
+  (dired-jump t (expand-file-name (libmpdel-song-file song) libmpdel-music-directory)))
 
 
 ;;; Helper queries

@@ -232,6 +232,11 @@ Use current buffer if BUFFER is nil."
                   (mapc (lambda (hook) (remove-hook hook refresh-fn)) hooks))
                 nil t))))
 
+(defun mpdel-playlist-dired ()
+  "Open `dired' on song at point."
+  (interactive)
+  (libmpdel-dired (mpdel-playlist--song-at-point)))
+
 ;;;###autoload
 (defun mpdel-playlist-open (&optional playlist)
   "Open a buffer with PLAYLIST, current playlist if nil."
@@ -275,6 +280,7 @@ Use current buffer if BUFFER is nil."
 (define-key mpdel-playlist-mode-map (kbd "]") #'libmpdel-playback-next)
 (define-key mpdel-playlist-mode-map (kbd "<M-up>") #'mpdel-playlist-move-up)
 (define-key mpdel-playlist-mode-map (kbd "<M-down>") #'mpdel-playlist-move-down)
+(define-key mpdel-playlist-mode-map (kbd "C-x C-j") #'mpdel-playlist-dired)
 
 (provide 'mpdel-playlist)
 ;;; mpdel-playlist.el ends here
