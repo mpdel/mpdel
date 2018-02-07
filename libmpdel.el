@@ -761,10 +761,9 @@ update modified files.
 
 URI is a particular directory or song/file to update.  If you do
 not specify it, everything is updated."
-  (interactive)
-  (if uri
-      (libmpdel-send-command "update")
-    (libmpdel-send-command `("update %S" uri))))
+  (interactive "i")
+  (libmpdel-send-command
+   (if uri `("update %S" ,uri) "update")))
 
 (provide 'libmpdel)
 ;;; libmpdel.el ends here
