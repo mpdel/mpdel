@@ -45,6 +45,12 @@
   "MPD server port to connect to.  Also see `libmpdel-hostname'."
   :type 'string)
 
+(defcustom libmpdel-music-directory "~/Music"
+  "MPD `music_directory' variable's value.
+
+This is used to map MPD's music files to the filesystem."
+  :type 'directory)
+
 (defcustom libmpdel-current-playlist-changed-hook nil
   "Functions to call when the current playlist is modified."
   :type 'hook
@@ -73,14 +79,6 @@ See `libmpdel-current-song-id'."
 (defvar libmpdel--connection nil
   "Current connection to the MPD server.
 The logs of this connection are accessible in the *mpd* buffer.")
-
-(defun libmpdel--process ()
-  "Return the process communicating with the MPD server."
-  (tq-process libmpdel--connection))
-
-(defun libmpdel--process-buffer ()
-  "Return the buffer associated with the connection process."
-  (process-buffer (libmpdel--process)))
 
 (defconst libmpdel--response-regexp
   (rx line-start
@@ -124,7 +122,143 @@ that the first handler is the one to execute when we receive a
 message from the server.")
 
 
+;;; Data structures
+
+(cl-defstruct (libmpdel-artist
+               (:constructor libmpdel--artist-create)
+               (:conc-name libmpdel--artist-))
+  (name nil :read-only t))
+
+(cl-defstruct (libmpdel-album
+               (:constructor libmpdel--album-create)
+               (:conc-name libmpdel--album-))
+  (name nil :read-only t)
+  (artist nil :read-only t))
+
+(cl-defstruct (libmpdel-song
+               (:constructor libmpdel--song-create)
+               (:conc-name libmpdel--song-))
+  (name nil :read-only t)
+  (track nil :read-only t)
+  (file nil :read-only t)
+  (album nil :read-only t)
+  (id nil :read-only t)
+  (pos nil :read-only t))
+
+(cl-defstruct (libmpdel-stored-playlist
+               (:constructor libmpdel--stored-playlist-create)
+               (:conc-name libmpdel--stored-playlist-))
+  (name nil :read-only t))
+
+(cl-defstruct (libmpdel-current-playlist
+               (:constructor libmpdel--current-playlist-create)
+               (:conc-name libmpdel--current-playlist-)))
+
+(defun libmpdel-current-playlist ()
+  "Return the current playlist."
+  (libmpdel--current-playlist-create))
+
+(cl-defgeneric libmpdel-artist-name (object)
+  "Return artist name of OBJECT.")
+
+(cl-defmethod libmpdel-artist-name ((artist libmpdel-artist))
+  (libmpdel--artist-name artist))
+
+(cl-defmethod libmpdel-artist-name ((album libmpdel-album))
+  (libmpdel-artist-name (libmpdel--album-artist album)))
+
+(cl-defmethod libmpdel-artist-name ((song libmpdel-song))
+  (libmpdel-artist-name (libmpdel--song-album song)))
+
+(cl-defgeneric libmpdel-artist (object)
+  "Return artist of OBJECT.")
+
+(cl-defmethod libmpdel-artist ((artist libmpdel-artist))
+  artist)
+
+(cl-defmethod libmpdel-artist ((album libmpdel-album))
+  (libmpdel--album-artist album))
+
+(cl-defmethod libmpdel-artist ((song libmpdel-song))
+  (libmpdel-artist (libmpdel--song-album song)))
+
+(cl-defgeneric libmpdel-album-name (object)
+  "Return album name of OBJECT.")
+
+(cl-defmethod libmpdel-album-name ((album libmpdel-album))
+  (libmpdel--album-name album))
+
+(cl-defmethod libmpdel-album-name ((song libmpdel-song))
+  (libmpdel-album-name (libmpdel--song-album song)))
+
+(cl-defgeneric libmpdel-album (object)
+  "Return album of OBJECT.")
+
+(cl-defmethod libmpdel-album ((album libmpdel-album))
+  album)
+
+(cl-defmethod libmpdel-album ((song libmpdel-song))
+  (libmpdel--song-album song))
+
+(cl-defgeneric libmpdel-entity-name (object)
+  "Return basename of OBJECT.")
+
+(cl-defmethod libmpdel-entity-name ((artist libmpdel-artist))
+  (libmpdel--artist-name artist))
+
+(cl-defmethod libmpdel-entity-name ((album libmpdel-album))
+  (libmpdel--album-name album))
+
+(cl-defmethod libmpdel-entity-name ((song libmpdel-song))
+  (libmpdel--song-name song))
+
+(cl-defmethod libmpdel-entity-name ((stored-playlist libmpdel-stored-playlist))
+  (libmpdel--stored-playlist-name stored-playlist))
+
+(defun libmpdel-song-file (song)
+  "Return the filename of SONG."
+  (libmpdel--song-file song))
+
+(defun libmpdel-song-track (song)
+  "Return the track number of SONG within its album."
+  (or (libmpdel--song-track song) ""))
+
+(defun libmpdel-song-id (song)
+  "Return SONG id within the current playlist, nil if none."
+  (libmpdel--song-id song))
+
+(defun libmpdel-song-position (song)
+  "Return position of SONG in playlist, nil if not in playlist."
+  (let ((pos (libmpdel--song-pos song)))
+    (when (and (stringp pos) (not (string= pos "")))
+      (string-to-number pos))))
+
+(defun libmpdel--create-song-from-data (song-data)
+  "Return a song from SONG-DATA, a server's response."
+  (libmpdel--song-create
+   :name (cdr (assq 'Title song-data))
+   :track (cdr (assq 'Track song-data))
+   :file (cdr (assq 'file song-data))
+   :album (libmpdel--album-create
+           :name (cdr (assq 'Album song-data))
+           :artist (libmpdel--artist-create :name (cdr (assq 'Artist song-data))))
+   :id (cdr (assq 'Id song-data))
+   :pos (cdr (assq 'Pos song-data))))
+
+(defun libmpdel--create-songs-from-data (data)
+  "Return a list of songs from DATA, a server's response."
+  (mapcar #'libmpdel--create-song-from-data (libmpdel-group-data data)))
+
+
 ;;; Helper functions
+
+(defun libmpdel--process ()
+  "Return the process communicating with the MPD server."
+  (tq-process libmpdel--connection))
+
+(defun libmpdel--process-buffer ()
+  "Return the buffer associated with the connection process."
+  (process-buffer (libmpdel--process)))
 
 (defun libmpdel--connect ()
   "Create a new connection with the MPD server."
@@ -415,133 +549,15 @@ If HANDLER is nil, ignore response."
       (push (reverse group) result)
       (reverse result))))
 
-
-;;; Data structures
+(cl-defgeneric libmpdel-dired (entity)
+  "Open `dired' on ENTITY.")
 
-(cl-defstruct (libmpdel-artist
-               (:constructor libmpdel--artist-create)
-               (:conc-name libmpdel--artist-))
-  (name nil :read-only t))
+(eval-when-compile
+  (declare-function dired-jump "dired-x"))
 
-(cl-defstruct (libmpdel-album
-               (:constructor libmpdel--album-create)
-               (:conc-name libmpdel--album-))
-  (name nil :read-only t)
-  (artist nil :read-only t))
-
-(cl-defstruct (libmpdel-song
-               (:constructor libmpdel--song-create)
-               (:conc-name libmpdel--song-))
-  (name nil :read-only t)
-  (track nil :read-only t)
-  (file nil :read-only t)
-  (album nil :read-only t)
-  (id nil :read-only t)
-  (pos nil :read-only t))
-
-(cl-defstruct (libmpdel-stored-playlist
-               (:constructor libmpdel--stored-playlist-create)
-               (:conc-name libmpdel--stored-playlist-))
-  (name nil :read-only t))
-
-(cl-defstruct (libmpdel-current-playlist
-               (:constructor libmpdel--current-playlist-create)
-               (:conc-name libmpdel--current-playlist-)))
-
-(defun libmpdel-current-playlist ()
-  "Return the current playlist."
-  (libmpdel--current-playlist-create))
-
-(cl-defgeneric libmpdel-artist-name (object)
-  "Return artist name of OBJECT.")
-
-(cl-defmethod libmpdel-artist-name ((artist libmpdel-artist))
-  (libmpdel--artist-name artist))
-
-(cl-defmethod libmpdel-artist-name ((album libmpdel-album))
-  (libmpdel-artist-name (libmpdel--album-artist album)))
-
-(cl-defmethod libmpdel-artist-name ((song libmpdel-song))
-  (libmpdel-artist-name (libmpdel--song-album song)))
-
-(cl-defgeneric libmpdel-artist (object)
-  "Return artist of OBJECT.")
-
-(cl-defmethod libmpdel-artist ((artist libmpdel-artist))
-  artist)
-
-(cl-defmethod libmpdel-artist ((album libmpdel-album))
-  (libmpdel--album-artist album))
-
-(cl-defmethod libmpdel-artist ((song libmpdel-song))
-  (libmpdel-artist (libmpdel--song-album song)))
-
-(cl-defgeneric libmpdel-album-name (object)
-  "Return album name of OBJECT.")
-
-(cl-defmethod libmpdel-album-name ((album libmpdel-album))
-  (libmpdel--album-name album))
-
-(cl-defmethod libmpdel-album-name ((song libmpdel-song))
-  (libmpdel-album-name (libmpdel--song-album song)))
-
-(cl-defgeneric libmpdel-album (object)
-  "Return album of OBJECT.")
-
-(cl-defmethod libmpdel-album ((album libmpdel-album))
-  album)
-
-(cl-defmethod libmpdel-album ((song libmpdel-song))
-  (libmpdel--song-album song))
-
-(cl-defgeneric libmpdel-entity-name (object)
-  "Return basename of OBJECT.")
-
-(cl-defmethod libmpdel-entity-name ((artist libmpdel-artist))
-  (libmpdel--artist-name artist))
-
-(cl-defmethod libmpdel-entity-name ((album libmpdel-album))
-  (libmpdel--album-name album))
-
-(cl-defmethod libmpdel-entity-name ((song libmpdel-song))
-  (libmpdel--song-name song))
-
-(cl-defmethod libmpdel-entity-name ((stored-playlist libmpdel-stored-playlist))
-  (libmpdel--stored-playlist-name stored-playlist))
-
-(defun libmpdel-song-file (song)
-  "Return the filename of SONG."
-  (libmpdel--song-file song))
-
-(defun libmpdel-song-track (song)
-  "Return the track number of SONG within its album."
-  (or (libmpdel--song-track song) ""))
-
-(defun libmpdel-song-id (song)
-  "Return SONG id within the current playlist, nil if none."
-  (libmpdel--song-id song))
-
-(defun libmpdel-song-position (song)
-  "Return position of SONG in playlist, nil if not in playlist."
-  (let ((pos (libmpdel--song-pos song)))
-    (when (and (stringp pos) (not (string= pos "")))
-      (string-to-number pos))))
-
-(defun libmpdel--create-song-from-data (song-data)
-  "Return a song from SONG-DATA, a server's response."
-  (libmpdel--song-create
-   :name (cdr (assq 'Title song-data))
-   :track (cdr (assq 'Track song-data))
-   :file (cdr (assq 'file song-data))
-   :album (libmpdel--album-create
-           :name (cdr (assq 'Album song-data))
-           :artist (libmpdel--artist-create :name (cdr (assq 'Artist song-data))))
-   :id (cdr (assq 'Id song-data))
-   :pos (cdr (assq 'Pos song-data))))
-
-(defun libmpdel--create-songs-from-data (data)
-  "Return a list of songs from DATA, a server's response."
-  (mapcar #'libmpdel--create-song-from-data (libmpdel-group-data data)))
+(cl-defmethod libmpdel-dired ((song libmpdel-song))
+  (require 'dired-x)
+  (dired-jump t (expand-file-name (libmpdel-song-file song) libmpdel-music-directory)))
 
 
 ;;; Helper queries
@@ -761,10 +777,9 @@ update modified files.
 
 URI is a particular directory or song/file to update.  If you do
 not specify it, everything is updated."
-  (interactive)
-  (if uri
-      (libmpdel-send-command "update")
-    (libmpdel-send-command `("update %S" uri))))
+  (interactive "i")
+  (libmpdel-send-command
+   (if uri `("update %S" ,uri) "update")))
 
 (provide 'libmpdel)
 ;;; libmpdel.el ends here
