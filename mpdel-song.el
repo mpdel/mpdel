@@ -1,4 +1,4 @@
-;;; mpdel-song.el --- Let the user control current song  -*- lexical-binding: t; -*-
+;;; mpdel-song.el --- Display song information and control playback -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2018  Damien Cassou
 
@@ -69,6 +69,18 @@
   :group 'mpdel-song)
 
 
+;;; Private variables
+
+(defvar-local mpdel-song-song nil
+  "Song displayed by current buffer.")
+
+(defvar-local mpdel-song-current-song-p nil
+  "Non-nil if buffer displays the current song.
+
+When non-nil, the buffer keeps showing the current song, even
+when the song changes.")
+
+
 ;;; Helper functions
 
 (defvar mpdel-song--timer nil
@@ -112,28 +124,34 @@
 
 (defun mpdel-song--display-metadata ()
   "Give information about current song metadata."
-  (let* ((song (libmpdel-current-song))
-         (title (libmpdel-entity-name song))
-         (album (libmpdel-album-name song))
-         (artist (libmpdel-artist-name song)))
+  (let* ((song mpdel-song-song)
+         (title (or (libmpdel-entity-name song) ""))
+         (album (or (libmpdel-album-name song) ""))
+         (artist (or (libmpdel-artist-name song) "")))
     (insert (format "Title: %s\nArtist: %s\nAlbum: %s\n"
                     title
                     artist
                     album))))
 
-(defun mpdel-song--refresh-from-data (data &optional buffer)
-  "Write DATA to BUFFER, current buffer if nil.
+(defun mpdel-song--refresh-current-song (data buffer)
+  "Write information about currently-played song in DATA to BUFFER.
 
 DATA is an alist returned by MPD server as answer to 'status'.
 In particular, it must contain key symbol `elapsed' and symbol
 `duration'."
-  (let ((buffer (or buffer (current-buffer)))
-        (inhibit-read-only t))
-    (with-current-buffer buffer
+  (with-current-buffer buffer
+    (let ((inhibit-read-only t))
       (erase-buffer)
       (mpdel-song--display-play-state)
       (mpdel-song--display-metadata)
       (mpdel-song--display-play-time data))))
+
+(defun mpdel-song--refresh-non-current-song (buffer)
+  "Write information about the song associated with BUFFER."
+  (with-current-buffer buffer
+    (let ((inhibit-read-only t))
+      (erase-buffer)
+      (mpdel-song--display-metadata))))
 
 
 ;;; Public interface
@@ -141,18 +159,34 @@ In particular, it must contain key symbol `elapsed' and symbol
 (defun mpdel-song-refresh (&optional buffer)
   "Refresh MPDEL seek BUFFER, current buffer if nil."
   (interactive)
-  (let ((buffer (or buffer (current-buffer))))
-    (libmpdel-send-command "status" (lambda (data) (mpdel-song--refresh-from-data data buffer)))))
+  (with-current-buffer (or buffer (current-buffer))
+    (if mpdel-song-current-song-p
+        (libmpdel-send-command "status" (lambda (data) (mpdel-song--refresh-current-song data buffer)))
+      (mpdel-song--refresh-non-current-song (current-buffer)))))
 
-(defun mpdel-song-open ()
-  "Open a buffer to guide the user seeking inside current song."
+(defun mpdel-song-open (&optional song)
+  "Open a buffer to display information about SONG.
+If SONG is nil, use current song instead.
+
+When SONG is nil, the buffer updates itself to keep showing
+latest song.  Additionally, the buffer lets the user control
+playback."
   (interactive)
-  (let ((buffer (get-buffer-create "*MPDEL song*")))
+  (let* ((current-song-p (not song))
+         (buffer (get-buffer-create (if current-song-p
+                                        "*MPDEL Current Song*"
+                                      (format "*MPDEL Song: %s*" (libmpdel-entity-name song)))))
+         (refresh-fn (lambda () (mpdel-song-refresh buffer)))
+         (song (or song (libmpdel-current-song))))
     (with-current-buffer buffer
-      (mpdel-song-refresh)
       (mpdel-song-mode)
-      (add-hook 'libmpdel-player-changed-hook (apply-partially #'mpdel-song-refresh buffer))
-      (add-hook 'kill-buffer-hook #'mpdel-song--stop-timer nil t)
+      (setq mpdel-song-song song)
+      (setq mpdel-song-current-song-p current-song-p)
+      (mpdel-song-refresh buffer)
+      (when current-song-p
+        (add-hook 'libmpdel-player-changed-hook refresh-fn)
+        (add-hook 'kill-buffer-hook #'mpdel-song--stop-timer nil t)
+        (add-hook 'kill-buffer-hook (lambda () (remove-hook 'libmpdel-player-changed-hook refresh-fn))))
       (pop-to-buffer (current-buffer)))))
 
 (defmacro mpdel-song--seek-command (time)
