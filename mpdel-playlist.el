@@ -92,7 +92,7 @@
   (let* ((pos (or pos (point))))
     (tabulated-list-get-id pos)))
 
-(defun mpdel-playlist--song-at-point (&optional pos)
+(defun mpdel-playlist-song-at-point (&optional pos)
   "Return song at POS, point if nil."
   (let* ((song-id (mpdel-playlist--song-id-at-point pos)))
     (gethash song-id mpdel-playlist--songs)))
@@ -111,9 +111,9 @@
   "Return songs within active region or the song at point."
   (cond
    ((use-region-p)
-    (mapcar #'mpdel-playlist--song-at-point (mpdel-playlist--points-in-region (region-beginning) (region-end))))
+    (mapcar #'mpdel-playlist-song-at-point (mpdel-playlist--points-in-region (region-beginning) (region-end))))
    ((= (point) (point-max)) nil)
-   (t (list (mpdel-playlist--song-at-point)))))
+   (t (list (mpdel-playlist-song-at-point)))))
 
 (defun mpdel-playlist-go-to-song (&optional song-id)
   "Move point to SONG-ID, current song if nil.
@@ -121,7 +121,7 @@ Return non-nil if SONG-ID is found, nil otherwise."
   (let ((song-id (or song-id (libmpdel-song-id (libmpdel-current-song)))))
     (goto-char (point-min))
     (while (and (not (= (point) (point-max)))
-                (not (equal (libmpdel-song-id (mpdel-playlist--song-at-point)) song-id)))
+                (not (equal (libmpdel-song-id (mpdel-playlist-song-at-point)) song-id)))
       (forward-line 1))
     (not (= (point) (point-max)))))
 
@@ -159,7 +159,7 @@ This function is used as a value for
 This function is used as a value for
 `imenu-extract-index-name-function'.  Point should be at the
 beginning of the line."
-  (let ((song (mpdel-playlist--song-at-point)))
+  (let ((song (mpdel-playlist-song-at-point)))
     (format "%s/%s/%s"
             (or (libmpdel-artist-name song) "??")
             (or (libmpdel-album-name song) "??")
@@ -200,7 +200,7 @@ Use current buffer if BUFFER is nil."
 (defun mpdel-playlist-play ()
   "Start playing the song at point."
   (interactive)
-  (libmpdel-play-song (mpdel-playlist--song-at-point)))
+  (libmpdel-play-song (mpdel-playlist-song-at-point)))
 
 (defun mpdel-playlist-move-up ()
   "Move selected songs up in the current playlist."
@@ -235,7 +235,7 @@ Use current buffer if BUFFER is nil."
 (defun mpdel-playlist-dired ()
   "Open `dired' on song at point."
   (interactive)
-  (libmpdel-dired (mpdel-playlist--song-at-point)))
+  (libmpdel-dired (mpdel-playlist-song-at-point)))
 
 ;;;###autoload
 (defun mpdel-playlist-open (&optional playlist)
