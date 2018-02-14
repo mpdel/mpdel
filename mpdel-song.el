@@ -27,8 +27,6 @@
 ;; information and control the current song.
 
 ;;; Code:
-(require 'map)
-
 (require 'libmpdel)
 
 
@@ -119,8 +117,8 @@ when the song changes.")
   "Give information about current play time in DATA."
   (insert
    (format "%s / %s"
-           (libmpdel-time-to-string (map-elt data 'elapsed))
-           (libmpdel-time-to-string (map-elt data 'duration)))))
+           (libmpdel-time-to-string (cdr (assq 'elapsed data)))
+           (libmpdel-time-to-string (cdr (assq 'duration data))))))
 
 (defun mpdel-song--display-metadata ()
   "Give information about current song metadata."
@@ -164,6 +162,7 @@ In particular, it must contain key symbol `elapsed' and symbol
         (libmpdel-send-command "status" (lambda (data) (mpdel-song--refresh-current-song data buffer)))
       (mpdel-song--refresh-non-current-song (current-buffer)))))
 
+;;;###autoload
 (defun mpdel-song-open (&optional song)
   "Open a buffer to display information about SONG.
 If SONG is nil, use current song instead.

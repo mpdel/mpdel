@@ -5,7 +5,7 @@
 ;; Author: Damien Cassou <damien@cassou.me>
 ;; Keywords: multimedia
 ;; Url: https://github.com/DamienCassou/mpdel
-;; Package-requires: ((emacs "25"))
+;; Package-requires: ((emacs "25.1"))
 ;; Version: 0.1.0
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -250,6 +250,7 @@ Use current buffer if BUFFER is nil."
     (switch-to-buffer buffer)
     (mpdel-playlist--register-to-hooks buffer)))
 
+;;;###autoload
 (defun mpdel-playlist-open-stored-playlist ()
   "Ask for a stored playlist and open it."
   (interactive)

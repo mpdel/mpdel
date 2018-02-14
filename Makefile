@@ -1,4 +1,4 @@
-SRCS = libmpdel.el mpdel-playlist.el ivy-mpdel.el mpdel-song.el
+SRCS = libmpdel.el mpdel-playlist.el ivy-mpdel.el mpdel-song.el mpdel-mode.el
 TESTS = test/libmpdel-test.el
 
 LOAD_PATH = -L .
@@ -14,6 +14,8 @@ BATCH     = $(EMACSBIN) -Q --batch $(LOAD_PATH) --eval "(setq load-prefer-newer 
 
 CURL = curl -fsSkL --retry 9 --retry-delay 9
 GITHUB=https://raw.githubusercontent.com
+
+all: check
 
 install-dependencies:
 	$(CURL) -O ${GITHUB}/abo-abo/swiper/master/ivy.el
