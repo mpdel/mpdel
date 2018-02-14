@@ -44,7 +44,7 @@ Start by adding these lines to your ~init.el~ file:
 
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'load-path "~/.emacs.d/lib/mpdel")
-  (require 'mpdel-mode)
+  (require 'mpdel)
   (mpdel-mode)
   (mpdel-setup)
 #+END_SRC

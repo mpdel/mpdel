@@ -1,4 +1,4 @@
-;;; mpdel-mode.el --- Play and control your MPD music  -*- lexical-binding: t; -*-
+;;; mpdel.el --- Play and control your MPD music  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2018  Damien Cassou
 
@@ -84,10 +84,10 @@ Each binding must be prefixed with `mpdel-prefix-key'.")
 
 \\{mpdel-mode-map}"
   :global t
-  :require 'mpdel-mode
+  :require 'mpdel
   :lighter " MPDel")
 
-(provide 'mpdel-mode)
-;;; mpdel-mode.el ends here
+(provide 'mpdel)
+;;; mpdel.el ends here
 
 ;;; LocalWords:  Mpdel mpdel
