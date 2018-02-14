@@ -15,6 +15,8 @@ BATCH     = $(EMACSBIN) -Q --batch $(LOAD_PATH) --eval "(setq load-prefer-newer 
 CURL = curl -fsSkL --retry 9 --retry-delay 9
 GITHUB=https://raw.githubusercontent.com
 
+all: check
+
 install-dependencies:
 	$(CURL) -O ${GITHUB}/abo-abo/swiper/master/ivy.el
 	$(CURL) -O ${GITHUB}/abo-abo/swiper/master/ivy-overlay.el
