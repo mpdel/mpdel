@@ -70,6 +70,7 @@
 
 ;;; Ivy interface
 
+;;;###autoload
 (defun ivy-mpdel-artists ()
   "Select music from a list of artists."
   (interactive)
@@ -95,6 +96,7 @@
   "Select a song from a list of songs of ALBUM."
   (libmpdel-list album #'ivy-mpdel-songs))
 
+;;;###autoload
 (defun ivy-mpdel-stored-playlists ()
   "Select music from a stored playlist or edit one."
   (interactive)

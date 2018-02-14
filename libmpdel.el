@@ -707,6 +707,7 @@ If HANDLER is nil, ignore response."
 
 ;;; Playback queries
 
+;;;###autoload
 (defun libmpdel-playback-set-volume (volume)
   "Set volume to VOLUME."
   (interactive (list
@@ -714,21 +715,25 @@ If HANDLER is nil, ignore response."
                                      (libmpdel-volume)))))
   (libmpdel-send-command `("setvol %s" ,volume)))
 
+;;;###autoload
 (defun libmpdel-playback-next ()
   "Play next song in the playlist."
   (interactive)
   (libmpdel-send-command "next"))
 
+;;;###autoload
 (defun libmpdel-playback-previous ()
   "Play previous song in the playlist."
   (interactive)
   (libmpdel-send-command "previous"))
 
+;;;###autoload
 (defun libmpdel-play ()
   "Start playing."
   (interactive)
   (libmpdel-send-command "play"))
 
+;;;###autoload
 (defun libmpdel-stop ()
   "Stop playing.  See also `libmpdel-playback-play-pause'."
   (interactive)
@@ -738,6 +743,7 @@ If HANDLER is nil, ignore response."
   "Start playing SONG, a song of the current playlist."
   (libmpdel-send-command `("playid %s" ,(libmpdel-song-id song))))
 
+;;;###autoload
 (defun libmpdel-playback-play-pause ()
   "Toggle between play and pause.
 See also `libmpdel-playback-stop'."
@@ -748,6 +754,7 @@ See also `libmpdel-playback-stop'."
      (pause "pause 0")
      (stop "play"))))
 
+;;;###autoload
 (defun libmpdel-playback-seek (time &optional handler)
   "Seeks to the position TIME within the current song.
 
@@ -770,6 +777,7 @@ succeeds."
 
 ;;; Database queries
 
+;;;###autoload
 (defun libmpdel-database-update (&optional uri)
   "Update the music database for URI, everything if nil.
 Updates the music database: find new files, remove deleted files,

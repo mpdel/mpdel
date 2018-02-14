@@ -164,6 +164,7 @@ In particular, it must contain key symbol `elapsed' and symbol
         (libmpdel-send-command "status" (lambda (data) (mpdel-song--refresh-current-song data buffer)))
       (mpdel-song--refresh-non-current-song (current-buffer)))))
 
+;;;###autoload
 (defun mpdel-song-open (&optional song)
   "Open a buffer to display information about SONG.
 If SONG is nil, use current song instead.

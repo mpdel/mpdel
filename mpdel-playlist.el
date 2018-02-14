@@ -250,6 +250,7 @@ Use current buffer if BUFFER is nil."
     (switch-to-buffer buffer)
     (mpdel-playlist--register-to-hooks buffer)))
 
+;;;###autoload
 (defun mpdel-playlist-open-stored-playlist ()
   "Ask for a stored playlist and open it."
   (interactive)
