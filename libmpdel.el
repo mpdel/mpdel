@@ -764,7 +764,8 @@ the current playing position.
 
 If HANDLER is non-nil, execute it with no parameter when seek
 succeeds."
-  (interactive)
+  (interactive (list (read-string "New position (e.g., 67, -23, +12): ")
+                     (lambda (_) (message "Seek done."))))
   (libmpdel-send-command `("seekcur %S" ,time) (lambda (_) (funcall handler))))
 
 
