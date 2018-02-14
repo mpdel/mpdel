@@ -23,7 +23,7 @@
 
 ;;; Commentary:
 
-;; Mpdel is an Emacs client for Music Player Daemon (MPD), a flexible,
+;; MPDel is an Emacs client for Music Player Daemon (MPD), a flexible,
 ;; powerful, server-side application for playing music.  This file
 ;; makes features (e.g., playlist, navigation and playback) provided
 ;; by other files in the project accessible globally through the
@@ -61,7 +61,6 @@
 (defvar mpdel-command-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "SPC") #'libmpdel-playback-play-pause)
-    (define-key map (kbd "c") #'libmpdel--connect)
     (define-key map (kbd "p") #'mpdel-playlist-open)
     (define-key map (kbd "P") #'mpdel-playlist-open-stored-playlist)
     (define-key map (kbd "S") #'mpdel-song-open)
