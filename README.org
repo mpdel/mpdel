@@ -1,0 +1,100 @@
+* MPDel
+  #+BEGIN_HTML
+      <p>
+        <a href="https://travis-ci.org/DamienCassou/mpdel">
+          <img src="https://travis-ci.org/DamienCassou/mpdel.svg?branch=master" alt="Build Status" />
+        </a>
+      </p>
+  #+END_HTML
+
+** Summary
+
+MPDel is an Emacs client for [[https://www.musicpd.org/][Music Player Daemon]] (MPD), a flexible,
+powerful, server-side application for playing music. MPDel provides
+playback control, completion-based search within your music database
+and current and stored playlist manipulation.
+
+This is a screenshot of the current playlist with the
+currently-playing song:
+
+[[file:media/mpdel-playlist.png]]
+
+You can navigate your music database and add songs to playlists with a
+completion:
+
+[[file:media/ivy-mpdel.png]]
+
+MPDel can show information about the currently playing song or any
+other song:
+
+[[file:media/mpdel-song.png]]
+
+** Installing
+
+Clone this git repository and install [[https://melpa.org/#/ivy][ivy]] (you don't need to use ivy
+as Emacs' completion system, just have it installed). I will ask to
+get MPDel inside [[http://melpa.org/][melpa]].
+
+You need to install and (quickly) configure an [[https://www.musicpd.org/][MPD server]] if you don't
+have any yet. Don't worry, that's simple and you won't regret it.
+
+** Using
+
+Start by adding these lines to your ~init.el~ file:
+
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'load-path "~/.emacs.d/lib/mpdel")
+  (require 'mpdel-mode)
+  (mpdel-mode)
+  (mpdel-setup)
+#+END_SRC
+
+Then, press ~C-x Z p~ to show the current playlist. The ~C-x Z~ global
+prefix is configurable with ~mpdel-prefix-key~:
+
+#+BEGIN_SRC emacs-lisp
+  (setq mpdel-prefix-key (kbd "C-. z"))
+#+END_SRC
+
+*** Adding songs to the current playlist
+
+You can add songs to the playlist by typing ~a~ in the current
+playlist or by typing ~C-x Z a~ everywhere in Emacs. At this point,
+the minibuffer contains a list of artists in the database. You can add
+all songs from any artist by selecting the artist and pressing ~M-o
+a~. You can also browse to the artist's albums by typing ~RET~ (i.e.,
+~enter~). Add a complete album to the current playlist by typing ~M-o
+a~ or go to the album's songs by typing ~RET~. Beyond ~a~ after ~M-o~,
+you can type ~r~ (replace whole playlist by selection) or ~P~ (add to
+a stored playlist).
+
+*** Global key bindings
+
+Anywhere in Emacs, if you activate ~mpdel-mode~, you have access to
+set of key bindings to control your music. The following key bindings
+must all be prefixed by ~mpdel-prefix-key~'s value (~C-x Z~ by
+default):
+
+| *Binding* | *Action*                     |
+|-----------+------------------------------|
+| ~SPC~     | play / pause                 |
+| ~S~       | display current song         |
+| ~a~       | navigate your database       |
+| ~p~       | open current playlist        |
+| ~l~       | navigate a stored playlist   |
+| ~P~       | open a stored playlist       |
+| ~]~       | start playing next song      |
+| ~[~       | start playing previous song  |
+
+** License
+
+See [[file:COPYING][COPYING]]. Copyright (c) 2018 Damien Cassou.
+
+  #+BEGIN_HTML
+  <a href="https://liberapay.com/DamienCassou/donate">
+    <img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg">
+  </a>
+  #+END_HTML
+
+
+#  LocalWords:  MPDel MPD minibuffer
