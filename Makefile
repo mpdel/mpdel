@@ -18,8 +18,8 @@ GITHUB=https://raw.githubusercontent.com
 all: check
 
 install-dependencies:
-	$(CURL) -O ${GITHUB}/abo-abo/swiper/master/ivy.el
-	$(CURL) -O ${GITHUB}/abo-abo/swiper/master/ivy-overlay.el
+	$(CURL) -O ${GITHUB}/abo-abo/swiper/0.10.0/ivy.el
+	$(CURL) -O ${GITHUB}/abo-abo/swiper/0.10.0/ivy-overlay.el
 	$(CURL) -O ${GITHUB}/purcell/package-lint/master/package-lint.el
 
 check: test lint
@@ -36,5 +36,10 @@ lint :
 	-f batch-byte-compile ${SRCS} ${TESTS}
 
 	# Run package-lint to check for packaging mistakes
-	$(BATCH) --eval "(require 'package-lint)" \
+	$(BATCH) \
+	--eval "(require 'package)" \
+	--eval "(push '(\"melpa\" . \"http://melpa.org/packages/\") package-archives)" \
+	--eval "(package-initialize)" \
+	--eval "(package-refresh-contents)" \
+	--eval "(require 'package-lint)" \
 	-f package-lint-batch-and-exit ${SRCS}
