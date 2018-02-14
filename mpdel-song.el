@@ -27,8 +27,6 @@
 ;; information and control the current song.
 
 ;;; Code:
-(require 'map)
-
 (require 'libmpdel)
 
 
@@ -119,8 +117,8 @@ when the song changes.")
   "Give information about current play time in DATA."
   (insert
    (format "%s / %s"
-           (libmpdel-time-to-string (map-elt data 'elapsed))
-           (libmpdel-time-to-string (map-elt data 'duration)))))
+           (libmpdel-time-to-string (cdr (assq 'elapsed data)))
+           (libmpdel-time-to-string (cdr (assq 'duration data))))))
 
 (defun mpdel-song--display-metadata ()
   "Give information about current song metadata."

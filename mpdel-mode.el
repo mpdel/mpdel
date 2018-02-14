@@ -5,7 +5,7 @@
 ;; Author: Damien Cassou <damien@cassou.me>
 ;; Keywords: multimedia
 ;; Url: https://github.com/DamienCassou/mpdel
-;; Package-requires: ((emacs "24.3"))
+;; Package-requires: ((emacs "25.1"))
 ;; Version: 0.1.0
 
 ;; This program is free software; you can redistribute it and/or modify
