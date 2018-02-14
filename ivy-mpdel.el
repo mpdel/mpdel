@@ -50,8 +50,7 @@
 
 (defun ivy-mpdel--apply-unwrapped (function)
   "Return a function applying FUNCTION after unwrapping its argument."
-  (lambda (pair) (funcall function
-                     (ivy-mpdel--unwrap pair))))
+  (lambda (pair) (funcall function (ivy-mpdel--unwrap pair))))
 
 (defun ivy-mpdel--stored-playlist-add-entity (entity)
   "Select a stored playlist and add ENTITY to it."
