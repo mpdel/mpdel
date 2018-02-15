@@ -10,7 +10,7 @@ LOAD_PATH += -L ../package-lint
 EMACSBIN ?= emacs
 BATCH     = $(EMACSBIN) -Q --batch $(LOAD_PATH) --eval "(setq load-prefer-newer t)"
 
-.PHONY: install_dependencies check test
+.PHONY: all install_dependencies check test lint
 
 CURL = curl -fsSkL --retry 9 --retry-delay 9
 GITHUB=https://raw.githubusercontent.com
