@@ -4,7 +4,7 @@
 
 ;; Author: Damien Cassou <damien@cassou.me>
 ;; Keywords: multimedia
-;; Url: https://github.com/DamienCassou/mpdel
+;; Url: https://gitlab.petton.fr/mpdel/mpdel
 ;; Package-requires: ((emacs "25.1"))
 ;; Version: 0.2.0
 
