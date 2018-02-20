@@ -5,7 +5,7 @@
 ;; Author: Damien Cassou <damien@cassou.me>
 ;; Keywords: multimedia
 ;; Url: https://github.com/DamienCassou/mpdel
-;; Package-requires: ((emacs "25.1") (ivy "0.10.0"))
+;; Package-requires: ((emacs "25.1"))
 ;; Version: 0.2.0
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -36,7 +36,6 @@
 (require 'libmpdel)
 (require 'mpdel-playlist)
 (require 'mpdel-song)
-(require 'ivy-mpdel)
 
 (defgroup mpdel nil
   "Configure mpdel's global minor mode."
@@ -53,8 +52,6 @@
 
 (defun mpdel-setup ()
   "Integrate all mpdel features together."
-  (define-key mpdel-playlist-mode-map "a" #'ivy-mpdel-artists)
-  (define-key mpdel-playlist-mode-map "l" #'ivy-mpdel-stored-playlists)
   (define-key mpdel-playlist-mode-map "S" #'mpdel-song-open)
   (define-key mpdel-playlist-mode-map "i" #'mpdel-playlist-open-song-at-point))
 
@@ -64,8 +61,6 @@
     (define-key map (kbd "p") #'mpdel-playlist-open)
     (define-key map (kbd "P") #'mpdel-playlist-open-stored-playlist)
     (define-key map (kbd "S") #'mpdel-song-open)
-    (define-key map (kbd "a") #'ivy-mpdel-artists)
-    (define-key map (kbd "l") #'ivy-mpdel-stored-playlists)
     (define-key map (kbd "]") #'libmpdel-playback-next)
     (define-key map (kbd "[") #'libmpdel-playback-previous)
     map)

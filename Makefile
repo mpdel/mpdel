@@ -1,33 +1,26 @@
-SRCS = libmpdel.el mpdel-playlist.el ivy-mpdel.el mpdel-song.el mpdel.el
-TESTS = test/libmpdel-test.el
+SRCS = mpdel-playlist.el mpdel-song.el mpdel.el
+TESTS =
 
-LOAD_PATH = -L .
-
-LOAD_PATH += -L ../ivy
-
-LOAD_PATH += -L ../package-lint
+LOAD_PATH = -L . -L ../package-lint
 
 EMACSBIN ?= emacs
-BATCH     = $(EMACSBIN) -Q --batch $(LOAD_PATH) --eval "(setq load-prefer-newer t)"
+BATCH     = $(EMACSBIN) -Q --batch $(LOAD_PATH) \
+		--eval "(setq load-prefer-newer t)" \
+		--eval "(require 'package)" \
+		--eval "(add-to-list 'package-archives '(\"melpa-stable\" . \"http://stable.melpa.org/packages/\"))" \
+		--funcall package-initialize
 
-.PHONY: all install_dependencies check test lint
-
-CURL = curl -fsSkL --retry 9 --retry-delay 9
-GITHUB=https://raw.githubusercontent.com
+.PHONY: all ci-dependencies check test lint
 
 all: check
 
-install-dependencies:
-	$(CURL) -O ${GITHUB}/abo-abo/swiper/0.10.0/ivy.el
-	$(CURL) -O ${GITHUB}/abo-abo/swiper/0.10.0/ivy-overlay.el
-	$(CURL) -O ${GITHUB}/purcell/package-lint/master/package-lint.el
+ci-dependencies:
+	# Install dependencies in ~/.emacs.d/elpa
+	$(BATCH) \
+	--funcall package-refresh-contents \
+	--eval "(package-install 'package-lint)"
 
-check: test lint
-
-test:
-	$(BATCH) --eval "(progn\
-	(load-file \"test/libmpdel-test.el\")\
-	(ert-run-tests-batch-and-exit))"
+check: lint
 
 lint :
 	# Byte compile all and stop on any warning or error
@@ -37,9 +30,5 @@ lint :
 
 	# Run package-lint to check for packaging mistakes
 	$(BATCH) \
-	--eval "(require 'package)" \
-	--eval "(push '(\"melpa\" . \"http://melpa.org/packages/\") package-archives)" \
-	--eval "(package-initialize)" \
-	--eval "(package-refresh-contents)" \
 	--eval "(require 'package-lint)" \
 	-f package-lint-batch-and-exit ${SRCS}
