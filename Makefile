@@ -1,7 +1,7 @@
 SRCS = mpdel-playlist.el mpdel-song.el mpdel.el
 TESTS =
 
-LOAD_PATH = -L . -L ../package-lint
+LOAD_PATH = -L . -L ../libmpdel -L ../package-lint
 
 EMACSBIN ?= emacs
 BATCH     = $(EMACSBIN) -Q --batch $(LOAD_PATH) \
@@ -9,6 +9,9 @@ BATCH     = $(EMACSBIN) -Q --batch $(LOAD_PATH) \
 		--eval "(require 'package)" \
 		--eval "(add-to-list 'package-archives '(\"melpa-stable\" . \"http://stable.melpa.org/packages/\"))" \
 		--funcall package-initialize
+
+CURL = curl -fsSkL --retry 9 --retry-delay 9
+GITLAB=https://gitlab.petton.fr
 
 .PHONY: all ci-dependencies check test lint
 
@@ -19,6 +22,9 @@ ci-dependencies:
 	$(BATCH) \
 	--funcall package-refresh-contents \
 	--eval "(package-install 'package-lint)"
+
+	# Install libmpdel separately as it is not in melpa yet
+	$(CURL) -O ${GITLAB}/mpdel/libmpdel/raw/master/libmpdel.el
 
 check: lint
 
