@@ -31,6 +31,7 @@
 (require 'subr-x)
 
 (require 'libmpdel)
+(require 'mpdel-core)
 
 
 ;;; Customization
@@ -256,13 +257,29 @@ Use current buffer if BUFFER is nil."
 (defun mpdel-playlist-open-stored-playlist ()
   "Ask for a stored playlist and open it."
   (interactive)
-  (libmpdel-list-stored-playlists
+  (libmpdel-list
+   'stored-playlists
    (lambda (playlists)
      (let ((playlist (libmpdel-completing-read "Playlist: " playlists)))
        (mpdel-playlist-open playlist)))))
 
 
 ;;; Major mode
+
+(defvar mpdel-playlist-mode-map
+  (let ((map (make-sparse-keymap)))
+    ;; inherit from both `mpdel-core-map' and
+    ;; `tabulated-list-mode-map':
+    (set-keymap-parent
+     map
+     (make-composed-keymap mpdel-core-map tabulated-list-mode-map))
+    (define-key map (kbd "g") #'mpdel-playlist-refresh)
+    (define-key map (kbd "k") #'mpdel-playlist-delete)
+    (define-key map (kbd "RET") #'mpdel-playlist-play)
+    (define-key map (kbd "<M-up>") #'mpdel-playlist-move-up)
+    (define-key map (kbd "<M-down>") #'mpdel-playlist-move-down)
+    (define-key map (kbd "C-x C-j") #'mpdel-playlist-dired)
+    map))
 
 (define-derived-mode mpdel-playlist-mode tabulated-list-mode "Playlist"
   "Display and manipulate the current MPD playlist."
@@ -274,16 +291,6 @@ Use current buffer if BUFFER is nil."
   (tabulated-list-init-header)
   (setq imenu-prev-index-position-function #'mpdel-playlist--imenu-prev-index-position)
   (setq imenu-extract-index-name-function #'mpdel-playlist--imenu-extract-index-name))
-
-(define-key mpdel-playlist-mode-map (kbd "g") #'mpdel-playlist-refresh)
-(define-key mpdel-playlist-mode-map (kbd "k") #'mpdel-playlist-delete)
-(define-key mpdel-playlist-mode-map (kbd "RET") #'mpdel-playlist-play)
-(define-key mpdel-playlist-mode-map (kbd "SPC") #'libmpdel-playback-play-pause)
-(define-key mpdel-playlist-mode-map (kbd "[") #'libmpdel-playback-previous)
-(define-key mpdel-playlist-mode-map (kbd "]") #'libmpdel-playback-next)
-(define-key mpdel-playlist-mode-map (kbd "<M-up>") #'mpdel-playlist-move-up)
-(define-key mpdel-playlist-mode-map (kbd "<M-down>") #'mpdel-playlist-move-down)
-(define-key mpdel-playlist-mode-map (kbd "C-x C-j") #'mpdel-playlist-dired)
 
 (provide 'mpdel-playlist)
 ;;; mpdel-playlist.el ends here
