@@ -284,10 +284,10 @@ Use current buffer if BUFFER is nil."
 (define-derived-mode mpdel-playlist-mode tabulated-list-mode "Playlist"
   "Display and manipulate the current MPD playlist."
   (setq tabulated-list-format
-        (vector (list "Title" 30 t)
-                (list "#" 6 t)
-                (list "Album" 30 t)
-                (list "Artist" 20 t)))
+        (vector (list "Title" 30 nil)
+                (list "#" 6 nil)
+                (list "Album" 30 nil)
+                (list "Artist" 20 nil)))
   (tabulated-list-init-header)
   (setq imenu-prev-index-position-function #'mpdel-playlist--imenu-prev-index-position)
   (setq imenu-extract-index-name-function #'mpdel-playlist--imenu-extract-index-name))
