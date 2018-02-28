@@ -143,9 +143,11 @@ Restore selection with `mpdel-playlist--restore-playlist-status'."
 (defun mpdel-playlist--restore-playlist-status (status)
   "Restore playlist selection STATUS.
 STATUS has been returned by `mpdel-playlist--save-playlist-status'."
-  (mpdel-playlist-go-to-song (cdr status))
-  (push-mark)
-  (mpdel-playlist-go-to-song (car status)))
+  (when (cdr status)
+    (mpdel-playlist-go-to-song (cdr status))
+    (push-mark))
+  (when (car status)
+    (mpdel-playlist-go-to-song (car status))))
 
 (defun mpdel-playlist--imenu-prev-index-position ()
   "Move point to previous line in playlist buffer.
