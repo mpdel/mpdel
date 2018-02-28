@@ -34,6 +34,7 @@
 ;;; Code:
 
 (require 'libmpdel)
+(require 'mpdel-core)
 (require 'mpdel-playlist)
 (require 'mpdel-song)
 
@@ -50,29 +51,16 @@
   (interactive)
   (mpdel-song-open (mpdel-playlist-song-at-point)))
 
-(defun mpdel-setup ()
-  "Integrate all mpdel features together."
-  (define-key mpdel-playlist-mode-map "S" #'mpdel-song-open)
-  (define-key mpdel-playlist-mode-map "i" #'mpdel-playlist-open-song-at-point))
-
-(defvar mpdel-command-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "SPC") #'libmpdel-playback-play-pause)
-    (define-key map (kbd "p") #'mpdel-playlist-open)
-    (define-key map (kbd "P") #'mpdel-playlist-open-stored-playlist)
-    (define-key map (kbd "S") #'mpdel-song-open)
-    (define-key map (kbd "]") #'libmpdel-playback-next)
-    (define-key map (kbd "[") #'libmpdel-playback-previous)
-    map)
-  "Key bindings to activate global mpdel commands.
-Each binding must be prefixed with `mpdel-prefix-key'.")
-(fset 'mpdel-command-map mpdel-command-map)
+(define-key mpdel-core-map (kbd "l") #'mpdel-playlist-open)
+(define-key mpdel-core-map (kbd "L") #'mpdel-playlist-open-stored-playlist)
+(define-key mpdel-core-map (kbd "v") #'mpdel-song-open)
+(define-key mpdel-playlist-mode-map (kbd "V") #'mpdel-playlist-open-song-at-point)
 
 (defvar mpdel-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map mpdel-prefix-key 'mpdel-command-map)
+    (define-key map mpdel-prefix-key 'mpdel-core-map)
     map)
-  "Keymap activating variable `mpdel-command-map'.")
+  "Keymap activating variable `mpdel-core-map'.")
 
 (define-minor-mode mpdel-mode
   "Activate keybindings to play and control your MPD server.
