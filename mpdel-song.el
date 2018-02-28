@@ -28,6 +28,7 @@
 
 ;;; Code:
 (require 'libmpdel)
+(require 'mpdel-core)
 
 
 ;;; Customization
@@ -201,8 +202,17 @@ playback."
      (funcall ,function)
      (mpdel-song-refresh)))
 
+(defmacro mpdel-song--apply (function)
+  "Return a command applying FUNCTION to song in current buffer."
+  `(lambda ()
+     (interactive)
+     (funcall ,function mpdel-song-song)))
+
 (defvar mpdel-song-mode-map
   (let ((map (make-sparse-keymap)))
+    (set-keymap-parent
+     map
+     (make-composed-keymap mpdel-core-map special-mode-map))
     (define-key map (kbd "g") #'mpdel-song-refresh)
     ;; force kill instead of burrying to stop the timer:
     (define-key map (kbd "q") (lambda () (interactive) (quit-window t)))
@@ -212,9 +222,10 @@ playback."
     (define-key map (kbd "B") (mpdel-song--seek-command mpdel-song-small-decrement))
     (define-key map (kbd "b") (mpdel-song--seek-command mpdel-song-normal-decrement))
     (define-key map (kbd "M-b") (mpdel-song--seek-command mpdel-song-large-decrement))
-    (define-key map (kbd "SPC") (mpdel-song--call-refresh-command #'libmpdel-playback-play-pause))
-    (define-key map (kbd "]") (mpdel-song--call-refresh-command #'libmpdel-playback-next))
-    (define-key map (kbd "[") (mpdel-song--call-refresh-command #'libmpdel-playback-previous))
+    (define-key map (kbd "a") (mpdel-song--apply #'libmpdel-current-playlist-add))
+    (define-key map (kbd "A") (mpdel-song--apply #'libmpdel-stored-playlist-add))
+    (define-key map (kbd "r") (mpdel-song--apply #'libmpdel-current-playlist-replace))
+    (define-key map (kbd "R") (mpdel-song--apply #'libmpdel-stored-playlist-replace))
     map))
 
 (define-derived-mode mpdel-song-mode special-mode "MPDEL song"
