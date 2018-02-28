@@ -1,11 +1,4 @@
 * MPDel
-  #+BEGIN_HTML
-      <p>
-        <a href="https://travis-ci.org/DamienCassou/mpdel">
-          <img src="https://travis-ci.org/DamienCassou/mpdel.svg?branch=master" alt="Build Status" />
-        </a>
-      </p>
-  #+END_HTML
 
 ** Summary
 
@@ -34,7 +27,7 @@ database and add songs to playlists with completion:
 ** Installing
 
 Clone this git repository and [[https://gitlab.petton.fr/mpdel/libmpdel][libmpdel]]. I will ask to get MPDel inside
-[[http://melpa.org/][melpa]].
+[[http://melpa.org/][melpa]] to facilitate installation.
 
 You need to install and (quickly) configure an [[https://www.musicpd.org/][MPD server]] if you don't
 have any yet. Don't worry, that's simple and you won't regret it.
@@ -44,35 +37,43 @@ have any yet. Don't worry, that's simple and you won't regret it.
 Start by adding these lines to your ~init.el~ file:
 
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/lib/libmpdel")
   (add-to-list 'load-path "~/.emacs.d/lib/mpdel")
   (require 'mpdel)
   (mpdel-mode)
-  (mpdel-setup)
 #+END_SRC
 
-Then, press ~C-x Z p~ to show the current playlist. The ~C-x Z~ global
+Then, press ~C-x Z l~ to show the current playlist. The ~C-x Z~ global
 prefix is configurable with ~mpdel-prefix-key~:
 
 #+BEGIN_SRC emacs-lisp
   (setq mpdel-prefix-key (kbd "C-. z"))
 #+END_SRC
 
-*** Global key bindings
+The following MPDel keybindings are available globally if ~mpdel-mode~
+is active:
 
-Anywhere in Emacs, if you activate ~mpdel-mode~, you have access to
-a set of key bindings to control your music. The following key bindings
-must all be prefixed by ~mpdel-prefix-key~'s value (~C-x Z~ by
-default):
+| *Binding*   | *Action*                             |
+|-------------+--------------------------------------|
+| ~C-x Z SPC~ | toggle between play and pause        |
+| ~C-x Z M-n~ | play next song                       |
+| ~C-x Z M-p~ | play previous song                   |
+| ~C-x Z l~   | open the current playlist            |
+| ~C-x Z L~   | open a stored playlist               |
+| ~C-x Z v~   | view current song                    |
 
-| *Binding* | *Action*                    |
-|-----------+-----------------------------|
-| ~SPC~     | play / pause                |
-| ~S~       | display current song        |
-| ~p~       | open current playlist       |
-| ~P~       | open a stored playlist      |
-| ~]~       | start playing next song     |
-| ~[~       | start playing previous song |
+The last component of each keybinding can also be pressed in any MPDel
+buffer (e.g., press ~M-n~ in a playlist buffer to play the next song)
+to do the same.  Additionally, the following keybindings are available
+in all MPDel buffers where they make sense:
+
+| *Binding* | *Action*                            |
+|-----------+-------------------------------------|
+| ~a~       | add item to current playlist        |
+| ~A~       | add item to a stored playlist       |
+| ~r~       | replace current playlist with item  |
+| ~R~       | replace a stored playlist with item |
+| ~v~       | view currently played song          |
+| ~V~       | view song at point                  |
 
 ** License
 
@@ -83,6 +84,5 @@ See [[file:COPYING][COPYING]]. Copyright (c) 2018 Damien Cassou.
     <img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg">
   </a>
   #+END_HTML
-
 
 #  LocalWords:  MPDel MPD minibuffer
