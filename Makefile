@@ -1,4 +1,4 @@
-SRCS = mpdel-core.el mpdel-playlist.el mpdel-song.el mpdel.el
+SRCS = mpdel-core.el mpdel-playlist.el mpdel-song.el mpdel-nav.el mpdel.el
 TESTS =
 
 LOAD_PATH = -L . -L ../libmpdel -L ../package-lint

@@ -37,6 +37,7 @@
 (require 'mpdel-core)
 (require 'mpdel-playlist)
 (require 'mpdel-song)
+(require 'mpdel-nav)
 
 (defgroup mpdel nil
   "Configure mpdel's global minor mode."
@@ -46,6 +47,9 @@
   "Prefix key to all global mpdel keybindings."
   :type 'key-sequence)
 
+(cl-defmethod mpdel-nav-dive ((entity libmpdel-song))
+  (mpdel-song-open entity))
+
 (defun mpdel-playlist-open-song-at-point ()
   "Open buffer displaying information about song at point."
   (interactive)
@@ -53,6 +57,8 @@
 
 (define-key mpdel-core-map (kbd "l") #'mpdel-playlist-open)
 (define-key mpdel-core-map (kbd "L") #'mpdel-playlist-open-stored-playlist)
+(define-key mpdel-core-map (kbd "n") #'mpdel-nav-open-artists)
+(define-key mpdel-core-map (kbd "N") #'mpdel-nav-open-stored-playlists)
 (define-key mpdel-core-map (kbd "v") #'mpdel-song-open)
 (define-key mpdel-playlist-mode-map (kbd "V") #'mpdel-playlist-open-song-at-point)
 

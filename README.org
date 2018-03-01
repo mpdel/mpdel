@@ -52,14 +52,16 @@ prefix is configurable with ~mpdel-prefix-key~:
 The following MPDel keybindings are available globally if ~mpdel-mode~
 is active:
 
-| *Binding*   | *Action*                             |
-|-------------+--------------------------------------|
-| ~C-x Z SPC~ | toggle between play and pause        |
-| ~C-x Z M-n~ | play next song                       |
-| ~C-x Z M-p~ | play previous song                   |
-| ~C-x Z l~   | open the current playlist            |
-| ~C-x Z L~   | open a stored playlist               |
-| ~C-x Z v~   | view current song                    |
+| *Binding*   | *Action*                                     |
+|-------------+----------------------------------------------|
+| ~C-x Z SPC~ | toggle between play and pause                |
+| ~C-x Z M-n~ | play next song                               |
+| ~C-x Z M-p~ | play previous song                           |
+| ~C-x Z l~   | open the current playlist                    |
+| ~C-x Z L~   | open a stored playlist                       |
+| ~C-x Z n~   | navigate your database from artists          |
+| ~C-x Z N~   | navigate your database from stored playlists |
+| ~C-x Z v~   | view current song                            |
 
 The last component of each keybinding can also be pressed in any MPDel
 buffer (e.g., press ~M-n~ in a playlist buffer to play the next song)
