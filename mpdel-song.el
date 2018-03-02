@@ -98,11 +98,7 @@ when the song changes.")
 
 (defun mpdel-song--seek (time)
   "Seek TIME within current song and refresh current buffer."
-  (libmpdel-playback-seek
-   time
-   (lambda ()
-     (message "Seek feedback!")
-     (mpdel-song-refresh))))
+  (libmpdel-playback-seek time))
 
 (defun mpdel-song--display-play-state ()
   "Give information about current play state and control timer."
@@ -189,12 +185,6 @@ playback."
         (add-hook 'kill-buffer-hook (lambda () (remove-hook 'libmpdel-player-changed-hook refresh-fn))))
       (pop-to-buffer (current-buffer)))))
 
-(defmacro mpdel-song--seek-command (time)
-  "Return a command seeking TIME in current song."
-  `(lambda ()
-     (interactive)
-     (mpdel-song--seek ,time)))
-
 (defmacro mpdel-song--call-refresh-command (function)
   "Return a command calling FUNCTION and refreshing buffer."
   `(lambda ()
@@ -216,12 +206,6 @@ playback."
     (define-key map (kbd "g") #'mpdel-song-refresh)
     ;; force kill instead of burrying to stop the timer:
     (define-key map (kbd "q") (lambda () (interactive) (quit-window t)))
-    (define-key map (kbd "F") (mpdel-song--seek-command mpdel-song-small-increment))
-    (define-key map (kbd "f") (mpdel-song--seek-command mpdel-song-normal-increment))
-    (define-key map (kbd "M-f") (mpdel-song--seek-command mpdel-song-large-increment))
-    (define-key map (kbd "B") (mpdel-song--seek-command mpdel-song-small-decrement))
-    (define-key map (kbd "b") (mpdel-song--seek-command mpdel-song-normal-decrement))
-    (define-key map (kbd "M-b") (mpdel-song--seek-command mpdel-song-large-decrement))
     (define-key map (kbd "a") (mpdel-song--apply #'libmpdel-current-playlist-add))
     (define-key map (kbd "A") (mpdel-song--apply #'libmpdel-stored-playlist-add))
     (define-key map (kbd "r") (mpdel-song--apply #'libmpdel-current-playlist-replace))

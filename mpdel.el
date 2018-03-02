@@ -55,6 +55,19 @@
   (interactive)
   (mpdel-song-open (mpdel-playlist-song-at-point)))
 
+(defmacro mpdel--seek-command (time)
+  "Return a command seeking TIME in current song."
+  `(lambda ()
+     (interactive)
+     (mpdel-song--seek ,time)))
+
+(define-key mpdel-core-map (kbd "F") (mpdel--seek-command mpdel-song-small-increment))
+(define-key mpdel-core-map (kbd "f") (mpdel--seek-command mpdel-song-normal-increment))
+(define-key mpdel-core-map (kbd "M-f") (mpdel--seek-command mpdel-song-large-increment))
+(define-key mpdel-core-map (kbd "B") (mpdel--seek-command mpdel-song-small-decrement))
+(define-key mpdel-core-map (kbd "b") (mpdel--seek-command mpdel-song-normal-decrement))
+(define-key mpdel-core-map (kbd "M-b") (mpdel--seek-command mpdel-song-large-decrement))
+
 (define-key mpdel-core-map (kbd "l") #'mpdel-playlist-open)
 (define-key mpdel-core-map (kbd "L") #'mpdel-playlist-open-stored-playlist)
 (define-key mpdel-core-map (kbd "n") #'mpdel-nav-open-artists)
