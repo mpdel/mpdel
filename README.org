@@ -1,5 +1,17 @@
 * MPDel
 
+  #+BEGIN_HTML
+      <p>
+        <a href="https://gitlab.petton.fr/mpdel/mpdel/commits/master">
+          <img alt="pipeline status" src="https://gitlab.petton.fr/mpdel/mpdel/badges/master/pipeline.svg" />
+        </a>
+
+        <a href="https://liberapay.com/DamienCassou/donate">
+          <img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg">
+        </a>
+      </p>
+  #+END_HTML
+
 ** Summary
 
 MPDel is an Emacs client for [[https://www.musicpd.org/][Music Player Daemon]] (MPD), a flexible,
@@ -138,11 +150,5 @@ song (e.g., ~"02:32 / 06:01"~).
 ** License
 
 See [[file:COPYING][COPYING]]. Copyright (c) 2018 Damien Cassou.
-
-  #+BEGIN_HTML
-  <a href="https://liberapay.com/DamienCassou/donate">
-    <img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg">
-  </a>
-  #+END_HTML
 
 #  LocalWords:  MPDel MPD minibuffer dired
