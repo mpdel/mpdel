@@ -52,30 +52,88 @@ prefix is configurable with ~mpdel-prefix-key~:
 The following MPDel keybindings are available globally if ~mpdel-mode~
 is active:
 
-| *Binding*   | *Action*                                     |
-|-------------+----------------------------------------------|
-| ~C-x Z SPC~ | toggle between play and pause                |
-| ~C-x Z M-n~ | play next song                               |
-| ~C-x Z M-p~ | play previous song                           |
-| ~C-x Z l~   | open the current playlist                    |
-| ~C-x Z L~   | open a stored playlist                       |
-| ~C-x Z n~   | navigate your database from artists          |
-| ~C-x Z N~   | navigate your database from stored playlists |
-| ~C-x Z v~   | view current song                            |
+| *Binding*   | *Action*                                                  |
+|-------------+-----------------------------------------------------------|
+| ~C-x Z SPC~ | toggle between play and pause                             |
+| ~C-x Z M-n~ | play next song                                            |
+| ~C-x Z M-p~ | play previous song                                        |
+| ~C-x Z l~   | open the current playlist                                 |
+| ~C-x Z L~   | open a stored playlist                                    |
+| ~C-x Z n~   | navigate your database from artists                       |
+| ~C-x Z N~   | navigate your database from stored playlists              |
+| ~C-x Z v~   | view current song                                         |
+| ~C-x Z f~   | go forward current song by ~mpdel-song-normal-increment~  |
+| ~C-x Z F~   | go forward current song by ~mpdel-song-small-increment~   |
+| ~C-x Z M-f~ | go forward current song by ~mpdel-song-large-increment~   |
+| ~C-x Z b~   | go backward current song by ~mpdel-song-normal-decrement~ |
+| ~C-x Z B~   | go backward current song by ~mpdel-song-small-decrement~  |
+| ~C-x Z M-b~ | go backward current song by ~mpdel-song-large-decrement~  |
 
 The last component of each keybinding can also be pressed in any MPDel
 buffer (e.g., press ~M-n~ in a playlist buffer to play the next song)
 to do the same.  Additionally, the following keybindings are available
 in all MPDel buffers where they make sense:
 
-| *Binding* | *Action*                            |
-|-----------+-------------------------------------|
-| ~a~       | add item to current playlist        |
-| ~A~       | add item to a stored playlist       |
-| ~r~       | replace current playlist with item  |
-| ~R~       | replace a stored playlist with item |
-| ~v~       | view currently played song          |
-| ~V~       | view song at point                  |
+| *Binding* | *Action*                             |
+|-----------+--------------------------------------|
+| ~a~       | add item to current playlist         |
+| ~A~       | add item to a stored playlist        |
+| ~r~       | replace current playlist with item   |
+| ~R~       | replace a stored playlist with item  |
+| ~v~       | view currently played song           |
+| ~V~       | view song at point                   |
+| ~C-x C-j~ | open a dired buffer on item at point |
+
+Opening a dired buffer on the item at point requires configuring
+~libmpdel-music-directory~ first.
+
+*** Navigator
+
+The keybinding ~C-x Z n~ (or just ~n~ in any MPDel buffer) opens a
+navigator on your database. You first get a list of all artists. From
+there, you can press ~a~, ~A~, ~r~ or ~R~ (see above) to add the item
+at point to a playlist. You can also press ~RET~ (the ~enter~ key) to
+"dive" into the selected item and display a list of the artist's
+albums. Keybindings are also available here to add albums to a
+playlist or dive into an album's songs. Diving into a song displays
+some information about it.
+
+You can also start a navigator on your stored playlists with ~C-x Z N~
+(or just ~N~) but that's probably less useful than opening a stored
+playlist buffer (with ~C-x Z L~ or just ~L~).
+
+There is just one navigator buffer available at any time and its name
+is ~*MPDEL Navigator*~.
+
+*** Playlists
+
+Playlist buffers display either the current playlist (~C-x Z l~ or
+just ~l~) or any stored playlist (~C-x Z L~ or just ~L~). A playlist
+buffer lists songs and can be edited.
+
+Here is a list of keybindings available for playlist buffers:
+
+| *Binding* | *Action*                                      |
+|-----------+-----------------------------------------------|
+| ~RET~     | play song at point (only in current playlist) |
+| ~k~       | removes selected song(s) from playlist        |
+| ~M-up~    | move selected song(s) up in the playlist      |
+| ~M-down~  | move selected song(s) down in the playlist    |
+
+When a command acts on the selected song(s) (such as ~k~), the song at
+point will be used if there is no active region and all songs of the
+region will be used otherwise.
+
+Playlist buffers are refreshed automatically when the MPD server
+refreshes them.
+
+*** Song
+
+Song buffers display information about a song, either the currently
+played one (~C-x Z v~ or just ~v~) or the song at point (with
+~V~). When displaying the currently played song, the buffer also shows
+playback status (e.g., ~"Currently playing"~) and current playback position in
+song (e.g., ~"02:32 / 06:01"~).
 
 ** License
 
@@ -87,4 +145,4 @@ See [[file:COPYING][COPYING]]. Copyright (c) 2018 Damien Cassou.
   </a>
   #+END_HTML
 
-#  LocalWords:  MPDel MPD minibuffer
+#  LocalWords:  MPDel MPD minibuffer dired
