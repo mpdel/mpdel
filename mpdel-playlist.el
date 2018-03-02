@@ -203,7 +203,9 @@ Use current buffer if BUFFER is nil."
 (defun mpdel-playlist-play ()
   "Start playing the song at point."
   (interactive)
-  (libmpdel-play-song (mpdel-playlist-song-at-point)))
+  (if (libmpdel-current-playlist-p mpdel-playlist-playlist)
+      (libmpdel-play-song (mpdel-playlist-song-at-point))
+    (message "You can only do that from the current playlist.")))
 
 (defun mpdel-playlist-move-up ()
   "Move selected songs up in the current playlist."
