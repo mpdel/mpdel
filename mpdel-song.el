@@ -210,6 +210,7 @@ playback."
     (define-key map (kbd "A") (mpdel-song--apply #'libmpdel-stored-playlist-add))
     (define-key map (kbd "r") (mpdel-song--apply #'libmpdel-current-playlist-replace))
     (define-key map (kbd "R") (mpdel-song--apply #'libmpdel-stored-playlist-replace))
+    (define-key map (kbd "C-x C-j") (mpdel-song--apply #'libmpdel-dired))
     map))
 
 (define-derived-mode mpdel-song-mode special-mode "MPDEL song"
