@@ -2,6 +2,14 @@
 
   #+BEGIN_HTML
       <p>
+        <a href="https://stable.melpa.org/#/mpdel">
+          <img alt="MELPA Stable" src="https://stable.melpa.org/packages/mpdel-badge.svg"/>
+        </a>
+
+        <a href="https://melpa.org/#/mpdel">
+          <img alt="MELPA Stable" src="https://melpa.org/packages/mpdel-badge.svg"/>
+        </a>
+
         <a href="https://gitlab.petton.fr/mpdel/mpdel/commits/master">
           <img alt="pipeline status" src="https://gitlab.petton.fr/mpdel/mpdel/badges/master/pipeline.svg" />
         </a>
