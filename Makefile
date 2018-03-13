@@ -10,9 +10,6 @@ BATCH     = $(EMACSBIN) -Q --batch $(LOAD_PATH) \
 		--eval "(add-to-list 'package-archives '(\"melpa-stable\" . \"http://stable.melpa.org/packages/\"))" \
 		--funcall package-initialize
 
-CURL = curl -fsSkL --retry 9 --retry-delay 9
-GITLAB=https://gitlab.petton.fr
-
 .PHONY: all ci-dependencies check test lint
 
 all: check
@@ -21,10 +18,8 @@ ci-dependencies:
 	# Install dependencies in ~/.emacs.d/elpa
 	$(BATCH) \
 	--funcall package-refresh-contents \
-	--eval "(package-install 'package-lint)"
-
-	# Install libmpdel separately as it is not in melpa yet
-	$(CURL) -O ${GITLAB}/mpdel/libmpdel/raw/master/libmpdel.el
+	--eval "(package-install 'package-lint)" \
+	--eval "(package-install 'libmpdel)"
 
 check: lint
 
