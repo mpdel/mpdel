@@ -46,8 +46,8 @@ database and add songs to playlists with completion:
 
 ** Installing
 
-Clone this git repository and [[https://gitlab.petton.fr/mpdel/libmpdel][libmpdel]]. I will ask to get MPDel inside
-[[http://melpa.org/][melpa]] to facilitate installation.
+Get mpdel from [[https://melpa.org/#/mpdel][melpa]] or [[https://stable.melpa.org/#/mpdel][melpa stable]]. You also need to install
+[[https://gitlab.petton.fr/mpdel/libmpdel][libmpdel]].
 
 You need to install and (quickly) configure an [[https://www.musicpd.org/][MPD server]] if you don't
 have any yet. Don't worry, that's simple and you won't regret it.
