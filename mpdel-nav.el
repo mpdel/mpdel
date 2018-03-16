@@ -114,18 +114,21 @@
   (interactive)
   (mpdel-nav--open 'stored-playlists))
 
+;;;###autoload
 (defun mpdel-nav-search-by-artist (name)
   "Display all songs whose artist's name match NAME.
 Interactively, ask for NAME."
   (interactive (list (read-from-minibuffer "Search with artist: ")))
   (mpdel-nav--open (libmpdel-search-criteria-create :type "artist" :what name)))
 
+;;;###autoload
 (defun mpdel-nav-search-by-album (name)
   "Display all songs whose album's name match NAME.
 Interactively, ask for NAME."
   (interactive (list (read-from-minibuffer "Search with album: ")))
   (mpdel-nav--open (libmpdel-search-criteria-create :type "album" :what name)))
 
+;;;###autoload
 (defun mpdel-nav-search-by-title (title)
   "Display all songs matching TITLE.
 Interactively, ask for TITLE."
