@@ -43,16 +43,65 @@
   "Return buffer for mpdel-nav."
   (get-buffer-create "*MPDEL Navigator*"))
 
-(defun mpdel-nav--entity-to-list-entry (entity)
+(cl-defgeneric mpdel-nav--entity-to-list-entry (entity)
   "Convert ENTITY to a format suitable for the tabulated list."
   (list entity
         (vector (libmpdel-entity-name entity))))
+
+(defun mpdel-nav--default-tabulated-list-format ()
+  "Return `tabulated-list-format' value for any non-specific entity."
+  (vector (list "Name" 0 t)))
+
+(cl-defmethod mpdel-nav--entity-to-list-entry ((entity libmpdel-album))
+  (list entity
+        (vector (libmpdel-entity-name entity)
+                (libmpdel-artist-name entity))))
+
+(defun mpdel-nav--album-tabulated-list-format ()
+  "Return `tabulated-list-format' value for albums."
+  (vector (list "Name" 40 t)
+          (list "Artist" 0 t)))
+
+(cl-defmethod mpdel-nav--entity-to-list-entry ((entity libmpdel-song))
+  (list entity
+        (vector (libmpdel-entity-name entity)
+                (libmpdel-album-name entity)
+                (libmpdel-artist-name entity))))
+
+(defun mpdel-nav--song-tabulated-list-format ()
+  "Return `tabulated-list-format' value for songs."
+  (vector (list "Name" 30 t)
+          (list "Album" 30 t)
+          (list "Artist" 0 t)))
+
+(cl-defgeneric mpdel-nav--tabulated-list-format (entity)
+  "Return `tabulated-list-format' value for children of ENTITY.")
+
+(cl-defmethod mpdel-nav--tabulated-list-format ((_entity (eql artists)))
+  (mpdel-nav--default-tabulated-list-format))
+
+(cl-defmethod mpdel-nav--tabulated-list-format ((_entity (eql stored-playlists)))
+  (mpdel-nav--default-tabulated-list-format))
+
+(cl-defmethod mpdel-nav--tabulated-list-format ((_entity libmpdel-stored-playlist))
+  (mpdel-nav--song-tabulated-list-format))
+
+(cl-defmethod mpdel-nav--tabulated-list-format ((_entity libmpdel-artist))
+  (mpdel-nav--album-tabulated-list-format))
+
+(cl-defmethod mpdel-nav--tabulated-list-format ((_entity libmpdel-album))
+  (mpdel-nav--song-tabulated-list-format))
+
+(cl-defmethod mpdel-nav--tabulated-list-format ((_entity libmpdel-search-criteria))
+  (mpdel-nav--song-tabulated-list-format))
 
 (defun mpdel-nav--open (entity)
   "Open a navigator buffer displaying children of ENTITY."
   (with-current-buffer (mpdel-nav--buffer)
     (mpdel-nav-mode)
     (setq mpdel-nav--entity entity)
+    (setq tabulated-list-format (mpdel-nav--tabulated-list-format entity))
+    (tabulated-list-init-header)
     (mpdel-nav-refresh)
     (switch-to-buffer (current-buffer))))
 
@@ -79,8 +128,7 @@
 
 (cl-defgeneric mpdel-nav-dive (entity)
   "Refresh navigator buffer to display content of ENTITY."
-  (setq mpdel-nav--entity entity)
-  (mpdel-nav-refresh))
+  (mpdel-nav--open entity))
 
 (defun mpdel-nav-add-to-current-playlist ()
   "Add entity at point to current playlist."
@@ -158,9 +206,7 @@ Interactively, ask for TITLE."
   "Keybindings for `mpdel-nav-mode'.")
 
 (define-derived-mode mpdel-nav-mode tabulated-list-mode "MPD Navigator"
-  "Abstract major mode to list part of the MPD database."
-  (setq tabulated-list-format (vector (list "Name" 0 t)))
-  (tabulated-list-init-header))
+  "Abstract major mode to list part of the MPD database.")
 
 (provide 'mpdel-nav)
 ;;; mpdel-nav.el ends here
