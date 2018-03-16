@@ -114,6 +114,24 @@
   (interactive)
   (mpdel-nav--open 'stored-playlists))
 
+(defun mpdel-nav-search-by-artist (name)
+  "Display all songs whose artist's name match NAME.
+Interactively, ask for NAME."
+  (interactive (list (read-from-minibuffer "Search with artist: ")))
+  (mpdel-nav--open (libmpdel-search-criteria-create :type "artist" :what name)))
+
+(defun mpdel-nav-search-by-album (name)
+  "Display all songs whose album's name match NAME.
+Interactively, ask for NAME."
+  (interactive (list (read-from-minibuffer "Search with album: ")))
+  (mpdel-nav--open (libmpdel-search-criteria-create :type "album" :what name)))
+
+(defun mpdel-nav-search-by-title (title)
+  "Display all songs matching TITLE.
+Interactively, ask for TITLE."
+  (interactive (list (read-from-minibuffer "Search with title: ")))
+  (mpdel-nav--open (libmpdel-search-criteria-create :type "title" :what title)))
+
 (defmacro mpdel-nav--apply (function)
   "Return a command applying FUNCTION to entity at point."
   `(lambda ()

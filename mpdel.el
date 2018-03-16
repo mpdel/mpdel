@@ -71,6 +71,10 @@
 (define-key mpdel-core-map (kbd "n") #'mpdel-nav-open-artists)
 (define-key mpdel-core-map (kbd "N") #'mpdel-nav-open-stored-playlists)
 (define-key mpdel-core-map (kbd "v") #'mpdel-song-open)
+(define-key mpdel-core-map (kbd "s s") #'mpdel-nav-search-by-title)
+(define-key mpdel-core-map (kbd "s l") #'mpdel-nav-search-by-album)
+(define-key mpdel-core-map (kbd "s r") #'mpdel-nav-search-by-artist)
+
 (define-key mpdel-playlist-mode-map (kbd "V") #'mpdel-playlist-open-song-at-point)
 
 (defvar mpdel-mode-map
