@@ -98,23 +98,9 @@
   (let* ((song-id (mpdel-playlist--song-id-at-point pos)))
     (gethash song-id mpdel-playlist--songs)))
 
-(defun mpdel-playlist--points-in-region (start end)
-  "Return a list of points for lines between START and END."
-  (save-excursion
-    (let (points)
-      (goto-char start)
-      (while (and (<= (point) end) (< (point) (point-max)))
-        (push (line-beginning-position) points)
-        (forward-line 1))
-      (reverse points))))
-
 (defun mpdel-playlist--selected-songs ()
   "Return songs within active region or the song at point."
-  (cond
-   ((use-region-p)
-    (mapcar #'mpdel-playlist-song-at-point (mpdel-playlist--points-in-region (region-beginning) (region-end))))
-   ((= (point) (point-max)) nil)
-   (t (list (mpdel-playlist-song-at-point)))))
+  (mpdel-core--selected-entities #'mpdel-playlist-song-at-point))
 
 (defun mpdel-playlist-go-to-song (&optional song-id)
   "Move point to SONG-ID, current song if nil.

@@ -30,6 +30,27 @@
 
 (require 'libmpdel)
 
+
+;;; Helper functions
+
+(defun mpdel-core--points-in-region (start end)
+  "Return a list of points for lines between START and END."
+  (save-excursion
+    (let (points)
+      (goto-char start)
+      (while (and (<= (point) end) (< (point) (point-max)))
+        (push (line-beginning-position) points)
+        (forward-line 1))
+      (reverse points))))
+
+(defun mpdel-core--selected-entities (point-to-entity)
+  "Apply POINT-TO-ENTITY for each line within active region or at point."
+  (cond
+   ((use-region-p)
+    (mapcar point-to-entity (mpdel-core--points-in-region (region-beginning) (region-end))))
+   ((= (point) (point-max)) nil)
+   (t (list (funcall point-to-entity (point))))))
+
 (defvar mpdel-core-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "SPC") #'libmpdel-playback-play-pause)
