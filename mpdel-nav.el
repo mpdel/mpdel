@@ -63,6 +63,10 @@
   "Return entity at POS, current point if nil."
   (tabulated-list-get-id pos))
 
+(defun mpdel-nav-selected-entities ()
+  "Return entities within active region or at point."
+  (mpdel-core--selected-entities #'mpdel-nav-entity-at-point))
+
 (defun mpdel-nav-refresh ()
   "Refresh buffer."
   (interactive)
@@ -114,7 +118,7 @@
   "Return a command applying FUNCTION to entity at point."
   `(lambda ()
      (interactive)
-     (funcall ,function (mpdel-nav-entity-at-point))))
+     (mapcar ,function (mpdel-nav-selected-entities))))
 
 (defvar mpdel-nav-mode-map
   (let ((map (make-sparse-keymap)))
