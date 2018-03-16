@@ -32,4 +32,5 @@ lint :
 	# Run package-lint to check for packaging mistakes
 	$(BATCH) \
 	--eval "(require 'package-lint)" \
+	--eval "(setq enable-dir-local-variables nil)" \
 	-f package-lint-batch-and-exit ${SRCS}
