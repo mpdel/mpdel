@@ -82,6 +82,9 @@ is active:
 | ~C-x Z n~   | navigate your database from artists                       |
 | ~C-x Z N~   | navigate your database from stored playlists              |
 | ~C-x Z v~   | view current song                                         |
+| ~C-x Z s r~ | search songs by artist name                               |
+| ~C-x Z s l~ | search songs by album name                                |
+| ~C-x Z s s~ | search songs by song title                                |
 | ~C-x Z f~   | go forward current song by ~mpdel-song-normal-increment~  |
 | ~C-x Z F~   | go forward current song by ~mpdel-song-small-increment~   |
 | ~C-x Z M-f~ | go forward current song by ~mpdel-song-large-increment~   |
