@@ -37,6 +37,8 @@
 (require 'mpdel-song)
 (require 'mpdel-nav)
 
+
+;;; Customization
 (defgroup mpdel nil
   "Configure mpdel's global minor mode."
   :group 'libmpdel)
@@ -45,22 +47,14 @@
   "Prefix key to all global mpdel keybindings."
   :type 'key-sequence)
 
-(cl-defmethod mpdel-nav-dive ((entity libmpdel-song))
-  (mpdel-song-open entity))
-
-(defun mpdel-playlist-open-song-at-point ()
-  "Open buffer displaying information about song at point."
-  (interactive)
-  (mpdel-song-open (mpdel-playlist-song-at-point)))
-
+
+;;; Add features to all mpdel buffers
 (defmacro mpdel--seek-command (time)
   "Return a command seeking TIME in current song."
   `(lambda ()
      (interactive)
      (mpdel-song--seek ,time)))
 
-
-;;; Add features to all mpdel buffers
 (define-key mpdel-core-map (kbd "F") (mpdel--seek-command mpdel-song-small-increment))
 (define-key mpdel-core-map (kbd "f") (mpdel--seek-command mpdel-song-normal-increment))
 (define-key mpdel-core-map (kbd "M-f") (mpdel--seek-command mpdel-song-large-increment))
@@ -84,8 +78,14 @@
   (interactive)
   (mpdel-nav--open (libmpdel-entity-parent (mpdel-playlist-song-at-point))))
 
-(define-key mpdel-playlist-mode-map (kbd "V") #'mpdel-playlist-open-song-at-point)
 (define-key mpdel-playlist-mode-map (kbd "^") #'mpdel-playlist-song-navigate)
+
+(defun mpdel-playlist-open-song-at-point ()
+  "Open buffer displaying information about song at point."
+  (interactive)
+  (mpdel-song-open (mpdel-playlist-song-at-point)))
+
+(define-key mpdel-playlist-mode-map (kbd "V") #'mpdel-playlist-open-song-at-point)
 
 
 ;;; Add features to the song buffers
@@ -95,6 +95,12 @@
   (mpdel-nav--open (libmpdel-entity-parent (mpdel-song-buffer-song))))
 
 (define-key mpdel-song-mode-map (kbd "^") #'mpdel-song-navigate)
+
+
+;;; Add features to the navigator buffers
+(cl-defmethod mpdel-nav-dive ((entity libmpdel-song))
+  "When diving into a song, open a song buffer."
+  (mpdel-song-open entity))
 
 
 ;;; Define the global minor mode so users can control MPD from non-MPD
