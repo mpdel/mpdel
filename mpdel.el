@@ -49,18 +49,47 @@
 
 
 ;;; Add features to all mpdel buffers
-(defmacro mpdel--seek-command (time)
-  "Return a command seeking TIME in current song."
-  `(lambda ()
-     (interactive)
-     (mpdel-song--seek ,time)))
+(defun mpdel-song-small-increment ()
+  "Move forward by value of variable `mpdel-song-small-increment'."
+  (interactive)
+  (mpdel-song--seek mpdel-song-small-increment))
 
-(define-key mpdel-core-map (kbd "F") (mpdel--seek-command mpdel-song-small-increment))
-(define-key mpdel-core-map (kbd "f") (mpdel--seek-command mpdel-song-normal-increment))
-(define-key mpdel-core-map (kbd "M-f") (mpdel--seek-command mpdel-song-large-increment))
-(define-key mpdel-core-map (kbd "B") (mpdel--seek-command mpdel-song-small-decrement))
-(define-key mpdel-core-map (kbd "b") (mpdel--seek-command mpdel-song-normal-decrement))
-(define-key mpdel-core-map (kbd "M-b") (mpdel--seek-command mpdel-song-large-decrement))
+(define-key mpdel-core-map (kbd "F") #'mpdel-song-small-increment)
+
+(defun mpdel-song-normal-increment ()
+  "Move forward by value of variable `mpdel-song-normal-increment'."
+  (interactive)
+  (mpdel-song--seek mpdel-song-normal-increment))
+
+(define-key mpdel-core-map (kbd "f") #'mpdel-song-normal-increment)
+
+(defun mpdel-song-large-increment ()
+  "Move forward by value of variable `mpdel-song-large-increment'."
+  (interactive)
+  (mpdel-song--seek mpdel-song-large-increment))
+
+(define-key mpdel-core-map (kbd "M-f") #'mpdel-song-large-increment)
+
+(defun mpdel-song-small-decrement ()
+  "Move backward by value of variable `mpdel-song-small-decrement'."
+  (interactive)
+  (mpdel-song--seek mpdel-song-small-decrement))
+
+(define-key mpdel-core-map (kbd "B") #'mpdel-song-small-decrement)
+
+(defun mpdel-song-normal-decrement ()
+  "Move backward by value of variable `mpdel-song-normal-decrement'."
+  (interactive)
+  (mpdel-song--seek mpdel-song-normal-decrement))
+
+(define-key mpdel-core-map (kbd "b") #'mpdel-song-normal-decrement)
+
+(defun mpdel-song-large-decrement ()
+  "Move backward by value of variable `mpdel-song-large-decrement'."
+  (interactive)
+  (mpdel-song--seek mpdel-song-large-decrement))
+
+(define-key mpdel-core-map (kbd "M-b") #'mpdel-song-large-decrement)
 
 (define-key mpdel-core-map (kbd "l") #'mpdel-playlist-open)
 (define-key mpdel-core-map (kbd "L") #'mpdel-playlist-open-stored-playlist)
