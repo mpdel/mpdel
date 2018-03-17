@@ -127,7 +127,7 @@
 
 
 ;;; Add features to the navigator buffers
-(cl-defmethod mpdel-nav-dive ((entity libmpdel-song))
+(cl-defmethod mpdel-nav--dive ((entity libmpdel-song))
   "When diving into a song, open a song buffer."
   (mpdel-song-open entity))
 

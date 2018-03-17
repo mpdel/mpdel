@@ -105,6 +105,10 @@
     (mpdel-nav-refresh)
     (switch-to-buffer (current-buffer))))
 
+(cl-defgeneric mpdel-nav--dive (entity)
+  "Refresh navigator buffer to display content of ENTITY."
+  (mpdel-nav--open entity))
+
 
 ;;; Public functions
 
@@ -126,36 +130,41 @@
        (setq tabulated-list-entries (mapcar #'mpdel-nav--entity-to-list-entry entities))
        (tabulated-list-print)))))
 
-(cl-defgeneric mpdel-nav-dive (entity)
-  "Refresh navigator buffer to display content of ENTITY."
-  (mpdel-nav--open entity))
+(defun mpdel-nav-dive (&optional entity)
+  "Refresh navigator buffer to display content of ENTITY.
+Use entity at point if ENTITY is nil."
+  (interactive)
+  (mpdel-nav--dive (or entity (mpdel-nav-entity-at-point))))
 
-(cl-defgeneric mpdel-nav-rise (entity)
-  "Refresh navigator to display parent of ENTITY among its siblings."
-  (let* ((parent (libmpdel-entity-parent entity))
+(defun mpdel-nav-rise (&optional entity)
+  "Refresh navigator to display parent of ENTITY among its siblings.
+Use entity at point if ENTITY is nil."
+  (interactive)
+  (let* ((entity (or entity (mpdel-nav-entity-at-point)))
+         (parent (libmpdel-entity-parent entity))
          (ancestor (and parent (libmpdel-entity-parent parent))))
     (when ancestor
       (mpdel-nav--open ancestor))))
 
 (defun mpdel-nav-add-to-current-playlist ()
-  "Add entity at point to current playlist."
+  "Add selected entities to current playlist."
   (interactive)
-  (libmpdel-current-playlist-add (mpdel-nav-entity-at-point)))
+  (mapcar #'libmpdel-current-playlist-add (mpdel-nav-selected-entities)))
 
 (defun mpdel-nav-add-to-stored-playlist ()
-  "Add entity at point to a stored playlist."
+  "Add selected entities to a stored playlist."
   (interactive)
-  (libmpdel-stored-playlist-add (mpdel-nav-entity-at-point)))
+  (mapcar #'libmpdel-stored-playlist-add (mpdel-nav-selected-entities)))
 
 (defun mpdel-nav-replace-current-playlist ()
-  "Replace current playlist with entity at point."
+  "Replace current playlist with selected entities."
   (interactive)
-  (libmpdel-current-playlist-replace (mpdel-nav-entity-at-point)))
+  (mapcar #'libmpdel-current-playlist-replace (mpdel-nav-selected-entities)))
 
 (defun mpdel-nav-replace-stored-playlist ()
   "Replace a stored playlist with entity at point."
   (interactive)
-  (libmpdel-stored-playlist-replace (mpdel-nav-entity-at-point)))
+  (mapcar #'libmpdel-stored-playlist-replace (mpdel-nav-selected-entities)))
 
 ;;;###autoload
 (defun mpdel-nav-open-artists ()
@@ -190,12 +199,6 @@ Interactively, ask for TITLE."
   (interactive (list (read-from-minibuffer "Search with title: ")))
   (mpdel-nav--open (libmpdel-search-criteria-create :type "title" :what title)))
 
-(defmacro mpdel-nav--apply (function)
-  "Return a command applying FUNCTION to entity at point."
-  `(lambda ()
-     (interactive)
-     (mapcar ,function (mpdel-nav-selected-entities))))
-
 (defvar mpdel-nav-mode-map
   (let ((map (make-sparse-keymap)))
     ;; inherit from both `mpdel-core-map' and
@@ -204,12 +207,12 @@ Interactively, ask for TITLE."
      map
      (make-composed-keymap mpdel-core-map tabulated-list-mode-map))
     (define-key map (kbd "g") #'mpdel-nav-refresh)
-    (define-key map (kbd "RET") (mpdel-nav--apply #'mpdel-nav-dive))
-    (define-key map (kbd "^") (mpdel-nav--apply #'mpdel-nav-rise))
-    (define-key map (kbd "a") (mpdel-nav--apply #'libmpdel-current-playlist-add))
-    (define-key map (kbd "A") (mpdel-nav--apply #'libmpdel-stored-playlist-add))
-    (define-key map (kbd "r") (mpdel-nav--apply #'libmpdel-current-playlist-replace))
-    (define-key map (kbd "R") (mpdel-nav--apply #'libmpdel-stored-playlist-replace))
+    (define-key map (kbd "RET") #'mpdel-nav-dive)
+    (define-key map (kbd "^") #'mpdel-nav-rise)
+    (define-key map (kbd "a") #'mpdel-nav-add-to-current-playlist)
+    (define-key map (kbd "A") #'mpdel-nav-add-to-stored-playlist)
+    (define-key map (kbd "r") #'mpdel-nav-replace-current-playlist)
+    (define-key map (kbd "R") #'mpdel-nav-replace-stored-playlist)
     map)
   "Keybindings for `mpdel-nav-mode'.")
 
