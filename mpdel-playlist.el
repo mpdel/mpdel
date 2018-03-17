@@ -47,9 +47,6 @@
 
 
 ;;; Private variables
-(defvar-local mpdel-playlist--songs nil
-  "Hashtable mapping identifiers to songs.")
-
 (defvar-local mpdel-playlist-playlist nil
   "Playlist displayed in the buffer.")
 
@@ -66,56 +63,36 @@
   (get-buffer-create (format "*MPDEL Playlist: %s*"
                              (libmpdel-entity-name stored-playlist))))
 
-(defun mpdel-playlist--song-to-list-entry (song-id)
-  "Convert SONG-ID to a format suitable for the tabulated list."
-  (let ((song (gethash song-id mpdel-playlist--songs)))
-    (list song-id
-          (vector
-           (or (libmpdel-entity-name song) "")
-           (or (libmpdel-song-track song) "")
-           (or (libmpdel-album-name song) "")
-           (or (libmpdel-artist-name song) "")))))
-
-(defun mpdel-playlist--populate-hashtable (songs)
-  "Save SONGS in `mpdel-playlist--songs'."
-  (setq mpdel-playlist--songs (make-hash-table :test #'equal))
-  (let ((use-song-id (not (cl-find-if-not #'libmpdel-song-id songs)))
-        (fallback-id 1))
-    (mapc
-     (lambda (song)
-       (puthash (if use-song-id (libmpdel-song-id song) (cl-incf fallback-id))
-                song
-                mpdel-playlist--songs))
-     songs)))
-
-(defun mpdel-playlist--song-id-at-point (&optional pos)
-  "Return song ID at POS, point if nil."
-  (let* ((pos (or pos (point))))
-    (tabulated-list-get-id pos)))
+(defun mpdel-playlist--song-to-list-entry (song)
+  "Convert SONG to a format suitable for the tabulated list."
+  (list song
+        (vector
+         (or (libmpdel-entity-name song) "")
+         (or (libmpdel-song-track song) "")
+         (or (libmpdel-album-name song) "")
+         (or (libmpdel-artist-name song) ""))))
 
 (defun mpdel-playlist-song-at-point (&optional pos)
   "Return song at POS, point if nil."
-  (let* ((song-id (mpdel-playlist--song-id-at-point pos)))
-    (gethash song-id mpdel-playlist--songs)))
+  (tabulated-list-get-id pos))
 
 (defun mpdel-playlist--selected-songs ()
   "Return songs within active region or the song at point."
   (mpdel-core--selected-entities #'mpdel-playlist-song-at-point))
 
-(defun mpdel-playlist-go-to-song (&optional song-id)
-  "Move point to SONG-ID, current song if nil.
-Return non-nil if SONG-ID is found, nil otherwise."
-  (let ((song-id (or song-id (libmpdel-song-id (libmpdel-current-song)))))
-    (goto-char (point-min))
-    (while (and (not (= (point) (point-max)))
-                (not (equal (libmpdel-song-id (mpdel-playlist-song-at-point)) song-id)))
-      (forward-line 1))
-    (not (= (point) (point-max)))))
+(defun mpdel-playlist-go-to-song (song)
+  "Move point to SONG.
+Return non-nil if SONG is found, nil otherwise."
+  (goto-char (point-min))
+  (while (and (not (= (point) (point-max)))
+              (not (libmpdel-equal (mpdel-playlist-song-at-point) song)))
+    (forward-line 1))
+  (not (= (point) (point-max))))
 
-(defun mpdel-playlist-highlight-song (&optional song-id)
-  "Highlight SONG-ID, current song if nil."
+(defun mpdel-playlist-highlight-song (&optional song)
+  "Highlight SONG, current song if nil."
   (save-excursion
-    (when (mpdel-playlist-go-to-song song-id)
+    (when (mpdel-playlist-go-to-song song)
       (let ((inhibit-read-only t))
         (put-text-property (line-beginning-position) (line-end-position)
                            'face 'mpdel-playlist--current-song-face)))))
@@ -124,8 +101,8 @@ Return non-nil if SONG-ID is found, nil otherwise."
   "Return an object representing selection.
 Restore selection with `mpdel-playlist--restore-playlist-status'."
   (cons
-   (mpdel-playlist--song-id-at-point (point))
-   (mpdel-playlist--song-id-at-point (mark t))))
+   (mpdel-playlist-song-at-point (point))
+   (mpdel-playlist-song-at-point (mark t))))
 
 (defun mpdel-playlist--restore-playlist-status (status)
   "Restore playlist selection STATUS.
@@ -168,8 +145,7 @@ Use current buffer if BUFFER is nil."
          mpdel-playlist-playlist
          (lambda (songs)
            (let ((playlist-status (mpdel-playlist--save-playlist-status)))
-             (mpdel-playlist--populate-hashtable songs)
-             (setq tabulated-list-entries (mapcar #'mpdel-playlist--song-to-list-entry (hash-table-keys mpdel-playlist--songs)))
+             (setq tabulated-list-entries (mapcar #'mpdel-playlist--song-to-list-entry songs))
              (tabulated-list-print)
              (mpdel-playlist--restore-playlist-status playlist-status)
              (when (and (not (libmpdel-stopped-p)) (libmpdel-current-playlist-p mpdel-playlist-playlist))
