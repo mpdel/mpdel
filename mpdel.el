@@ -75,7 +75,24 @@
 (define-key mpdel-core-map (kbd "s l") #'mpdel-nav-search-by-album)
 (define-key mpdel-core-map (kbd "s r") #'mpdel-nav-search-by-artist)
 
+
+;;; Add features to playlist buffers
+(defun mpdel-playlist-song-navigate ()
+  "Open a navigator containing song at point."
+  (interactive)
+  (mpdel-nav--open (libmpdel-entity-parent (mpdel-playlist-song-at-point))))
+
 (define-key mpdel-playlist-mode-map (kbd "V") #'mpdel-playlist-open-song-at-point)
+(define-key mpdel-playlist-mode-map (kbd "^") #'mpdel-playlist-song-navigate)
+
+
+;;; Add features to the song buffers
+(defun mpdel-song-navigate ()
+  "Open a navigator containing song at point."
+  (interactive)
+  (mpdel-nav--open (libmpdel-entity-parent (mpdel-song-buffer-song))))
+
+(define-key mpdel-song-mode-map (kbd "^") #'mpdel-song-navigate)
 
 (defvar mpdel-mode-map
   (let ((map (make-sparse-keymap)))

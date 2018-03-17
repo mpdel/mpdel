@@ -130,6 +130,13 @@
   "Refresh navigator buffer to display content of ENTITY."
   (mpdel-nav--open entity))
 
+(cl-defgeneric mpdel-nav-rise (entity)
+  "Refresh navigator to display parent of ENTITY among its siblings."
+  (let* ((parent (libmpdel-entity-parent entity))
+         (ancestor (and parent (libmpdel-entity-parent parent))))
+    (when ancestor
+      (mpdel-nav--open ancestor))))
+
 (defun mpdel-nav-add-to-current-playlist ()
   "Add entity at point to current playlist."
   (interactive)
@@ -198,6 +205,7 @@ Interactively, ask for TITLE."
      (make-composed-keymap mpdel-core-map tabulated-list-mode-map))
     (define-key map (kbd "g") #'mpdel-nav-refresh)
     (define-key map (kbd "RET") (mpdel-nav--apply #'mpdel-nav-dive))
+    (define-key map (kbd "^") (mpdel-nav--apply #'mpdel-nav-rise))
     (define-key map (kbd "a") (mpdel-nav--apply #'libmpdel-current-playlist-add))
     (define-key map (kbd "A") (mpdel-nav--apply #'libmpdel-stored-playlist-add))
     (define-key map (kbd "r") (mpdel-nav--apply #'libmpdel-current-playlist-replace))
