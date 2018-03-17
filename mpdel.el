@@ -59,6 +59,8 @@
      (interactive)
      (mpdel-song--seek ,time)))
 
+
+;;; Add features to all mpdel buffers
 (define-key mpdel-core-map (kbd "F") (mpdel--seek-command mpdel-song-small-increment))
 (define-key mpdel-core-map (kbd "f") (mpdel--seek-command mpdel-song-normal-increment))
 (define-key mpdel-core-map (kbd "M-f") (mpdel--seek-command mpdel-song-large-increment))
@@ -94,6 +96,9 @@
 
 (define-key mpdel-song-mode-map (kbd "^") #'mpdel-song-navigate)
 
+
+;;; Define the global minor mode so users can control MPD from non-MPD
+;;; buffers
 (defvar mpdel-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map mpdel-prefix-key 'mpdel-core-map)
