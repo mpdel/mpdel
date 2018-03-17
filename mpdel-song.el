@@ -85,6 +85,11 @@ when the song changes.")
 (defvar mpdel-song--timer nil
   "Store timer to refresh the seek buffer.")
 
+(defun mpdel-song-buffer-song (&optional buffer)
+  "Return song displayed in BUFFER, current one if nil."
+  (with-current-buffer (or buffer (current-buffer))
+    mpdel-song-song))
+
 (defun mpdel-song--start-timer ()
   "Start refresh timer."
   (unless mpdel-song--timer
