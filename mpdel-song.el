@@ -190,18 +190,39 @@ playback."
         (add-hook 'kill-buffer-hook (lambda () (remove-hook 'libmpdel-player-changed-hook refresh-fn))))
       (pop-to-buffer (current-buffer)))))
 
-(defmacro mpdel-song--call-refresh-command (function)
-  "Return a command calling FUNCTION and refreshing buffer."
-  `(lambda ()
-     (interactive)
-     (funcall ,function)
-     (mpdel-song-refresh)))
+(defun mpdel-song-quit-window ()
+  "Quit window and kill its buffer.
 
-(defmacro mpdel-song--apply (function)
-  "Return a command applying FUNCTION to song in current buffer."
-  `(lambda ()
-     (interactive)
-     (funcall ,function mpdel-song-song)))
+Killing the buffer instead of just burrying it is important when
+displaying current song: this is because the buffer keeps
+refreshing itself to display playback position."
+  (interactive)
+  (quit-window t))
+
+(defun mpdel-song-add-to-current-playlist (&optional buffer)
+  "Add BUFFER's song to current playlist, current buffer if nil."
+  (interactive)
+  (libmpdel-current-playlist-add (mpdel-song-buffer-song buffer)))
+
+(defun mpdel-song-add-to-stored-playlist (&optional buffer)
+  "Add BUFFER's song to a stored playlist, current buffer if nil."
+  (interactive)
+  (libmpdel-stored-playlist-add (mpdel-song-buffer-song buffer)))
+
+(defun mpdel-song-replace-current-playlist (&optional buffer)
+  "Replace current playlist with BUFFER's song, current buffer if nil."
+  (interactive)
+  (libmpdel-current-playlist-replace (mpdel-song-buffer-song buffer)))
+
+(defun mpdel-song-replace-stored-playlist (&optional buffer)
+  "Replace a stored playlist with BUFFER's song, current buffer if nil."
+  (interactive)
+  (libmpdel-stored-playlist-replace (mpdel-song-buffer-song buffer)))
+
+(defun mpdel-song-dired (&optional buffer)
+  "Open dired on BUFFER's song, current buffer if nil."
+  (interactive)
+  (libmpdel-dired (mpdel-song-buffer-song buffer)))
 
 (defvar mpdel-song-mode-map
   (let ((map (make-sparse-keymap)))
@@ -209,13 +230,12 @@ playback."
      map
      (make-composed-keymap mpdel-core-map special-mode-map))
     (define-key map (kbd "g") #'mpdel-song-refresh)
-    ;; force kill instead of burrying to stop the timer:
-    (define-key map (kbd "q") (lambda () (interactive) (quit-window t)))
-    (define-key map (kbd "a") (mpdel-song--apply #'libmpdel-current-playlist-add))
-    (define-key map (kbd "A") (mpdel-song--apply #'libmpdel-stored-playlist-add))
-    (define-key map (kbd "r") (mpdel-song--apply #'libmpdel-current-playlist-replace))
-    (define-key map (kbd "R") (mpdel-song--apply #'libmpdel-stored-playlist-replace))
-    (define-key map (kbd "C-x C-j") (mpdel-song--apply #'libmpdel-dired))
+    (define-key map (kbd "q") #'mpdel-song-quit-window)
+    (define-key map (kbd "a") #'mpdel-song-add-to-current-playlist)
+    (define-key map (kbd "A") #'mpdel-song-add-to-stored-playlist)
+    (define-key map (kbd "r") #'mpdel-song-replace-current-playlist)
+    (define-key map (kbd "R") #'mpdel-song-replace-stored-playlist)
+    (define-key map (kbd "C-x C-j") #'mpdel-song-dired)
     map))
 
 (define-derived-mode mpdel-song-mode special-mode "MPDEL song"
