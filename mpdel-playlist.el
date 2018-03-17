@@ -71,8 +71,8 @@
   (let ((song (gethash song-id mpdel-playlist--songs)))
     (list song-id
           (vector
-           (libmpdel-entity-name song)
-           (libmpdel-song-track song)
+           (or (libmpdel-entity-name song) "")
+           (or (libmpdel-song-track song) "")
            (or (libmpdel-album-name song) "")
            (or (libmpdel-artist-name song) "")))))
 
