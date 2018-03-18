@@ -67,6 +67,9 @@ Use point if POS is nil and use current buffer if BUFFER is nil."
   (with-current-buffer (or buffer (current-buffer))
     (mpdel-core--entity-at-point (or pos (point)) major-mode)))
 
+
+;;; Define the mpdel shared map
+
 (defvar mpdel-core-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "SPC") #'libmpdel-playback-play-pause)
