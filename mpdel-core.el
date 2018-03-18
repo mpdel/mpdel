@@ -68,6 +68,34 @@ Use point if POS is nil and use current buffer if BUFFER is nil."
     (mpdel-core--entity-at-point (or pos (point)) major-mode)))
 
 
+;;; Commands
+
+(defun mpdel-core-add-to-current-playlist ()
+  "Add selected entities to current playlist."
+  (interactive)
+  (libmpdel-current-playlist-add (mpdel-core-selected-entities)))
+
+(defun mpdel-core-add-to-stored-playlist ()
+  "Add selected entities to a stored playlist."
+  (interactive)
+  (libmpdel-stored-playlist-add (mpdel-core-selected-entities)))
+
+(defun mpdel-core-replace-current-playlist ()
+  "Replace current playlist with selected entities."
+  (interactive)
+  (libmpdel-current-playlist-replace (mpdel-core-selected-entities)))
+
+(defun mpdel-core-replace-stored-playlist ()
+  "Replace a stored playlist with selected entities."
+  (interactive)
+  (libmpdel-stored-playlist-replace (mpdel-core-selected-entities)))
+
+(defun mpdel-core-dired (&optional pos)
+  "Open dired on the entity at POS, point if nil."
+  (interactive)
+  (libmpdel-dired (mpdel-core-entity-at-point pos)))
+
+
 ;;; Define the mpdel shared map
 
 (defvar mpdel-core-map
@@ -75,6 +103,11 @@ Use point if POS is nil and use current buffer if BUFFER is nil."
     (define-key map (kbd "SPC") #'libmpdel-playback-play-pause)
     (define-key map (kbd "M-n") #'libmpdel-playback-next)
     (define-key map (kbd "M-p") #'libmpdel-playback-previous)
+    (define-key map (kbd "a") #'mpdel-core-add-to-current-playlist)
+    (define-key map (kbd "A") #'mpdel-core-add-to-stored-playlist)
+    (define-key map (kbd "r") #'mpdel-core-replace-current-playlist)
+    (define-key map (kbd "R") #'mpdel-core-replace-stored-playlist)
+    (define-key map (kbd "C-x C-j") #'mpdel-core-dired)
     map)
   "Keymap for all mpdel buffers.")
 

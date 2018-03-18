@@ -91,41 +91,6 @@
 
 (define-key mpdel-core-map (kbd "M-b") #'mpdel-song-large-decrement)
 
-(defun mpdel-add-to-current-playlist ()
-  "Add selected entities to current playlist."
-  (interactive)
-  (libmpdel-current-playlist-add (mpdel-core-selected-entities)))
-
-(define-key mpdel-core-map (kbd "a") #'mpdel-add-to-current-playlist)
-
-(defun mpdel-add-to-stored-playlist ()
-  "Add selected entities to a stored playlist."
-  (interactive)
-  (libmpdel-stored-playlist-add (mpdel-core-selected-entities)))
-
-(define-key mpdel-core-map (kbd "A") #'mpdel-add-to-stored-playlist)
-
-(defun mpdel-replace-current-playlist ()
-  "Replace current playlist with selected entities."
-  (interactive)
-  (libmpdel-current-playlist-replace (mpdel-core-selected-entities)))
-
-(define-key mpdel-core-map (kbd "r") #'mpdel-replace-current-playlist)
-
-(defun mpdel-replace-stored-playlist ()
-  "Replace a stored playlist with selected entities."
-  (interactive)
-  (libmpdel-stored-playlist-replace (mpdel-core-selected-entities)))
-
-(define-key mpdel-core-map (kbd "R") #'mpdel-replace-stored-playlist)
-
-(defun mpdel-dired (&optional pos)
-  "Open dired on the entity at POS, point if nil."
-  (interactive)
-  (libmpdel-dired (mpdel-core-entity-at-point pos)))
-
-(define-key mpdel-core-map (kbd "C-x C-j") #'mpdel-dired)
-
 (define-key mpdel-core-map (kbd "l") #'mpdel-playlist-open)
 (define-key mpdel-core-map (kbd "L") #'mpdel-playlist-open-stored-playlist)
 (define-key mpdel-core-map (kbd "n") #'mpdel-nav-open-artists)
