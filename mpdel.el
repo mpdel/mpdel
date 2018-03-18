@@ -91,6 +91,41 @@
 
 (define-key mpdel-core-map (kbd "M-b") #'mpdel-song-large-decrement)
 
+(defun mpdel-add-to-current-playlist ()
+  "Add selected entities to current playlist."
+  (interactive)
+  (libmpdel-current-playlist-add (mpdel-core-selected-entities)))
+
+(define-key mpdel-core-map (kbd "a") #'mpdel-add-to-current-playlist)
+
+(defun mpdel-add-to-stored-playlist ()
+  "Add selected entities to a stored playlist."
+  (interactive)
+  (libmpdel-stored-playlist-add (mpdel-core-selected-entities)))
+
+(define-key mpdel-core-map (kbd "A") #'mpdel-add-to-stored-playlist)
+
+(defun mpdel-replace-current-playlist ()
+  "Replace current playlist with selected entities."
+  (interactive)
+  (libmpdel-current-playlist-replace (mpdel-core-selected-entities)))
+
+(define-key mpdel-core-map (kbd "r") #'mpdel-replace-current-playlist)
+
+(defun mpdel-replace-stored-playlist ()
+  "Replace a stored playlist with selected entities."
+  (interactive)
+  (libmpdel-stored-playlist-replace (mpdel-core-selected-entities)))
+
+(define-key mpdel-core-map (kbd "R") #'mpdel-replace-stored-playlist)
+
+(defun mpdel-dired (&optional pos)
+  "Open dired on the entity at POS, point if nil."
+  (interactive)
+  (libmpdel-dired (mpdel-core-entity-at-point pos)))
+
+(define-key mpdel-core-map (kbd "C-x C-j") #'mpdel-dired)
+
 (define-key mpdel-core-map (kbd "l") #'mpdel-playlist-open)
 (define-key mpdel-core-map (kbd "L") #'mpdel-playlist-open-stored-playlist)
 (define-key mpdel-core-map (kbd "n") #'mpdel-nav-open-artists)
@@ -105,19 +140,22 @@
 (defun mpdel-playlist-song-navigate ()
   "Open a navigator containing song at point."
   (interactive)
-  (mpdel-nav--open (libmpdel-entity-parent (mpdel-playlist-song-at-point))))
+  (mpdel-nav--open (libmpdel-entity-parent (mpdel-core-entity-at-point))))
 
 (define-key mpdel-playlist-mode-map (kbd "^") #'mpdel-playlist-song-navigate)
 
 (defun mpdel-playlist-open-song-at-point ()
   "Open buffer displaying information about song at point."
   (interactive)
-  (mpdel-song-open (mpdel-playlist-song-at-point)))
+  (mpdel-song-open (mpdel-core-entity-at-point)))
 
 (define-key mpdel-playlist-mode-map (kbd "V") #'mpdel-playlist-open-song-at-point)
 
 
 ;;; Add features to the song buffers
+(cl-defmethod mpdel-core--entity-at-point (_pos (_mode (derived-mode mpdel-song-mode)))
+  (mpdel-song-buffer-song))
+
 (defun mpdel-song-navigate ()
   "Open a navigator containing song at point."
   (interactive)

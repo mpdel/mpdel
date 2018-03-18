@@ -199,31 +199,6 @@ refreshing itself to display playback position."
   (interactive)
   (quit-window t))
 
-(defun mpdel-song-add-to-current-playlist (&optional buffer)
-  "Add BUFFER's song to current playlist, current buffer if nil."
-  (interactive)
-  (libmpdel-current-playlist-add (mpdel-song-buffer-song buffer)))
-
-(defun mpdel-song-add-to-stored-playlist (&optional buffer)
-  "Add BUFFER's song to a stored playlist, current buffer if nil."
-  (interactive)
-  (libmpdel-stored-playlist-add (mpdel-song-buffer-song buffer)))
-
-(defun mpdel-song-replace-current-playlist (&optional buffer)
-  "Replace current playlist with BUFFER's song, current buffer if nil."
-  (interactive)
-  (libmpdel-current-playlist-replace (mpdel-song-buffer-song buffer)))
-
-(defun mpdel-song-replace-stored-playlist (&optional buffer)
-  "Replace a stored playlist with BUFFER's song, current buffer if nil."
-  (interactive)
-  (libmpdel-stored-playlist-replace (mpdel-song-buffer-song buffer)))
-
-(defun mpdel-song-dired (&optional buffer)
-  "Open dired on BUFFER's song, current buffer if nil."
-  (interactive)
-  (libmpdel-dired (mpdel-song-buffer-song buffer)))
-
 (defvar mpdel-song-mode-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent
@@ -231,11 +206,6 @@ refreshing itself to display playback position."
      (make-composed-keymap mpdel-core-map special-mode-map))
     (define-key map (kbd "g") #'mpdel-song-refresh)
     (define-key map (kbd "q") #'mpdel-song-quit-window)
-    (define-key map (kbd "a") #'mpdel-song-add-to-current-playlist)
-    (define-key map (kbd "A") #'mpdel-song-add-to-stored-playlist)
-    (define-key map (kbd "r") #'mpdel-song-replace-current-playlist)
-    (define-key map (kbd "R") #'mpdel-song-replace-stored-playlist)
-    (define-key map (kbd "C-x C-j") #'mpdel-song-dired)
     map))
 
 (define-derived-mode mpdel-song-mode special-mode "MPDEL song"

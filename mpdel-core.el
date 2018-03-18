@@ -27,6 +27,7 @@
 ;; user-interfaces.
 
 ;;; Code:
+(require 'tabulated-list)
 
 (require 'libmpdel)
 
@@ -43,13 +44,28 @@
         (forward-line 1))
       (reverse points))))
 
-(defun mpdel-core--selected-entities (point-to-entity)
-  "Apply POINT-TO-ENTITY for each line within active region or at point."
+(cl-defgeneric mpdel-core--entity-at-point (_pos _mode)
+  "Return entity at POS.
+MODE is the current buffer's major mode."
+  (message "No entity at point."))
+
+(cl-defmethod mpdel-core--entity-at-point (pos (_mode (derived-mode tabulated-list-mode)))
+  (tabulated-list-get-id pos))
+
+(defun mpdel-core-selected-entities ()
+  "Return entities within active region or at point."
   (cond
    ((use-region-p)
-    (mapcar point-to-entity (mpdel-core--points-in-region (region-beginning) (region-end))))
+    (mapcar (lambda (pos) (mpdel-core--entity-at-point pos major-mode))
+            (mpdel-core--points-in-region (region-beginning) (region-end))))
    ((= (point) (point-max)) nil)
-   (t (list (funcall point-to-entity (point))))))
+   (t (list (mpdel-core--entity-at-point (point) major-mode)))))
+
+(defun mpdel-core-entity-at-point (&optional pos buffer)
+  "Return entity at POS in BUFFER.
+Use point if POS is nil and use current buffer if BUFFER is nil."
+  (with-current-buffer (or buffer (current-buffer))
+    (mpdel-core--entity-at-point (or pos (point)) major-mode)))
 
 (defvar mpdel-core-map
   (let ((map (make-sparse-keymap)))

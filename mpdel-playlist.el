@@ -72,20 +72,12 @@
          (or (libmpdel-album-name song) "")
          (or (libmpdel-artist-name song) ""))))
 
-(defun mpdel-playlist-song-at-point (&optional pos)
-  "Return song at POS, point if nil."
-  (tabulated-list-get-id pos))
-
-(defun mpdel-playlist--selected-songs ()
-  "Return songs within active region or the song at point."
-  (mpdel-core--selected-entities #'mpdel-playlist-song-at-point))
-
 (defun mpdel-playlist-go-to-song (song)
   "Move point to SONG.
 Return non-nil if SONG is found, nil otherwise."
   (goto-char (point-min))
   (while (and (not (= (point) (point-max)))
-              (not (libmpdel-equal (mpdel-playlist-song-at-point) song)))
+              (not (libmpdel-equal (mpdel-core-entity-at-point) song)))
     (forward-line 1))
   (not (= (point) (point-max))))
 
@@ -101,8 +93,8 @@ Return non-nil if SONG is found, nil otherwise."
   "Return an object representing selection.
 Restore selection with `mpdel-playlist--restore-playlist-status'."
   (cons
-   (mpdel-playlist-song-at-point (point))
-   (mpdel-playlist-song-at-point (mark t))))
+   (mpdel-core-entity-at-point (point))
+   (mpdel-core-entity-at-point (mark t))))
 
 (defun mpdel-playlist--restore-playlist-status (status)
   "Restore playlist selection STATUS.
@@ -125,7 +117,7 @@ This function is used as a value for
 This function is used as a value for
 `imenu-extract-index-name-function'.  Point should be at the
 beginning of the line."
-  (let ((song (mpdel-playlist-song-at-point)))
+  (let ((song (mpdel-core-entity-at-point)))
     (format "%s/%s/%s"
             (or (libmpdel-artist-name song) "??")
             (or (libmpdel-album-name song) "??")
@@ -154,7 +146,7 @@ Use current buffer if BUFFER is nil."
 (defun mpdel-playlist-delete ()
   "Delete selected songs from current playlist."
   (interactive)
-  (let ((songs (mpdel-playlist--selected-songs)))
+  (let ((songs (mpdel-core-selected-entities)))
     (when songs
       (libmpdel-playlist-delete songs mpdel-playlist-playlist)
       ;; Move point to the closest non-deleted song
@@ -166,20 +158,20 @@ Use current buffer if BUFFER is nil."
   "Start playing the song at point."
   (interactive)
   (if (libmpdel-current-playlist-p mpdel-playlist-playlist)
-      (libmpdel-play-song (mpdel-playlist-song-at-point))
+      (libmpdel-play-song (mpdel-core-entity-at-point))
     (message "You can only do that from the current playlist.")))
 
 (defun mpdel-playlist-move-up ()
   "Move selected songs up in the current playlist."
   (interactive)
-  (let ((songs (mpdel-playlist--selected-songs)))
+  (let ((songs (mpdel-core-selected-entities)))
     (when songs
       (libmpdel-playlist-move-up songs))))
 
 (defun mpdel-playlist-move-down ()
   "Move selected songs down in the current playlist."
   (interactive)
-  (let ((songs (mpdel-playlist--selected-songs)))
+  (let ((songs (mpdel-core-selected-entities)))
     (when songs
       (libmpdel-playlist-move-down songs))))
 
@@ -198,11 +190,6 @@ Use current buffer if BUFFER is nil."
                 (lambda ()
                   (mapc (lambda (hook) (remove-hook hook refresh-fn)) hooks))
                 nil t))))
-
-(defun mpdel-playlist-dired ()
-  "Open `dired' on song at point."
-  (interactive)
-  (libmpdel-dired (mpdel-playlist-song-at-point)))
 
 ;;;###autoload
 (defun mpdel-playlist-open (&optional playlist)
@@ -242,7 +229,6 @@ Use current buffer if BUFFER is nil."
     (define-key map (kbd "RET") #'mpdel-playlist-play)
     (define-key map (kbd "<M-up>") #'mpdel-playlist-move-up)
     (define-key map (kbd "<M-down>") #'mpdel-playlist-move-down)
-    (define-key map (kbd "C-x C-j") #'mpdel-playlist-dired)
     map))
 
 (define-derived-mode mpdel-playlist-mode tabulated-list-mode "Playlist"

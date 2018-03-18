@@ -112,14 +112,6 @@
 
 ;;; Public functions
 
-(defun mpdel-nav-entity-at-point (&optional pos)
-  "Return entity at POS, current point if nil."
-  (tabulated-list-get-id pos))
-
-(defun mpdel-nav-selected-entities ()
-  "Return entities within active region or at point."
-  (mpdel-core--selected-entities #'mpdel-nav-entity-at-point))
-
 (defun mpdel-nav-refresh ()
   "Refresh buffer."
   (interactive)
@@ -134,37 +126,17 @@
   "Refresh navigator buffer to display content of ENTITY.
 Use entity at point if ENTITY is nil."
   (interactive)
-  (mpdel-nav--dive (or entity (mpdel-nav-entity-at-point))))
+  (mpdel-nav--dive (or entity (mpdel-core-entity-at-point))))
 
 (defun mpdel-nav-rise (&optional entity)
   "Refresh navigator to display parent of ENTITY among its siblings.
 Use entity at point if ENTITY is nil."
   (interactive)
-  (let* ((entity (or entity (mpdel-nav-entity-at-point)))
+  (let* ((entity (or entity (mpdel-core-entity-at-point)))
          (parent (libmpdel-entity-parent entity))
          (ancestor (and parent (libmpdel-entity-parent parent))))
     (when ancestor
       (mpdel-nav--open ancestor))))
-
-(defun mpdel-nav-add-to-current-playlist ()
-  "Add selected entities to current playlist."
-  (interactive)
-  (mapcar #'libmpdel-current-playlist-add (mpdel-nav-selected-entities)))
-
-(defun mpdel-nav-add-to-stored-playlist ()
-  "Add selected entities to a stored playlist."
-  (interactive)
-  (mapcar #'libmpdel-stored-playlist-add (mpdel-nav-selected-entities)))
-
-(defun mpdel-nav-replace-current-playlist ()
-  "Replace current playlist with selected entities."
-  (interactive)
-  (mapcar #'libmpdel-current-playlist-replace (mpdel-nav-selected-entities)))
-
-(defun mpdel-nav-replace-stored-playlist ()
-  "Replace a stored playlist with entity at point."
-  (interactive)
-  (mapcar #'libmpdel-stored-playlist-replace (mpdel-nav-selected-entities)))
 
 ;;;###autoload
 (defun mpdel-nav-open-artists ()
@@ -209,10 +181,6 @@ Interactively, ask for TITLE."
     (define-key map (kbd "g") #'mpdel-nav-refresh)
     (define-key map (kbd "RET") #'mpdel-nav-dive)
     (define-key map (kbd "^") #'mpdel-nav-rise)
-    (define-key map (kbd "a") #'mpdel-nav-add-to-current-playlist)
-    (define-key map (kbd "A") #'mpdel-nav-add-to-stored-playlist)
-    (define-key map (kbd "r") #'mpdel-nav-replace-current-playlist)
-    (define-key map (kbd "R") #'mpdel-nav-replace-stored-playlist)
     map)
   "Keybindings for `mpdel-nav-mode'.")
 
