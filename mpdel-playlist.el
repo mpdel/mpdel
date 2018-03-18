@@ -222,7 +222,7 @@ Use current buffer if BUFFER is nil."
      (make-composed-keymap mpdel-core-map tabulated-list-mode-map))
     (define-key map (kbd "g") #'mpdel-playlist-refresh)
     (define-key map (kbd "k") #'mpdel-playlist-delete)
-    (define-key map (kbd "RET") #'mpdel-playlist-play)
+    (define-key map (kbd "SPC") #'mpdel-playlist-play)
     (define-key map (kbd "<M-up>") #'mpdel-playlist-move-up)
     (define-key map (kbd "<M-down>") #'mpdel-playlist-move-down)
     map))

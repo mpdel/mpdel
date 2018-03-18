@@ -67,6 +67,9 @@ Use point if POS is nil and use current buffer if BUFFER is nil."
   (with-current-buffer (or buffer (current-buffer))
     (mpdel-core--entity-at-point (or pos (point)) major-mode)))
 
+(cl-defgeneric mpdel-core--open-entity (entity)
+  "Open buffer displaying information about ENTITY.")
+
 
 ;;; Commands
 
@@ -95,6 +98,12 @@ Use point if POS is nil and use current buffer if BUFFER is nil."
   (interactive)
   (libmpdel-dired (mpdel-core-entity-at-point pos)))
 
+(defun mpdel-core-open-entity-at-point (&optional pos)
+  "Open buffer displaying information about entity at POS.
+Use point if POS is nil."
+  (interactive)
+  (mpdel-core--open-entity (mpdel-core-entity-at-point (or pos (point)))))
+
 
 ;;; Define the mpdel shared map
 
@@ -108,6 +117,7 @@ Use point if POS is nil and use current buffer if BUFFER is nil."
     (define-key map (kbd "r") #'mpdel-core-replace-current-playlist)
     (define-key map (kbd "R") #'mpdel-core-replace-stored-playlist)
     (define-key map (kbd "C-x C-j") #'mpdel-core-dired)
+    (define-key map (kbd "RET") #'mpdel-core-open-entity-at-point)
     map)
   "Keymap for all mpdel buffers.")
 

@@ -104,7 +104,7 @@ in all MPDel buffers where they make sense:
 | ~r~       | replace current playlist with item   |
 | ~R~       | replace a stored playlist with item  |
 | ~v~       | view currently played song           |
-| ~V~       | view song at point                   |
+| ~RET~     | open a buffer showing item at point  |
 | ~C-x C-j~ | open a dired buffer on item at point |
 
 Opening a dired buffer on the item at point requires configuring
@@ -138,7 +138,7 @@ Here is a list of keybindings available for playlist buffers:
 
 | *Binding* | *Action*                                      |
 |-----------+-----------------------------------------------|
-| ~RET~     | play song at point (only in current playlist) |
+| ~SPC~     | play song at point (only in current playlist) |
 | ~k~       | removes selected song(s) from playlist        |
 | ~M-up~    | move selected song(s) up in the playlist      |
 | ~M-down~  | move selected song(s) down in the playlist    |

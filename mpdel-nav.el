@@ -105,10 +105,6 @@
     (mpdel-nav-refresh)
     (switch-to-buffer (current-buffer))))
 
-(cl-defgeneric mpdel-nav--dive (entity)
-  "Refresh navigator buffer to display content of ENTITY."
-  (mpdel-nav--open entity))
-
 
 ;;; Public functions
 
@@ -121,12 +117,6 @@
      (with-current-buffer (mpdel-nav--buffer)
        (setq tabulated-list-entries (mapcar #'mpdel-nav--entity-to-list-entry entities))
        (tabulated-list-print)))))
-
-(defun mpdel-nav-dive (&optional entity)
-  "Refresh navigator buffer to display content of ENTITY.
-Use entity at point if ENTITY is nil."
-  (interactive)
-  (mpdel-nav--dive (or entity (mpdel-core-entity-at-point))))
 
 (defun mpdel-nav-rise (&optional entity)
   "Refresh navigator to display parent of ENTITY among its siblings.
@@ -179,7 +169,6 @@ Interactively, ask for TITLE."
      map
      (make-composed-keymap mpdel-core-map tabulated-list-mode-map))
     (define-key map (kbd "g") #'mpdel-nav-refresh)
-    (define-key map (kbd "RET") #'mpdel-nav-dive)
     (define-key map (kbd "^") #'mpdel-nav-rise)
     map)
   "Keybindings for `mpdel-nav-mode'.")

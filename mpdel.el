@@ -91,6 +91,13 @@
 
 (define-key mpdel-core-map (kbd "M-b") #'mpdel-song-large-decrement)
 
+(cl-defmethod mpdel-core--open-entity ((entity t))
+  ;; By default, open any entity with a navigator
+  (mpdel-nav--open entity))
+
+(cl-defmethod mpdel-core--open-entity ((song libmpdel-song))
+  (mpdel-song-open song))
+
 (define-key mpdel-core-map (kbd "l") #'mpdel-playlist-open)
 (define-key mpdel-core-map (kbd "L") #'mpdel-playlist-open-stored-playlist)
 (define-key mpdel-core-map (kbd "n") #'mpdel-nav-open-artists)
@@ -109,13 +116,6 @@
 
 (define-key mpdel-playlist-mode-map (kbd "^") #'mpdel-playlist-song-navigate)
 
-(defun mpdel-playlist-open-song-at-point ()
-  "Open buffer displaying information about song at point."
-  (interactive)
-  (mpdel-song-open (mpdel-core-entity-at-point)))
-
-(define-key mpdel-playlist-mode-map (kbd "V") #'mpdel-playlist-open-song-at-point)
-
 
 ;;; Add features to the song buffers
 (cl-defmethod mpdel-core--entity-at-point (_pos (_mode (derived-mode mpdel-song-mode)))
@@ -127,12 +127,6 @@
   (mpdel-nav--open (libmpdel-entity-parent (mpdel-song-buffer-song))))
 
 (define-key mpdel-song-mode-map (kbd "^") #'mpdel-song-navigate)
-
-
-;;; Add features to the navigator buffers
-(cl-defmethod mpdel-nav--dive ((entity libmpdel-song))
-  "When diving into a song, open a song buffer."
-  (mpdel-song-open entity))
 
 
 ;;; Define the global minor mode so users can control MPD from non-MPD
