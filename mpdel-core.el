@@ -104,6 +104,15 @@ Use point if POS is nil."
   (interactive)
   (mpdel-core--open-entity (mpdel-core-entity-at-point (or pos (point)))))
 
+(defun mpdel-core-open-entity-parent-at-point (&optional pos)
+  "Open a navigator showing the parent of entity at POS.
+If POS is nil, use point.
+
+For example, if point is on a song, open a navigator on its
+album."
+  (interactive)
+  (mpdel-core--open-entity (libmpdel-entity-parent (mpdel-core-entity-at-point pos))))
+
 
 ;;; Define the mpdel shared map
 
@@ -118,6 +127,7 @@ Use point if POS is nil."
     (define-key map (kbd "R") #'mpdel-core-replace-stored-playlist)
     (define-key map (kbd "C-x C-j") #'mpdel-core-dired)
     (define-key map (kbd "RET") #'mpdel-core-open-entity-at-point)
+    (define-key map (kbd "^") #'mpdel-core-open-entity-parent-at-point)
     map)
   "Keymap for all mpdel buffers.")
 

@@ -118,15 +118,17 @@
        (setq tabulated-list-entries (mapcar #'mpdel-nav--entity-to-list-entry entities))
        (tabulated-list-print)))))
 
-(defun mpdel-nav-rise (&optional entity)
+(defun mpdel-nav-open-entity-parent-at-point (&optional entity)
   "Refresh navigator to display parent of ENTITY among its siblings.
 Use entity at point if ENTITY is nil."
   (interactive)
   (let* ((entity (or entity (mpdel-core-entity-at-point)))
          (parent (libmpdel-entity-parent entity))
          (ancestor (and parent (libmpdel-entity-parent parent))))
-    (when ancestor
-      (mpdel-nav--open ancestor))))
+    (if (and ancestor (libmpdel-equal parent mpdel-nav--entity))
+        (mpdel-nav--open ancestor)
+      (when parent
+        (mpdel-nav--open parent)))))
 
 ;;;###autoload
 (defun mpdel-nav-open-artists ()
@@ -169,7 +171,7 @@ Interactively, ask for TITLE."
      map
      (make-composed-keymap mpdel-core-map tabulated-list-mode-map))
     (define-key map (kbd "g") #'mpdel-nav-refresh)
-    (define-key map (kbd "^") #'mpdel-nav-rise)
+    (define-key map (kbd "^") #'mpdel-nav-open-entity-parent-at-point)
     map)
   "Keybindings for `mpdel-nav-mode'.")
 

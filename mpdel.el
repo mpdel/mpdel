@@ -108,15 +108,6 @@
 (define-key mpdel-core-map (kbd "s r") #'mpdel-nav-search-by-artist)
 
 
-;;; Add features to playlist buffers
-(defun mpdel-playlist-song-navigate ()
-  "Open a navigator containing song at point."
-  (interactive)
-  (mpdel-nav--open (libmpdel-entity-parent (mpdel-core-entity-at-point))))
-
-(define-key mpdel-playlist-mode-map (kbd "^") #'mpdel-playlist-song-navigate)
-
-
 ;;; Add features to the song buffers
 (cl-defmethod mpdel-core--entity-at-point (_pos (_mode (derived-mode mpdel-song-mode)))
   (mpdel-song-buffer-song))
@@ -125,8 +116,6 @@
   "Open a navigator containing song at point."
   (interactive)
   (mpdel-nav--open (libmpdel-entity-parent (mpdel-song-buffer-song))))
-
-(define-key mpdel-song-mode-map (kbd "^") #'mpdel-song-navigate)
 
 
 ;;; Define the global minor mode so users can control MPD from non-MPD
