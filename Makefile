@@ -34,6 +34,9 @@ lint :
 	--eval "(setq byte-compile-error-on-warn t)" \
 	-f batch-byte-compile ${SRCS} ${TESTS}
 
+	# Load all source files in the same Emacs to find conflicts
+	$(BATCH) $(addprefix -l , ${SRCS})
+
 	# Run package-lint to check for packaging mistakes
 	$(BATCH) \
 	--eval "(require 'package-lint)" \
