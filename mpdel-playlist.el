@@ -72,14 +72,15 @@
          (or (libmpdel-album-name song) "")
          (or (libmpdel-artist-name song) ""))))
 
-(defun mpdel-playlist-go-to-song (song)
-  "Move point to SONG.
+(defun mpdel-playlist-go-to-song (&optional song)
+  "Move point to SONG, currently-played song if nil.
 Return non-nil if SONG is found, nil otherwise."
-  (goto-char (point-min))
-  (while (and (not (= (point) (point-max)))
-              (not (libmpdel-equal (mpdel-core-entity-at-point) song)))
-    (forward-line 1))
-  (not (= (point) (point-max))))
+  (let ((song (or song (libmpdel-current-song))))
+    (goto-char (point-min))
+    (while (and (not (= (point) (point-max)))
+                (not (libmpdel-equal (mpdel-core-entity-at-point) song)))
+      (forward-line 1))
+    (not (= (point) (point-max)))))
 
 (defun mpdel-playlist-highlight-song (&optional song)
   "Highlight SONG, current song if nil."
