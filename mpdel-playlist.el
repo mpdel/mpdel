@@ -208,11 +208,7 @@ Use current buffer if BUFFER is nil."
 (defun mpdel-playlist-open-stored-playlist ()
   "Ask for a stored playlist and open it."
   (interactive)
-  (libmpdel-list
-   'stored-playlists
-   (lambda (playlists)
-     (let ((playlist (libmpdel-completing-read "Playlist: " playlists)))
-       (mpdel-playlist-open playlist)))))
+  (libmpdel-funcall-on-stored-playlist #'mpdel-playlist-open))
 
 
 ;;; Major mode
