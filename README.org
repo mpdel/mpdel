@@ -105,6 +105,7 @@ in all MPDel buffers where they make sense:
 | ~R~       | replace a stored playlist with item  |
 | ~v~       | view currently played song           |
 | ~RET~     | open a buffer showing item at point  |
+| ~^~       | open item's parent                   |
 | ~C-x C-j~ | open a dired buffer on item at point |
 
 Opening a dired buffer on the item at point requires configuring
@@ -117,9 +118,10 @@ navigator on your database. You first get a list of all artists. From
 there, you can press ~a~, ~A~, ~r~ or ~R~ (see above) to add the item
 at point to a playlist. You can also press ~RET~ (the ~enter~ key) to
 "dive" into the selected item and display a list of the artist's
-albums. Keybindings are also available here to add albums to a
-playlist or dive into an album's songs. Diving into a song displays
-some information about it.
+albums. On the contrary, press ~^~ to go back to the item's parent
+(e.g., artist of the album at point). Keybindings are also available
+here to add albums to a playlist or dive into an album's songs. Diving
+into a song displays some information about it.
 
 You can also start a navigator on your stored playlists with ~C-x Z N~
 (or just ~N~) but that's probably less useful than opening a stored
@@ -155,8 +157,9 @@ refreshes them.
 Song buffers display information about a song, either the currently
 played one (~C-x Z v~ or just ~v~) or the song at point (with
 ~V~). When displaying the currently played song, the buffer also shows
-playback status (e.g., ~"Currently playing"~) and current playback position in
-song (e.g., ~"02:32 / 06:01"~).
+playback status (e.g., "Currently playing") and current playback
+position in song (e.g., "02:32 / 06:01"). Press ~^~ to open a
+navigator on the song's album.
 
 ** License
 
