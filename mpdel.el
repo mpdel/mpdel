@@ -5,7 +5,7 @@
 ;; Author: Damien Cassou <damien@cassou.me>
 ;; Keywords: multimedia
 ;; Url: https://gitlab.petton.fr/mpdel/mpdel
-;; Package-requires: ((emacs "25.1") (libmpdel "0.3.0"))
+;; Package-requires: ((emacs "25.1") (libmpdel "0.5.0"))
 ;; Version: 0.3.0
 
 ;; This program is free software; you can redistribute it and/or modify
