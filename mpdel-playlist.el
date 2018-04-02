@@ -56,7 +56,7 @@
 (cl-defgeneric mpdel-playlist--buffer (playlist)
   "Return buffer displaying PLAYLIST.")
 
-(cl-defmethod mpdel-playlist--buffer ((_ libmpdel-current-playlist))
+(cl-defmethod mpdel-playlist--buffer ((_ (eql current-playlist)))
   (get-buffer-create "*MPDEL Current Playlist*"))
 
 (cl-defmethod mpdel-playlist--buffer ((stored-playlist libmpdel-stored-playlist))
@@ -196,7 +196,7 @@ Use current buffer if BUFFER is nil."
 (defun mpdel-playlist-open (&optional playlist)
   "Open a buffer with PLAYLIST, current playlist if nil."
   (interactive)
-  (let* ((playlist (or playlist (libmpdel-current-playlist)))
+  (let* ((playlist (or playlist 'current-playlist))
          (buffer (mpdel-playlist--buffer playlist)))
     (with-current-buffer buffer
       (mpdel-playlist-mode)
