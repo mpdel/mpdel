@@ -8,6 +8,7 @@ BATCH     = $(EMACSBIN) -Q --batch $(LOAD_PATH) \
 		--eval "(setq load-prefer-newer t)" \
 		--eval "(require 'package)" \
 		--eval "(add-to-list 'package-archives '(\"melpa-stable\" . \"http://stable.melpa.org/packages/\"))" \
+		--eval "(setq enable-dir-local-variables nil)" \
 		--funcall package-initialize
 
 CURL = curl -fsSkL --retry 9 --retry-delay 9
