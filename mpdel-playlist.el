@@ -75,12 +75,7 @@
 (defun mpdel-playlist-go-to-song (&optional song)
   "Move point to SONG, currently-played song if nil.
 Return non-nil if SONG is found, nil otherwise."
-  (let ((song (or song (libmpdel-current-song))))
-    (goto-char (point-min))
-    (while (and (not (= (point) (point-max)))
-                (not (libmpdel-equal (mpdel-core-entity-at-point) song)))
-      (forward-line 1))
-    (not (= (point) (point-max)))))
+  (mpdel-core-go-to-entity (or song (libmpdel-current-song))))
 
 (defun mpdel-playlist-highlight-song (&optional song)
   "Highlight SONG, current song if nil."

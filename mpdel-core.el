@@ -70,6 +70,16 @@ Use point if POS is nil and use current buffer if BUFFER is nil."
 (cl-defgeneric mpdel-core--open-entity (entity)
   "Open buffer displaying information about ENTITY.")
 
+(defun mpdel-core-go-to-entity (entity &optional buffer)
+  "Move point to ENTITY in BUFFER, current one if nil.
+Return non-nil if ENTITY is found, nil otherwise."
+  (with-current-buffer (or buffer (current-buffer))
+    (goto-char (point-min))
+    (while (and (not (= (point) (point-max)))
+                (not (libmpdel-equal (mpdel-core-entity-at-point) entity)))
+      (forward-line 1))
+    (not (= (point) (point-max)))))
+
 
 ;;; Commands
 
