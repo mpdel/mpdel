@@ -5,13 +5,13 @@
     - make check
 
 test:emacs:25.1:
-  image: registry.gitlab.com/damiencassou/emacs-ci-docker:25.1
+  image: silex/emacs:25.1-dev
   <<: *test_job_definition
 
 test:emacs:25.3:
-  image: registry.gitlab.com/damiencassou/emacs-ci-docker:25.3
+  image: silex/emacs:25.3-dev
   <<: *test_job_definition
 
 test:emacs:26:
-  image: registry.gitlab.com/damiencassou/emacs-ci-docker:26.0.91
+  image: silex/emacs:26-dev
   <<: *test_job_definition
