@@ -65,8 +65,8 @@
 (cl-defmethod mpdel-nav--entity-to-list-entry ((entity libmpdel-song))
   (list entity
         (vector (libmpdel-entity-name entity)
-                (libmpdel-album-name entity)
-                (libmpdel-artist-name entity))))
+                (or (libmpdel-album-name entity) "")
+                (or (libmpdel-artist-name entity) ""))))
 
 (defun mpdel-nav--song-tabulated-list-format ()
   "Return `tabulated-list-format' value for songs."
