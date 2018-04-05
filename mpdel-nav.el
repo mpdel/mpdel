@@ -95,28 +95,34 @@
 (cl-defmethod mpdel-nav--tabulated-list-format ((_entity libmpdel-search-criteria))
   (mpdel-nav--song-tabulated-list-format))
 
-(defun mpdel-nav--open (entity)
-  "Open a navigator buffer displaying children of ENTITY."
+(defun mpdel-nav--open (entity &optional target)
+  "Open a navigator buffer displaying children of ENTITY.
+
+If TARGET is non-nil and is in buffer, move point to it."
   (with-current-buffer (mpdel-nav--buffer)
     (mpdel-nav-mode)
     (setq mpdel-nav--entity entity)
     (setq tabulated-list-format (mpdel-nav--tabulated-list-format entity))
     (tabulated-list-init-header)
-    (mpdel-nav-refresh)
+    (mpdel-nav-refresh target)
     (switch-to-buffer (current-buffer))))
 
 
 ;;; Public functions
 
-(defun mpdel-nav-refresh ()
-  "Refresh buffer."
+(defun mpdel-nav-refresh (&optional target)
+  "Refresh buffer.
+
+If TARGET is non-nil and is in buffer, move point to it."
   (interactive)
   (libmpdel-list
    mpdel-nav--entity
    (lambda (entities)
      (with-current-buffer (mpdel-nav--buffer)
        (setq tabulated-list-entries (mapcar #'mpdel-nav--entity-to-list-entry entities))
-       (tabulated-list-print)))))
+       (tabulated-list-print)
+       (when target
+         (mpdel-core-go-to-entity target))))))
 
 (defun mpdel-nav-open-entity-parent-at-point (&optional entity)
   "Refresh navigator to display parent of ENTITY among its siblings.
@@ -126,9 +132,9 @@ Use entity at point if ENTITY is nil."
          (parent (libmpdel-entity-parent entity))
          (ancestor (and parent (libmpdel-entity-parent parent))))
     (if (and ancestor (libmpdel-equal parent mpdel-nav--entity))
-        (mpdel-nav--open ancestor)
+        (mpdel-nav--open ancestor parent)
       (when parent
-        (mpdel-nav--open parent)))))
+        (mpdel-nav--open parent entity)))))
 
 ;;;###autoload
 (defun mpdel-nav-open-artists ()

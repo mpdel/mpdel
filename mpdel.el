@@ -91,11 +91,11 @@
 
 (define-key mpdel-core-map (kbd "M-b") #'mpdel-song-large-decrement)
 
-(cl-defmethod mpdel-core--open-entity ((entity t))
+(cl-defmethod mpdel-core--open-entity ((entity t) &optional target)
   ;; By default, open any entity with a navigator
-  (mpdel-nav--open entity))
+  (mpdel-nav--open entity target))
 
-(cl-defmethod mpdel-core--open-entity ((song libmpdel-song))
+(cl-defmethod mpdel-core--open-entity ((song libmpdel-song) &optional _target)
   (mpdel-song-open song))
 
 (define-key mpdel-core-map (kbd "l") #'mpdel-playlist-open)

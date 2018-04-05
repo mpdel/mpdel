@@ -67,8 +67,10 @@ Use point if POS is nil and use current buffer if BUFFER is nil."
   (with-current-buffer (or buffer (current-buffer))
     (mpdel-core--entity-at-point (or pos (point)) major-mode)))
 
-(cl-defgeneric mpdel-core--open-entity (entity)
-  "Open buffer displaying information about ENTITY.")
+(cl-defgeneric mpdel-core--open-entity (entity &optional target)
+  "Open buffer displaying information about ENTITY.
+
+If TARGET is non-nil and is in buffer, move point to it.")
 
 (defun mpdel-core-go-to-entity (entity &optional buffer)
   "Move point to ENTITY in BUFFER, current one if nil.
@@ -121,7 +123,8 @@ If POS is nil, use point.
 For example, if point is on a song, open a navigator on its
 album."
   (interactive)
-  (mpdel-core--open-entity (libmpdel-entity-parent (mpdel-core-entity-at-point pos))))
+  (let ((entity (mpdel-core-entity-at-point pos)))
+    (mpdel-core--open-entity (libmpdel-entity-parent entity) entity)))
 
 
 ;;; Define the mpdel shared map
