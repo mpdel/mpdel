@@ -7,15 +7,11 @@
         </a>
 
         <a href="https://melpa.org/#/mpdel">
-          <img alt="MELPA Stable" src="https://melpa.org/packages/mpdel-badge.svg"/>
+          <img alt="MELPA" src="https://melpa.org/packages/mpdel-badge.svg"/>
         </a>
 
         <a href="https://gitlab.petton.fr/mpdel/mpdel/commits/master">
           <img alt="pipeline status" src="https://gitlab.petton.fr/mpdel/mpdel/badges/master/pipeline.svg" />
-        </a>
-
-        <a href="https://liberapay.com/DamienCassou/donate">
-          <img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg">
         </a>
       </p>
   #+END_HTML
@@ -164,5 +160,11 @@ navigator on the song's album.
 ** License
 
 See [[file:COPYING][COPYING]]. Copyright (c) 2018 Damien Cassou.
+
+  #+BEGIN_HTML
+  <a href="https://liberapay.com/DamienCassou/donate">
+    <img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg">
+  </a>
+  #+END_HTML
 
 #  LocalWords:  MPDel MPD minibuffer dired
