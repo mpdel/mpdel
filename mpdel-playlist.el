@@ -171,6 +171,14 @@ Use current buffer if BUFFER is nil."
     (when songs
       (libmpdel-playlist-move-down songs))))
 
+(defun mpdel-playlist-save ()
+  "Save current playlist into a new stored playlist.
+Ask for stored playlist name."
+  (interactive)
+  (if (libmpdel-current-playlist-p mpdel-playlist-playlist)
+      (call-interactively #'libmpdel-playlist-save)
+    (user-error "You can only save from the current playlist")))
+
 (defun mpdel-playlist--register-to-hooks (buffer)
   "Register to several hooks to refresh BUFFER."
   (with-current-buffer buffer
@@ -221,6 +229,7 @@ Use current buffer if BUFFER is nil."
     (define-key map (kbd "SPC") #'mpdel-playlist-play)
     (define-key map (kbd "<M-up>") #'mpdel-playlist-move-up)
     (define-key map (kbd "<M-down>") #'mpdel-playlist-move-down)
+    (define-key map (kbd "C-x C-s") #'mpdel-playlist-save)
     map))
 
 (define-derived-mode mpdel-playlist-mode tabulated-list-mode "Playlist"

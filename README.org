@@ -137,7 +137,8 @@ Here is a list of keybindings available for playlist buffers:
 | *Binding* | *Action*                                      |
 |-----------+-----------------------------------------------|
 | ~SPC~     | play song at point (only in current playlist) |
-| ~k~       | removes selected song(s) from playlist        |
+| ~C-x C-s~ | save current playlist in a new one            |
+| ~k~       | remove selected song(s) from playlist         |
 | ~M-up~    | move selected song(s) up in the playlist      |
 | ~M-down~  | move selected song(s) down in the playlist    |
 
