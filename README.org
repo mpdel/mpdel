@@ -99,6 +99,7 @@ in all MPDel buffers where they make sense:
 | ~A~       | add item to a stored playlist        |
 | ~r~       | replace current playlist with item   |
 | ~R~       | replace a stored playlist with item  |
+| ~p~       | play selected items immediately      |
 | ~v~       | view currently played song           |
 | ~RET~     | open a buffer showing item at point  |
 | ~^~       | open item's parent                   |
@@ -136,7 +137,6 @@ Here is a list of keybindings available for playlist buffers:
 
 | *Binding* | *Action*                                      |
 |-----------+-----------------------------------------------|
-| ~SPC~     | play song at point (only in current playlist) |
 | ~C-x C-s~ | save current playlist in a new one            |
 | ~k~       | remove selected song(s) from playlist         |
 | ~M-up~    | move selected song(s) up in the playlist      |

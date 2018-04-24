@@ -155,7 +155,7 @@ Use current buffer if BUFFER is nil."
   (interactive)
   (if (libmpdel-current-playlist-p mpdel-playlist-playlist)
       (libmpdel-play-song (mpdel-core-entity-at-point))
-    (message "You can only do that from the current playlist.")))
+    (mpdel-core-insert-current-playlist)))
 
 (defun mpdel-playlist-move-up ()
   "Move selected songs up in the current playlist."
@@ -226,7 +226,7 @@ Ask for stored playlist name."
      (make-composed-keymap mpdel-core-map tabulated-list-mode-map))
     (define-key map (kbd "g") #'mpdel-playlist-refresh)
     (define-key map (kbd "k") #'mpdel-playlist-delete)
-    (define-key map (kbd "SPC") #'mpdel-playlist-play)
+    (define-key map (kbd "p") #'mpdel-playlist-play)
     (define-key map (kbd "<M-up>") #'mpdel-playlist-move-up)
     (define-key map (kbd "<M-down>") #'mpdel-playlist-move-down)
     (define-key map (kbd "C-x C-s") #'mpdel-playlist-save)
