@@ -108,22 +108,7 @@ Return non-nil if ENTITY is found, nil otherwise."
 (defun mpdel-core-insert-current-playlist ()
   "Insert selected entities after currently-played song."
   (interactive)
-  (libmpdel-list-songs
-   (mpdel-core-selected-entities)
-   (lambda (songs)
-     (libmpdel-send-commands
-      (mapcar (lambda (song) (format "addid %S" (libmpdel-song-file song))) songs)
-      (lambda (data)
-        (let ((song-ids (mapcar (lambda (song-data) (cdr song-data)) data))
-              ;; Add after current song if possible:
-              (target-index (if (libmpdel-current-song) "-1" "0")))
-          (libmpdel-send-commands
-           ;; The reverse is important to get the songs in the same
-           ;; order as in the selection:
-           (mapcar
-            (lambda (song-id) (format "moveid %s %s" song-id target-index))
-            (reverse song-ids))
-           (lambda (_) (libmpdel-send-command `("playid %s" ,(car song-ids)))))))))))
+  (libmpdel-current-playlist-insert (mpdel-core-selected-entities)))
 
 (defun mpdel-core-dired (&optional pos)
   "Open dired on the entity at POS, point if nil."
