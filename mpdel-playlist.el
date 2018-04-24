@@ -97,7 +97,7 @@ Restore selection with `mpdel-playlist--restore-playlist-status'."
 STATUS has been returned by `mpdel-playlist--save-playlist-status'."
   (when (cdr status)
     (mpdel-playlist-go-to-song (cdr status))
-    (push-mark))
+    (push-mark nil t))
   (when (car status)
     (mpdel-playlist-go-to-song (car status))))
 
