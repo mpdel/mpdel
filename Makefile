@@ -43,3 +43,6 @@ lint :
 	--eval "(require 'package-lint)" \
 	--eval "(setq enable-dir-local-variables nil)" \
 	-f package-lint-batch-and-exit ${SRCS}
+
+	# Run checkdoc to check Emacs Lisp conventions
+	$(BATCH) --eval "(mapcar #'checkdoc-file '($(patsubst %, \"%\", ${SRCS})))"
