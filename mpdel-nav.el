@@ -66,12 +66,16 @@
   (list entity
         (vector (libmpdel-entity-name entity)
                 (or (libmpdel-album-name entity) "")
+                (or (libmpdel-song-disk entity) "")
+                (or (libmpdel-entity-date entity) "")
                 (or (libmpdel-artist-name entity) ""))))
 
 (defun mpdel-nav--song-tabulated-list-format ()
   "Return `tabulated-list-format' value for songs."
   (vector (list "Name" 30 t)
           (list "Album" 30 t)
+          (list "Disk" 4 t)
+          (list "Date" 5 t)
           (list "Artist" 0 t)))
 
 (cl-defgeneric mpdel-nav--tabulated-list-format (entity)
