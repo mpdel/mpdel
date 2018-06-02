@@ -8,6 +8,8 @@ export PACKAGE_ARCHIVES=melpa
 export PACKAGE_TEST_DEPS=libmpdel package-lint
 export PACKAGE_TEST_ARCHIVES=melpa
 
+export PACKAGE_IGNORE_DEPS=libmpdel
+
 EMAKE_PATH = ../emake
 
 LOAD_PATH = -L . -L $(EMAKE_PATH)  -L ../package-lint -L ../libmpdel
