@@ -5,7 +5,7 @@ export PACKAGE_FILE=$(word 1,$(SRCS))
 export PACKAGE_LISP=$(SRCS) $(TESTS)
 export PACKAGE_ARCHIVES=melpa
 
-export PACKAGE_TEST_DEPS=libmpdel
+export PACKAGE_TEST_DEPS=libmpdel package-lint
 export PACKAGE_TEST_ARCHIVES=melpa
 
 EMAKE_PATH = ../emake
