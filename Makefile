@@ -1,48 +1,18 @@
-SRCS = mpdel-core.el mpdel-playlist.el mpdel-song.el mpdel-nav.el mpdel.el
-TESTS =
+PACKAGE_BASENAME = mpdel
 
-LOAD_PATH = -L . -L ../libmpdel -L ../package-lint
+export CI=false
 
-EMACSBIN ?= emacs
-BATCH     = $(EMACSBIN) -Q --batch $(LOAD_PATH) \
-		--eval "(setq load-prefer-newer t)" \
-		--eval "(require 'package)" \
-		--eval "(add-to-list 'package-archives '(\"melpa-stable\" . \"http://stable.melpa.org/packages/\"))" \
-		--eval "(setq enable-dir-local-variables nil)" \
-		--funcall package-initialize
+emake.mk:
+	curl --fail --silent --show-error --insecure --location --retry 9 --retry-delay 9 -O \
+		https://raw.githubusercontent.com/vermiculus/emake.el/master/emake.mk
 
-CURL = curl -fsSkL --retry 9 --retry-delay 9
-GITLAB=https://gitlab.petton.fr
+# Include emake.mk if present
+-include emake.mk
 
-.PHONY: all ci-dependencies check test lint
-
-all: check
-
-ci-dependencies:
-	# Install dependencies in ~/.emacs.d/elpa
-	$(BATCH) \
-	--funcall package-refresh-contents \
-	--eval "(package-install 'package-lint)"
-
-	# Install libmpdel separately as it is not in melpa yet
-	$(CURL) -O ${GITLAB}/mpdel/libmpdel/raw/master/libmpdel.el
+.PHONY: check lint
 
 check: lint
 
-lint :
-	# Byte compile all and stop on any warning or error
-	$(BATCH) \
-	--eval "(setq byte-compile-error-on-warn t)" \
-	-f batch-byte-compile ${SRCS} ${TESTS}
-
-	# Load all source files in the same Emacs to find conflicts
-	$(BATCH) $(addprefix -l , ${SRCS})
-
-	# Run package-lint to check for packaging mistakes
-	$(BATCH) \
-	--eval "(require 'package-lint)" \
-	--eval "(setq enable-dir-local-variables nil)" \
-	-f package-lint-batch-and-exit ${SRCS}
-
-	# Run checkdoc to check Emacs Lisp conventions
-	$(BATCH) --eval "(mapcar #'checkdoc-file '($(patsubst %, \"%\", ${SRCS})))"
+lint: PACKAGE_LISP += $(PACKAGE_TESTS)
+lint: PACKAGE_ARCHIVES += melpa-stable
+lint: lint-checkdoc lint-package-lint compile
