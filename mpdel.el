@@ -6,7 +6,7 @@
 ;; Keywords: multimedia
 ;; Url: https://gitlab.petton.fr/mpdel/mpdel
 ;; Package-requires: ((emacs "25.1") (libmpdel "0.7.0"))
-;; Version: 0.5.0
+;; Version: 0.6.0
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
