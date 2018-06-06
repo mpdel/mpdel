@@ -66,7 +66,7 @@
   (list entity
         (vector (libmpdel-entity-name entity)
                 (or (libmpdel-album-name entity) "")
-                (or (libmpdel-song-disk entity) "")
+                (or (libmpdel-song-disc entity) "")
                 (or (libmpdel-entity-date entity) "")
                 (or (libmpdel-artist-name entity) ""))))
 

@@ -70,7 +70,7 @@
          (or (libmpdel-entity-name song) "")
          (or (libmpdel-song-track song) "")
          (or (libmpdel-album-name song) "")
-         (or (libmpdel-song-disk song) "")
+         (or (libmpdel-song-disc song) "")
          (or (libmpdel-entity-date song) "")
          (or (libmpdel-artist-name song) ""))))
 
