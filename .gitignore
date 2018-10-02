@@ -1,6 +1,3 @@
 /README.html
 /nohup.out
-/emake.el
-/emake.mk
-/.elpa
-/.elpa.test
+/makel.mk

@@ -1,18 +1,21 @@
-PACKAGE_BASENAME = mpdel
+ELPA_DEPENDENCIES=package-lint libmpdel
 
-export CI=false
+ELPA_ARCHIVES=melpa
 
-emake.mk:
-	curl --fail --silent --show-error --insecure --location --retry 9 --retry-delay 9 -O \
-		https://raw.githubusercontent.com/vermiculus/emake.el/master/emake.mk
+LINT_CHECKDOC_FILES=$(wildcard *.el)
+LINT_PACKAGE_LINT_FILES=$(wildcard *.el)
+LINT_COMPILE_FILES=$(wildcard *.el)
+
+makel.mk:
+	# Download makel
+	@if [ -f ../makel/makel.mk ]; then \
+		ln -s ../makel/makel.mk .; \
+	else \
+		curl \
+		--fail --silent --show-error --insecure --location \
+		--retry 9 --retry-delay 9 \
+		-O https://gitlab.petton.fr/DamienCassou/makel/raw/v0.2.0/makel.mk; \
+	fi
 
 # Include emake.mk if present
--include emake.mk
-
-.PHONY: check lint
-
-check: lint
-
-lint: PACKAGE_LISP += $(PACKAGE_TESTS)
-lint: PACKAGE_ARCHIVES += melpa-stable
-lint: lint-checkdoc lint-package-lint compile
+-include makel.mk
