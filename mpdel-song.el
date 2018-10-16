@@ -190,6 +190,11 @@ playback."
         (add-hook 'kill-buffer-hook (lambda () (remove-hook 'libmpdel-player-changed-hook refresh-fn))))
       (pop-to-buffer (current-buffer)))))
 
+(defun mpdel-song-play ()
+  "Start playing the song of the current buffer."
+  (interactive)
+  (libmpdel-play-song mpdel-song-song))
+
 (defun mpdel-song-quit-window ()
   "Quit window and kill its buffer.
 
@@ -205,6 +210,7 @@ refreshing itself to display playback position."
      map
      (make-composed-keymap mpdel-core-map special-mode-map))
     (define-key map (kbd "g") #'mpdel-song-refresh)
+    (define-key map (kbd "p") #'mpdel-song-play)
     (define-key map (kbd "q") #'mpdel-song-quit-window)
     map))
 
