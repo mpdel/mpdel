@@ -45,21 +45,23 @@
       (reverse points))))
 
 (cl-defgeneric mpdel-core--entity-at-point (_pos _mode)
-  "Return entity at POS.
+  "Return entity at POS, nil if none.
 MODE is the current buffer's major mode."
-  (message "No entity at point."))
+  nil)
 
 (cl-defmethod mpdel-core--entity-at-point (pos (_mode (derived-mode tabulated-list-mode)))
   (tabulated-list-get-id pos))
 
 (defun mpdel-core-selected-entities ()
-  "Return entities within active region or at point."
+  "Return entities within active region or at point.
+Return nil if no entity is found."
   (cond
    ((use-region-p)
     (mapcar (lambda (pos) (mpdel-core--entity-at-point pos major-mode))
             (mpdel-core--points-in-region (region-beginning) (region-end))))
    ((= (point) (point-max)) nil)
-   (t (list (mpdel-core--entity-at-point (point) major-mode)))))
+   (t (let ((entity (mpdel-core--entity-at-point (point) major-mode)))
+        (when entity (list entity))))))
 
 (defun mpdel-core-entity-at-point (&optional pos buffer)
   "Return entity at POS in BUFFER.
@@ -106,9 +108,15 @@ Return non-nil if ENTITY is found, nil otherwise."
   (libmpdel-stored-playlist-replace (mpdel-core-selected-entities)))
 
 (defun mpdel-core-insert-current-playlist ()
-  "Insert selected entities after currently-played song."
+  "Insert selected entities after currently-played song.
+Start playing the first.
+
+If no entity is selected, restart playing the current song."
   (interactive)
-  (libmpdel-current-playlist-insert (mpdel-core-selected-entities)))
+  (let ((entities (mpdel-core-selected-entities)))
+    (if entities
+        (libmpdel-current-playlist-insert entities)
+      (libmpdel-playback-seek "0"))))
 
 (defun mpdel-core-dired (&optional pos)
   "Open dired on the entity at POS, point if nil."

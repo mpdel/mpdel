@@ -73,6 +73,7 @@ is active:
 | ~C-x Z SPC~ | toggle between play and pause                             |
 | ~C-x Z M-n~ | play next song                                            |
 | ~C-x Z M-p~ | play previous song                                        |
+| ~C-x Z p~   | restart playing current song                              |
 | ~C-x Z l~   | open the current playlist                                 |
 | ~C-x Z L~   | open a stored playlist                                    |
 | ~C-x Z n~   | navigate your database from artists                       |
@@ -135,12 +136,12 @@ buffer lists songs and can be edited.
 
 Here is a list of keybindings available for playlist buffers:
 
-| *Binding* | *Action*                                      |
-|-----------+-----------------------------------------------|
-| ~C-x C-s~ | save current playlist in a new one            |
-| ~k~       | remove selected song(s) from playlist         |
-| ~M-up~    | move selected song(s) up in the playlist      |
-| ~M-down~  | move selected song(s) down in the playlist    |
+| *Binding* | *Action*                                   |
+|-----------+--------------------------------------------|
+| ~C-x C-s~ | save current playlist in a new one         |
+| ~k~       | remove selected song(s) from playlist      |
+| ~M-up~    | move selected song(s) up in the playlist   |
+| ~M-down~  | move selected song(s) down in the playlist |
 
 When a command acts on the selected song(s) (such as ~k~), the song at
 point will be used if there is no active region and all songs of the
