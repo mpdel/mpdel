@@ -150,7 +150,8 @@ Use current buffer if BUFFER is nil."
       ;; Move point to the closest non-deleted song
       (forward-line 1)
       (when (= (point) (point-max))
-        (forward-line -2)))))
+        (forward-line -2))
+      (setq deactivate-mark t))))
 
 (defun mpdel-playlist-play ()
   "Start playing the song at point."
