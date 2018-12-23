@@ -85,27 +85,38 @@ Return non-nil if ENTITY is found, nil otherwise."
     (not (= (point) (point-max)))))
 
 
+(defun mpdel-core-after-playlist-modification ()
+  "Called at the end of any playlist modification command."
+  (when (derived-mode-p 'tabulated-list-mode)
+    (unless (use-region-p)
+      (forward-line 1))
+    (setq deactivate-mark t)))
+
 ;;; Commands
 
 (defun mpdel-core-add-to-current-playlist ()
   "Add selected entities to current playlist."
   (interactive)
-  (libmpdel-current-playlist-add (mpdel-core-selected-entities)))
+  (libmpdel-current-playlist-add (mpdel-core-selected-entities))
+  (mpdel-core-after-playlist-modification))
 
 (defun mpdel-core-add-to-stored-playlist ()
   "Add selected entities to a stored playlist."
   (interactive)
-  (libmpdel-stored-playlist-add (mpdel-core-selected-entities)))
+  (libmpdel-stored-playlist-add (mpdel-core-selected-entities))
+  (mpdel-core-after-playlist-modification))
 
 (defun mpdel-core-replace-current-playlist ()
   "Replace current playlist with selected entities."
   (interactive)
-  (libmpdel-current-playlist-replace (mpdel-core-selected-entities)))
+  (libmpdel-current-playlist-replace (mpdel-core-selected-entities))
+  (mpdel-core-after-playlist-modification))
 
 (defun mpdel-core-replace-stored-playlist ()
   "Replace a stored playlist with selected entities."
   (interactive)
-  (libmpdel-stored-playlist-replace (mpdel-core-selected-entities)))
+  (libmpdel-stored-playlist-replace (mpdel-core-selected-entities))
+  (mpdel-core-after-playlist-modification))
 
 (defun mpdel-core-insert-current-playlist ()
   "Insert selected entities after currently-played song.
@@ -114,9 +125,10 @@ Start playing the first.
 If no entity is selected, restart playing the current song."
   (interactive)
   (let ((entities (mpdel-core-selected-entities)))
-    (if entities
-        (libmpdel-current-playlist-insert entities)
-      (libmpdel-playback-seek "0"))))
+    (if (not entities)
+        (libmpdel-playback-seek "0")
+      (libmpdel-current-playlist-insert entities)
+      (mpdel-core-after-playlist-modification))))
 
 (defun mpdel-core-dired (&optional pos)
   "Open dired on the entity at POS, point if nil."
