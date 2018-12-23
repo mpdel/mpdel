@@ -246,7 +246,8 @@ Ask for stored playlist name."
                 (list "Artist" 0 nil)))
   (tabulated-list-init-header)
   (setq imenu-prev-index-position-function #'mpdel-playlist--imenu-prev-index-position)
-  (setq imenu-extract-index-name-function #'mpdel-playlist--imenu-extract-index-name))
+  (setq imenu-extract-index-name-function #'mpdel-playlist--imenu-extract-index-name)
+  (hl-line-mode))
 
 (provide 'mpdel-playlist)
 ;;; mpdel-playlist.el ends here

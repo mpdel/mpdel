@@ -186,7 +186,8 @@ Interactively, ask for TITLE."
   "Keybindings for `mpdel-nav-mode'.")
 
 (define-derived-mode mpdel-nav-mode tabulated-list-mode "MPD Navigator"
-  "Abstract major mode to list part of the MPD database.")
+  "Abstract major mode to list part of the MPD database."
+  (hl-line-mode))
 
 (provide 'mpdel-nav)
 ;;; mpdel-nav.el ends here
