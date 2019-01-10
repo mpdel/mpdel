@@ -1,6 +1,6 @@
 ;;; mpdel-playlist.el --- Display and manipulate MPD playlists  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2017  Damien Cassou
+;; Copyright (C) 2017-2019  Damien Cassou
 
 ;; Author: Damien Cassou <damien@cassou.me>
 ;; Keywords: multimedia
