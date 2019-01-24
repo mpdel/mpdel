@@ -84,6 +84,9 @@
 (cl-defmethod mpdel-nav--tabulated-list-format ((_entity (eql artists)))
   (mpdel-nav--default-tabulated-list-format))
 
+(cl-defmethod mpdel-nav--tabulated-list-format ((_entity (eql albums)))
+  (mpdel-nav--album-tabulated-list-format))
+
 (cl-defmethod mpdel-nav--tabulated-list-format ((_entity (eql stored-playlists)))
   (mpdel-nav--default-tabulated-list-format))
 
@@ -156,6 +159,12 @@ Use entity at point if ENTITY is nil."
   "Display all artists in the MPD database."
   (interactive)
   (mpdel-nav--open 'artists))
+
+;;;###autoload
+(defun mpdel-nav-open-albums ()
+  "Display all albums in the MPD database."
+  (interactive)
+  (mpdel-nav--open 'albums))
 
 ;;;###autoload
 (defun mpdel-nav-open-stored-playlists ()
