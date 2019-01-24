@@ -99,6 +99,16 @@
 (cl-defmethod mpdel-nav--tabulated-list-format ((_entity libmpdel-search-criteria))
   (mpdel-nav--song-tabulated-list-format))
 
+(defun mpdel-nav--display-wait ()
+  "Display a waiting message in current tabulated buffer."
+  (setq tabulated-list-entries
+        (list (list
+               nil
+               (vconcat
+                '("Please wait…")
+                (make-vector (1- (length tabulated-list-format)) "")))))
+  (tabulated-list-print))
+
 (defun mpdel-nav--open (entity &optional target)
   "Open a navigator buffer displaying children of ENTITY.
 
@@ -108,6 +118,7 @@ If TARGET is non-nil and is in buffer, move point to it."
     (setq mpdel-nav--entity entity)
     (setq tabulated-list-format (mpdel-nav--tabulated-list-format entity))
     (tabulated-list-init-header)
+    (mpdel-nav--display-wait)
     (mpdel-nav-refresh target)
     (switch-to-buffer (current-buffer))))
 
