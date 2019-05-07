@@ -191,7 +191,7 @@ taste:
 
 *** Faces
 
-MPDel defines ~mpdel-playlist--current-song-face~. This face is used
+MPDel defines ~mpdel-playlist-current-song-face~. This face is used
 to highlight the currently-played song in the current playlist.
 
 *** Hooks

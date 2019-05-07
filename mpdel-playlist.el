@@ -40,7 +40,7 @@
   "Display and manipulate MPD playlists."
   :group 'libmpdel)
 
-(defface mpdel-playlist--current-song-face
+(defface mpdel-playlist-current-song-face
   '((t . (:inherit font-lock-keyword-face)))
   "Face to highlight current song in playlist."
   :group 'mpdel-playlist)
@@ -85,7 +85,7 @@ Return non-nil if SONG is found, nil otherwise."
     (when (mpdel-playlist-go-to-song song)
       (let ((inhibit-read-only t))
         (put-text-property (line-beginning-position) (line-end-position)
-                           'face 'mpdel-playlist--current-song-face)))))
+                           'face 'mpdel-playlist-current-song-face)))))
 
 (defun mpdel-playlist--save-playlist-status ()
   "Return an object representing selection.
