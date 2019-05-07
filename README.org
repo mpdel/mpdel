@@ -191,8 +191,17 @@ taste:
 
 *** Faces
 
-MPDel defines ~mpdel-playlist-current-song-face~. This face is used
-to highlight the currently-played song in the current playlist.
+MPDel defines several faces to customize the playlists:
+
+| *Face name*                        | *Description*         |
+|------------------------------------+-----------------------|
+| ~mpdel-playlist-current-song-face~ | currently-played song |
+| ~mpdel-playlist-name-face~         | song names            |
+| ~mpdel-playlist-track-face~        | track numbers         |
+| ~mpdel-playlist-album-face~        | album names           |
+| ~mpdel-playlist-disk-face~         | disk numbers          |
+| ~mpdel-playlist-date-face~         | dates                 |
+| ~mpdel-playlist-artist-face~       | artist names          |
 
 *** Hooks
 

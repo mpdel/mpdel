@@ -45,6 +45,36 @@
   "Face to highlight current song in playlist."
   :group 'mpdel-playlist)
 
+(defface mpdel-playlist-name-face
+  '((t . (:inherit default)))
+  "Face for song names in playlist."
+  :group 'mpdel-playlist)
+
+(defface mpdel-playlist-track-face
+  '((t . (:inherit default)))
+  "Face for track numbers in playlist."
+  :group 'mpdel-playlist)
+
+(defface mpdel-playlist-album-face
+  '((t . (:inherit default)))
+  "Face for album names in playlist."
+  :group 'mpdel-playlist)
+
+(defface mpdel-playlist-disk-face
+  '((t . (:inherit default)))
+  "Face for disk numbers in playlist."
+  :group 'mpdel-playlist)
+
+(defface mpdel-playlist-date-face
+  '((t . (:inherit default)))
+  "Face for dates in playlist."
+  :group 'mpdel-playlist)
+
+(defface mpdel-playlist-artist-face
+  '((t . (:inherit default)))
+  "Face for artist names in playlist."
+  :group 'mpdel-playlist)
+
 
 ;;; Private variables
 (defvar-local mpdel-playlist-playlist nil
@@ -67,12 +97,12 @@
   "Convert SONG to a format suitable for the tabulated list."
   (list song
         (vector
-         (or (libmpdel-entity-name song) "")
-         (or (libmpdel-song-track song) "")
-         (or (libmpdel-album-name song) "")
-         (or (libmpdel-song-disc song) "")
-         (or (libmpdel-entity-date song) "")
-         (or (libmpdel-artist-name song) ""))))
+         (propertize (or (libmpdel-entity-name song) "") 'face 'mpdel-playlist-name-face)
+         (propertize (or (libmpdel-song-track song) "") 'face 'mpdel-playlist-track-face)
+         (propertize (or (libmpdel-album-name song) "") 'face 'mpdel-playlist-album-face)
+         (propertize (or (libmpdel-song-disc song) "") 'face 'mpdel-playlist-disk-face)
+         (propertize (or (libmpdel-entity-date song) "") 'face 'mpdel-playlist-date-face)
+         (propertize (or (libmpdel-artist-name song) "") 'face 'mpdel-playlist-artist-face))))
 
 (defun mpdel-playlist-go-to-song (&optional song)
   "Move point to SONG, currently-played song if nil.
