@@ -159,6 +159,59 @@ playback status (e.g., "Currently playing") and current playback
 position in song (e.g., "02:32 / 06:01"). Press ~^~ to open a
 navigator on the song's album.
 
+** Customizing
+
+By default, MPDel just works and you don't have to customize
+anything. Nevertheless, there are a few customization options if you
+are that kind of person (and you probably are 😄).
+
+*** Communication with MPD
+
+If you have only one MPD server, you can tell libmpdel how to
+communicate with it through the options ~libmpdel-hostname~ and
+~libmpdel-port~. If you have more than one server, configure them in
+~libmpdel-profiles~. In this case, change the active server profile
+with ~M-x libmpdel-connect-profile~.
+
+*** Keyboard
+
+As discussed above, you might want to configure ~mpdel-prefix-key~ to
+control which global keybinding gives you access to MPDel. This prefix
+key is active when ~mpdel-mode~ is active. 
+
+There are several keybinding tables (i.e., keymaps) to modify to your
+taste:
+
+| *Keymap variable*         | *Description*                          |
+|---------------------------+----------------------------------------|
+| ~mpdel-core-map~          | active globally                        |
+| ~mpdel-nav-mode-map~      | active in navigators                   |
+| ~mpdel-playlist-mode-map~ | active in current and stored playlists |
+| ~mpdel-song-mode-map~     | active in song buffers                 |
+
+*** Faces
+
+MPDel defines ~mpdel-playlist--current-song-face~. This face is used
+to highlight the currently-played song in the current playlist.
+
+*** Hooks
+
+You can add functions to the hooks below to get your code executed on
+a particular occasion:
+
+| *hook name*                              | *occasion*                                         |
+|------------------------------------------+----------------------------------------------------|
+| ~libmpdel-current-playlist-changed-hook~ | when the current playlist is modified              |
+| ~libmpdel-stored-playlist-changed-hook~  | when a stored playlist is modified                 |
+| ~libmpdel-player-changed-hook~           | when the player status changes (start, stop, seek) |
+| ~libmpdel-current-song-changed-hook~     | when the current song changes                      |
+
+*** Extras
+
+If your music files are hosted on the computer where MPDel is running,
+you can configure ~libmpdel-music-directory~ to navigate to a music
+file with ~C-x C-j~ from any MPDel buffer.
+
 ** License
 
 See [[file:COPYING][COPYING]]. Copyright (c) 2018 Damien Cassou.
@@ -169,4 +222,4 @@ See [[file:COPYING][COPYING]]. Copyright (c) 2018 Damien Cassou.
   </a>
   #+END_HTML
 
-#  LocalWords:  MPDel MPD minibuffer dired
+#  LocalWords:  MPDel MPD minibuffer dired keymap keymaps
