@@ -208,7 +208,7 @@ MPDel defines several faces to customize the playlists:
 You can add functions to the hooks below to get your code executed on
 a particular occasion:
 
-| *hook name*                              | *occasion*                                         |
+| *Hook name*                              | *Occasion*                                         |
 |------------------------------------------+----------------------------------------------------|
 | ~libmpdel-current-playlist-changed-hook~ | when the current playlist is modified              |
 | ~libmpdel-stored-playlist-changed-hook~  | when a stored playlist is modified                 |
