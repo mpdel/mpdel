@@ -27,11 +27,8 @@
 ;; playlists.
 
 ;;; Code:
-(require 'cl-lib)
-(require 'subr-x)
-
-(require 'libmpdel)
 (require 'mpdel-core)
+(require 'mpdel-tablist)
 
 
 ;;; Customization
@@ -45,150 +42,68 @@
   "Face to highlight current song in playlist."
   :group 'mpdel-playlist)
 
-(defface mpdel-playlist-name-face
-  '((t . (:inherit default)))
-  "Face for song names in playlist."
-  :group 'mpdel-playlist)
+
+;;; `navigel' major-mode configuration
 
-(defface mpdel-playlist-track-face
-  '((t . (:inherit default)))
-  "Face for track numbers in playlist."
-  :group 'mpdel-playlist)
+(cl-defmethod navigel-entity-tablist-mode ((_entity (eql current-playlist)) &context (navigel-app mpdel))
+  (mpdel-playlist-current-playlist-mode))
 
-(defface mpdel-playlist-album-face
-  '((t . (:inherit default)))
-  "Face for album names in playlist."
-  :group 'mpdel-playlist)
+(cl-defmethod navigel-entity-tablist-mode ((_entity libmpdel-stored-playlist) &context (navigel-app mpdel))
+  (mpdel-playlist-stored-playlist-mode))
 
-(defface mpdel-playlist-disk-face
-  '((t . (:inherit default)))
-  "Face for disk numbers in playlist."
-  :group 'mpdel-playlist)
-
-(defface mpdel-playlist-date-face
-  '((t . (:inherit default)))
-  "Face for dates in playlist."
-  :group 'mpdel-playlist)
-
-(defface mpdel-playlist-artist-face
-  '((t . (:inherit default)))
-  "Face for artist names in playlist."
-  :group 'mpdel-playlist)
+(cl-defmethod navigel-delete ((songs list) &context (navigel-app mpdel) (major-mode mpdel-playlist-mode) &optional _callback)
+  (libmpdel-playlist-delete songs navigel-entity))
 
 
-;;; Private variables
-(defvar-local mpdel-playlist-playlist nil
-  "Playlist displayed in the buffer.")
+;;; Private functions
 
-
-;;; Helper functions
-
-(cl-defgeneric mpdel-playlist--buffer (playlist)
-  "Return buffer displaying PLAYLIST.")
-
-(cl-defmethod mpdel-playlist--buffer ((_ (eql current-playlist)))
-  (get-buffer-create "*MPDEL Current Playlist*"))
-
-(cl-defmethod mpdel-playlist--buffer ((stored-playlist libmpdel-stored-playlist))
-  (get-buffer-create (format "*MPDEL Playlist: %s*"
-                             (libmpdel-entity-name stored-playlist))))
-
-(defun mpdel-playlist--song-to-list-entry (song)
-  "Convert SONG to a format suitable for the tabulated list."
-  (list song
-        (vector
-         (propertize (or (libmpdel-entity-name song) "") 'face 'mpdel-playlist-name-face)
-         (propertize (or (libmpdel-song-track song) "") 'face 'mpdel-playlist-track-face)
-         (propertize (or (libmpdel-album-name song) "") 'face 'mpdel-playlist-album-face)
-         (propertize (or (libmpdel-song-disc song) "") 'face 'mpdel-playlist-disk-face)
-         (propertize (or (libmpdel-entity-date song) "") 'face 'mpdel-playlist-date-face)
-         (propertize (or (libmpdel-artist-name song) "") 'face 'mpdel-playlist-artist-face))))
-
-(defun mpdel-playlist-go-to-song (&optional song)
-  "Move point to SONG, currently-played song if nil.
-Return non-nil if SONG is found, nil otherwise."
-  (mpdel-core-go-to-entity (or song (libmpdel-current-song))))
-
-(defun mpdel-playlist-highlight-song (&optional song)
-  "Highlight SONG, current song if nil."
+(defun mpdel-playlist--highlight ()
+  "Highlight currently played song in current buffer."
   (save-excursion
-    (when (mpdel-playlist-go-to-song song)
+    (when (navigel-go-to-entity (libmpdel-current-song))
       (let ((inhibit-read-only t))
         (put-text-property (line-beginning-position) (line-end-position)
                            'face 'mpdel-playlist-current-song-face)))))
 
-(defun mpdel-playlist--save-playlist-status ()
-  "Return an object representing selection.
-Restore selection with `mpdel-playlist--restore-playlist-status'."
-  (cons
-   (mpdel-core-entity-at-point (point))
-   (mpdel-core-entity-at-point (mark t))))
+
+;;; Private functions
 
-(defun mpdel-playlist--restore-playlist-status (status)
-  "Restore playlist selection STATUS.
-STATUS has been returned by `mpdel-playlist--save-playlist-status'."
-  (when (cdr status)
-    (mpdel-playlist-go-to-song (cdr status))
-    (push-mark nil t))
-  (when (car status)
-    (mpdel-playlist-go-to-song (car status))))
-
-(defun mpdel-playlist--imenu-prev-index-position ()
-  "Move point to previous line in playlist buffer.
-This function is used as a value for
-`imenu-prev-index-position-function'."
-  (unless (bobp)
-    (forward-line -1)))
-
-(defun mpdel-playlist--imenu-extract-index-name ()
-  "Return imenu name for line at point.
-This function is used as a value for
-`imenu-extract-index-name-function'.  Point should be at the
-beginning of the line."
-  (let ((song (mpdel-core-entity-at-point)))
-    (format "%s/%s/%s"
-            (or (libmpdel-artist-name song) "??")
-            (or (libmpdel-album-name song) "??")
-            (libmpdel-entity-name song))))
+(defun mpdel-playlist--register-to-hooks ()
+  "Register to several hooks to refresh automatically refresh the current buffer.."
+  (let ((buffer (current-buffer)))
+    (let* ((refresh-fn (lambda ()
+                         (with-current-buffer buffer
+                           (navigel-refresh))))
+           (playlist navigel-entity)
+           (hooks (if (libmpdel-stored-playlist-p playlist)
+                      '(libmpdel-stored-playlist-changed-hook)
+                    '(libmpdel-current-playlist-changed-hook
+                      libmpdel-current-song-changed-hook
+                      libmpdel-player-changed-hook))))
+      (dolist (hook hooks)
+        (add-hook hook refresh-fn))
+      (add-hook 'kill-buffer-hook
+                (lambda () (dolist (hook hooks) (remove-hook hook refresh-fn)))
+                nil t))))
 
 
-;;; Commands
+;;; Public functions
 
-(defun mpdel-playlist-refresh (&optional buffer)
-  "Clear and re-populate the playlist BUFFER.
-Use current buffer if BUFFER is nil."
+;;;###autoload
+(defun mpdel-playlist-open ()
+  "Display the current playlist."
   (interactive)
-  (let ((buffer (or buffer (current-buffer))))
-    (when (buffer-live-p buffer)
-      (with-current-buffer buffer
-        (libmpdel-list
-         mpdel-playlist-playlist
-         (lambda (songs)
-           (let ((playlist-status (mpdel-playlist--save-playlist-status)))
-             (setq tabulated-list-entries (mapcar #'mpdel-playlist--song-to-list-entry songs))
-             (tabulated-list-print)
-             (mpdel-playlist--restore-playlist-status playlist-status)
-             (when (and (not (libmpdel-stopped-p)) (libmpdel-current-playlist-p mpdel-playlist-playlist))
-               (mpdel-playlist-highlight-song)))))))))
+  (mpdel-core-open 'current-playlist))
 
-(defun mpdel-playlist-delete ()
-  "Delete selected songs from current playlist."
-  (interactive)
-  (let ((songs (mpdel-core-selected-entities)))
-    (when songs
-      (libmpdel-playlist-delete songs mpdel-playlist-playlist)
-      ;; Move point to the closest non-deleted song
-      (forward-line 1)
-      (when (= (point) (point-max))
-        (forward-line -2))
-      (setq deactivate-mark t))))
+(define-key mpdel-core-map (kbd "l") #'mpdel-playlist-open)
 
-(defun mpdel-playlist-play ()
-  "Start playing the song at point."
+;;;###autoload
+(defun mpdel-playlist-open-stored-playlist ()
+  "Ask for a stored playlist and open it."
   (interactive)
-  (if (libmpdel-current-playlist-p mpdel-playlist-playlist)
-      (libmpdel-play-song (mpdel-core-entity-at-point))
-    (mpdel-core-insert-current-playlist)))
+  (libmpdel-funcall-on-stored-playlist #'mpdel-core-open))
+
+(define-key mpdel-core-map (kbd "L") #'mpdel-playlist-open-stored-playlist)
 
 (defun mpdel-playlist-move-up ()
   "Move selected songs up in the current playlist."
@@ -208,76 +123,41 @@ Use current buffer if BUFFER is nil."
   "Save current playlist into a new stored playlist.
 Ask for stored playlist name."
   (interactive)
-  (if (libmpdel-current-playlist-p mpdel-playlist-playlist)
+  (if (libmpdel-current-playlist-p navigel-entity)
       (call-interactively #'libmpdel-playlist-save)
     (user-error "You can only save from the current playlist")))
 
-(defun mpdel-playlist--register-to-hooks (buffer)
-  "Register to several hooks to refresh BUFFER."
-  (with-current-buffer buffer
-    (let* ((refresh-fn (lambda () (mpdel-playlist-refresh buffer)))
-           (playlist mpdel-playlist-playlist)
-           (hooks (if (libmpdel-stored-playlist-p playlist)
-                      '(libmpdel-stored-playlist-changed-hook)
-                    '(libmpdel-current-playlist-changed-hook
-                      libmpdel-current-song-changed-hook
-                      libmpdel-player-changed-hook))))
-      (mapc (lambda (hook) (add-hook hook refresh-fn)) hooks)
-      (add-hook 'kill-buffer-hook
-                (lambda ()
-                  (mapc (lambda (hook) (remove-hook hook refresh-fn)) hooks))
-                nil t))))
-
-;;;###autoload
-(defun mpdel-playlist-open (&optional playlist)
-  "Open a buffer with PLAYLIST, current playlist if nil."
-  (interactive)
-  (let* ((playlist (or playlist 'current-playlist))
-         (buffer (mpdel-playlist--buffer playlist)))
-    (with-current-buffer buffer
-      (mpdel-playlist-mode)
-      (setq mpdel-playlist-playlist playlist)
-      (mpdel-playlist-refresh buffer))
-    (switch-to-buffer buffer)
-    (mpdel-playlist--register-to-hooks buffer)))
-
-;;;###autoload
-(defun mpdel-playlist-open-stored-playlist ()
-  "Ask for a stored playlist and open it."
-  (interactive)
-  (libmpdel-funcall-on-stored-playlist #'mpdel-playlist-open))
-
 
-;;; Major mode
+;;; Modes
 
 (defvar mpdel-playlist-mode-map
   (let ((map (make-sparse-keymap)))
-    ;; inherit from both `mpdel-core-map' and
-    ;; `tabulated-list-mode-map':
-    (set-keymap-parent
-     map
-     (make-composed-keymap mpdel-core-map tabulated-list-mode-map))
-    (define-key map (kbd "g") #'mpdel-playlist-refresh)
-    (define-key map (kbd "k") #'mpdel-playlist-delete)
-    (define-key map (kbd "p") #'mpdel-playlist-play)
+    map)
+  "Keybindings for `mpdel-playlist-mode'.")
+
+(define-derived-mode mpdel-playlist-mode mpdel-tablist-mode "MPDel Playlist"
+  (add-hook 'navigel-init-done-hook #'mpdel-playlist--register-to-hooks nil t))
+
+(defvar mpdel-playlist-current-playlist-mode-map
+  (let ((map (make-sparse-keymap)))
     (define-key map (kbd "<M-up>") #'mpdel-playlist-move-up)
     (define-key map (kbd "<M-down>") #'mpdel-playlist-move-down)
     (define-key map (kbd "C-x C-s") #'mpdel-playlist-save)
-    map))
+    map)
+  "Keybindings for `mpdel-playlist-current-playlist-mode'.")
 
-(define-derived-mode mpdel-playlist-mode tabulated-list-mode "Playlist"
-  "Display and manipulate the current MPD playlist."
-  (setq tabulated-list-format
-        (vector (list "Title" 30 nil)
-                (list "#" 6 nil)
-                (list "Album" 30 nil)
-                (list "Disk" 4 nil)
-                (list "Date" 5 nil)
-                (list "Artist" 0 nil)))
-  (tabulated-list-init-header)
-  (setq imenu-prev-index-position-function #'mpdel-playlist--imenu-prev-index-position)
-  (setq imenu-extract-index-name-function #'mpdel-playlist--imenu-extract-index-name)
-  (hl-line-mode))
+(define-derived-mode mpdel-playlist-current-playlist-mode mpdel-playlist-mode "MPDel Current playlist"
+  "Major mode to display the current playlist."
+  (add-hook 'navigel-changed-hook #'mpdel-playlist--highlight nil t))
+
+(defvar mpdel-playlist-stored-playlist-mode-map
+  (let ((map (make-sparse-keymap)))
+    map)
+  "Keybindings for `mpdel-playlist-stored-playlist-mode'.")
+
+
+(define-derived-mode mpdel-playlist-stored-playlist-mode mpdel-playlist-mode "MPDel Stored playlist"
+  "Major mode to display a stored playlist.")
 
 (provide 'mpdel-playlist)
 ;;; mpdel-playlist.el ends here

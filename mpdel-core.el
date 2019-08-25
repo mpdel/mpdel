@@ -27,96 +27,61 @@
 ;; user-interfaces.
 
 ;;; Code:
-(require 'tabulated-list)
-
 (require 'libmpdel)
+(require 'navigel)
 
 
-;;; Helper functions
+;;; `navigel' general configuration
 
-(defun mpdel-core--points-in-region (start end)
-  "Return a list of points for lines between START and END."
-  (save-excursion
-    (let (points)
-      (goto-char start)
-      (while (and (<= (point) end) (< (point) (point-max)))
-        (push (line-beginning-position) points)
-        (forward-line 1))
-      (reverse points))))
+(cl-defmethod navigel-name (entity &context (navigel-app mpdel))
+  (libmpdel-entity-name entity))
 
-(cl-defgeneric mpdel-core--entity-at-point (_pos _mode)
-  "Return entity at POS, nil if none.
-MODE is the current buffer's major mode."
-  nil)
+(cl-defmethod navigel-children (entity callback &context (navigel-app mpdel))
+  (libmpdel-list entity callback))
 
-(cl-defmethod mpdel-core--entity-at-point (pos (_mode (derived-mode tabulated-list-mode)))
-  (tabulated-list-get-id pos))
+(cl-defmethod navigel-equal (entity1 entity2 &context (navigel-app mpdel))
+  (libmpdel-equal entity1 entity2))
+
+(cl-defmethod navigel-parent (entity &context (navigel-app mpdel))
+  (libmpdel-entity-parent entity))
+
+
+;;; Public functions
+
+(defun mpdel-core-open (entity &optional target)
+  "Open a buffer showing ENTITY.
+If TARGET is non nil and visible on the buffer, move point to
+it."
+  (let ((navigel-app 'mpdel))
+    (navigel-open entity target)))
 
 (defun mpdel-core-selected-entities ()
-  "Return entities within active region or at point.
-Return nil if no entity is found."
-  (cond
-   ((use-region-p)
-    (mapcar (lambda (pos) (mpdel-core--entity-at-point pos major-mode))
-            (mpdel-core--points-in-region (region-beginning) (region-end))))
-   ((= (point) (point-max)) nil)
-   (t (let ((entity (mpdel-core--entity-at-point (point) major-mode)))
-        (when entity (list entity))))))
+  "Return the selected entities in the current buffer.
 
-(defun mpdel-core-entity-at-point (&optional pos buffer)
-  "Return entity at POS in BUFFER.
-Use point if POS is nil and use current buffer if BUFFER is nil."
-  (with-current-buffer (or buffer (current-buffer))
-    (mpdel-core--entity-at-point (or pos (point)) major-mode)))
-
-(cl-defgeneric mpdel-core--open-entity (entity &optional target)
-  "Open buffer displaying information about ENTITY.
-
-If TARGET is non-nil and is in buffer, move point to it.")
-
-(defun mpdel-core-go-to-entity (entity &optional buffer)
-  "Move point to ENTITY in BUFFER, current one if nil.
-Return non-nil if ENTITY is found, nil otherwise."
-  (with-current-buffer (or buffer (current-buffer))
-    (goto-char (point-min))
-    (while (and (not (= (point) (point-max)))
-                (not (libmpdel-equal (mpdel-core-entity-at-point) entity)))
-      (forward-line 1))
-    (not (= (point) (point-max)))))
-
-
-(defun mpdel-core-after-playlist-modification ()
-  "Called at the end of any playlist modification command."
-  (when (derived-mode-p 'tabulated-list-mode)
-    (unless (use-region-p)
-      (forward-line 1))
-    (setq deactivate-mark t)))
-
-;;; Commands
+If any entity is marked, return the list of all marked entities.
+If no entity is marked but there is an entity at point, return a
+list with this entity.  Otherwise, return nil."
+  (navigel-marked-entities t))
 
 (defun mpdel-core-add-to-current-playlist ()
   "Add selected entities to current playlist."
   (interactive)
-  (libmpdel-current-playlist-add (mpdel-core-selected-entities))
-  (mpdel-core-after-playlist-modification))
+  (libmpdel-current-playlist-add (mpdel-core-selected-entities)))
 
 (defun mpdel-core-add-to-stored-playlist ()
   "Add selected entities to a stored playlist."
   (interactive)
-  (libmpdel-stored-playlist-add (mpdel-core-selected-entities))
-  (mpdel-core-after-playlist-modification))
+  (libmpdel-stored-playlist-add (mpdel-core-selected-entities)))
 
 (defun mpdel-core-replace-current-playlist ()
   "Replace current playlist with selected entities."
   (interactive)
-  (libmpdel-current-playlist-replace (mpdel-core-selected-entities))
-  (mpdel-core-after-playlist-modification))
+  (libmpdel-current-playlist-replace (mpdel-core-selected-entities)))
 
 (defun mpdel-core-replace-stored-playlist ()
   "Replace a stored playlist with selected entities."
   (interactive)
-  (libmpdel-stored-playlist-replace (mpdel-core-selected-entities))
-  (mpdel-core-after-playlist-modification))
+  (libmpdel-stored-playlist-replace (mpdel-core-selected-entities)))
 
 (defun mpdel-core-insert-current-playlist ()
   "Insert selected entities after currently-played song.
@@ -127,32 +92,42 @@ If no entity is selected, restart playing the current song."
   (let ((entities (mpdel-core-selected-entities)))
     (if (not entities)
         (libmpdel-playback-seek "0")
-      (libmpdel-current-playlist-insert entities)
-      (mpdel-core-after-playlist-modification))))
+      (libmpdel-current-playlist-insert entities))))
 
-(defun mpdel-core-dired (&optional pos)
-  "Open dired on the entity at POS, point if nil."
+(defun mpdel-core-dired ()
+  "Open dired on the entity at point."
   (interactive)
-  (libmpdel-dired (mpdel-core-entity-at-point pos)))
+  (libmpdel-dired (navigel-entity-at-point)))
 
-(defun mpdel-core-open-entity-at-point (&optional pos)
-  "Open buffer displaying information about entity at POS.
-Use point if POS is nil."
+;;;###autoload
+(defun mpdel-core-open-artists ()
+  "Display all artists in the MPD database."
   (interactive)
-  (mpdel-core--open-entity (mpdel-core-entity-at-point (or pos (point)))))
+  (mpdel-core-open 'artists))
 
-(defun mpdel-core-open-entity-parent-at-point (&optional pos)
-  "Open a navigator showing the parent of entity at POS.
-If POS is nil, use point.
+;;;###autoload
+(defun mpdel-core-search-by-artist (name)
+  "Display all songs whose artist's name match NAME.
+Interactively, ask for NAME."
+  (interactive (list (read-from-minibuffer "Search for artist: ")))
+  (mpdel-core-open (libmpdel-search-criteria-create :type "artist" :what name)))
 
-For example, if point is on a song, open a navigator on its
-album."
-  (interactive)
-  (let ((entity (mpdel-core-entity-at-point pos)))
-    (mpdel-core--open-entity (libmpdel-entity-parent entity) entity)))
+;;;###autoload
+(defun mpdel-core-search-by-album (name)
+  "Display all songs whose album's name match NAME.
+Interactively, ask for NAME."
+  (interactive (list (read-from-minibuffer "Search for album: ")))
+  (mpdel-core-open (libmpdel-search-criteria-create :type "album" :what name)))
+
+;;;###autoload
+(defun mpdel-core-search-by-title (title)
+  "Display all songs matching TITLE.
+Interactively, ask for TITLE."
+  (interactive (list (read-from-minibuffer "Search for title: ")))
+  (mpdel-core-open (libmpdel-search-criteria-create :type "title" :what title)))
 
 
-;;; Define the mpdel shared map
+;;; Mode
 
 (defvar mpdel-core-map
   (let ((map (make-sparse-keymap)))
@@ -165,10 +140,13 @@ album."
     (define-key map (kbd "R") #'mpdel-core-replace-stored-playlist)
     (define-key map (kbd "p") #'mpdel-core-insert-current-playlist)
     (define-key map (kbd "C-x C-j") #'mpdel-core-dired)
-    (define-key map (kbd "RET") #'mpdel-core-open-entity-at-point)
-    (define-key map (kbd "^") #'mpdel-core-open-entity-parent-at-point)
+    (define-key map (kbd "n") #'mpdel-core-open-artists)
+    (define-key map (kbd "s s") #'mpdel-core-search-by-title)
+    (define-key map (kbd "s l") #'mpdel-core-search-by-album)
+    (define-key map (kbd "s r") #'mpdel-core-search-by-artist)
+    (define-key map (kbd "^") #'navigel-open-parent)
     map)
-  "Keymap for all mpdel buffers.")
+  "Keybindings for all MPDel buffers.")
 
 ;; Make it possible to activate `mpdel-core-map' from a keybinding:
 (fset 'mpdel-core-map mpdel-core-map)

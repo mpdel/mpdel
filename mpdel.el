@@ -5,7 +5,7 @@
 ;; Author: Damien Cassou <damien@cassou.me>
 ;; Keywords: multimedia
 ;; Url: https://gitlab.petton.fr/mpdel/mpdel
-;; Package-requires: ((emacs "25.1") (libmpdel "1.0.0"))
+;; Package-requires: ((emacs "25.1") (libmpdel "1.0.0") (navigel "0.4.0"))
 ;; Version: 1.0.0
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -31,16 +31,14 @@
 
 ;;; Code:
 
-(require 'libmpdel)
-(require 'mpdel-core)
-(require 'mpdel-playlist)
 (require 'mpdel-song)
-(require 'mpdel-nav)
+(require 'mpdel-playlist)
+(require 'mpdel-tablist)
 
 
 ;;; Customization
 (defgroup mpdel nil
-  "Configure mpdel's global minor mode."
+  "Configure MPDel."
   :group 'libmpdel)
 
 (defcustom mpdel-prefix-key (kbd "C-x Z")
@@ -48,78 +46,9 @@
   :type 'key-sequence)
 
 
-;;; Add features to all mpdel buffers
-(defun mpdel-song-small-increment ()
-  "Move forward by value of variable `mpdel-song-small-increment'."
-  (interactive)
-  (mpdel-song--seek mpdel-song-small-increment))
+;;; Minor mode: Define the global minor mode so users can control MPD
+;;; from non-MPDel buffers
 
-(define-key mpdel-core-map (kbd "F") #'mpdel-song-small-increment)
-
-(defun mpdel-song-normal-increment ()
-  "Move forward by value of variable `mpdel-song-normal-increment'."
-  (interactive)
-  (mpdel-song--seek mpdel-song-normal-increment))
-
-(define-key mpdel-core-map (kbd "f") #'mpdel-song-normal-increment)
-
-(defun mpdel-song-large-increment ()
-  "Move forward by value of variable `mpdel-song-large-increment'."
-  (interactive)
-  (mpdel-song--seek mpdel-song-large-increment))
-
-(define-key mpdel-core-map (kbd "M-f") #'mpdel-song-large-increment)
-
-(defun mpdel-song-small-decrement ()
-  "Move backward by value of variable `mpdel-song-small-decrement'."
-  (interactive)
-  (mpdel-song--seek mpdel-song-small-decrement))
-
-(define-key mpdel-core-map (kbd "B") #'mpdel-song-small-decrement)
-
-(defun mpdel-song-normal-decrement ()
-  "Move backward by value of variable `mpdel-song-normal-decrement'."
-  (interactive)
-  (mpdel-song--seek mpdel-song-normal-decrement))
-
-(define-key mpdel-core-map (kbd "b") #'mpdel-song-normal-decrement)
-
-(defun mpdel-song-large-decrement ()
-  "Move backward by value of variable `mpdel-song-large-decrement'."
-  (interactive)
-  (mpdel-song--seek mpdel-song-large-decrement))
-
-(define-key mpdel-core-map (kbd "M-b") #'mpdel-song-large-decrement)
-
-(cl-defmethod mpdel-core--open-entity ((entity t) &optional target)
-  ;; By default, open any entity with a navigator
-  (mpdel-nav--open entity target))
-
-(cl-defmethod mpdel-core--open-entity ((song libmpdel-song) &optional _target)
-  (mpdel-song-open song))
-
-(define-key mpdel-core-map (kbd "l") #'mpdel-playlist-open)
-(define-key mpdel-core-map (kbd "L") #'mpdel-playlist-open-stored-playlist)
-(define-key mpdel-core-map (kbd "n") #'mpdel-nav-open-artists)
-(define-key mpdel-core-map (kbd "N") #'mpdel-nav-open-stored-playlists)
-(define-key mpdel-core-map (kbd "v") #'mpdel-song-open)
-(define-key mpdel-core-map (kbd "s s") #'mpdel-nav-search-by-title)
-(define-key mpdel-core-map (kbd "s l") #'mpdel-nav-search-by-album)
-(define-key mpdel-core-map (kbd "s r") #'mpdel-nav-search-by-artist)
-
-
-;;; Add features to the song buffers
-(cl-defmethod mpdel-core--entity-at-point (_pos (_mode (derived-mode mpdel-song-mode)))
-  (mpdel-song-buffer-song))
-
-(defun mpdel-song-navigate ()
-  "Open a navigator containing song at point."
-  (interactive)
-  (mpdel-nav--open (libmpdel-entity-parent (mpdel-song-buffer-song))))
-
-
-;;; Define the global minor mode so users can control MPD from non-MPD
-;;; buffers
 (defvar mpdel-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map mpdel-prefix-key 'mpdel-core-map)

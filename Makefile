@@ -1,4 +1,4 @@
-ELPA_DEPENDENCIES=package-lint libmpdel
+ELPA_DEPENDENCIES=package-lint libmpdel navigel tablist
 
 ELPA_ARCHIVES=melpa
 

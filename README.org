@@ -77,7 +77,6 @@ is active:
 | ~C-x Z l~   | open the current playlist                                 |
 | ~C-x Z L~   | open a stored playlist                                    |
 | ~C-x Z n~   | navigate your database from artists                       |
-| ~C-x Z N~   | navigate your database from stored playlists              |
 | ~C-x Z v~   | view current song                                         |
 | ~C-x Z s r~ | search songs by artist name                               |
 | ~C-x Z s l~ | search songs by album name                                |
@@ -121,31 +120,25 @@ albums. On the contrary, press ~^~ to go back to the item's parent
 here to add albums to a playlist or dive into an album's songs. Diving
 into a song displays some information about it.
 
-You can also start a navigator on your stored playlists with ~C-x Z N~
-(or just ~N~) but that's probably less useful than opening a stored
-playlist buffer (with ~C-x Z L~ or just ~L~).
-
-There is just one navigator buffer available at any time and its name
-is ~*MPDEL Navigator*~.
-
 *** Playlists
 
 Playlist buffers display either the current playlist (~C-x Z l~ or
 just ~l~) or any stored playlist (~C-x Z L~ or just ~L~). A playlist
 buffer lists songs and can be edited.
 
-Here is a list of keybindings available for playlist buffers:
+Here is a list of keybindings available for the current playlist
+buffer:
 
-| *Binding* | *Action*                                   |
-|-----------+--------------------------------------------|
-| ~C-x C-s~ | save current playlist in a new one         |
-| ~k~       | remove selected song(s) from playlist      |
-| ~M-up~    | move selected song(s) up in the playlist   |
-| ~M-down~  | move selected song(s) down in the playlist |
+| *Binding* | *Action*                                 |
+|-----------+------------------------------------------|
+| ~C-x C-s~ | save current playlist in a new one       |
+| ~m~       | mark the song at point                   |
+| ~k~       | remove marked song(s) from the playlist  |
+| ~M-up~    | move marked song(s) up in the playlist   |
+| ~M-down~  | move marked song(s) down in the playlist |
 
-When a command acts on the selected song(s) (such as ~k~), the song at
-point will be used if there is no active region and all songs of the
-region will be used otherwise.
+When a command acts on the marked song(s) (such as ~k~), the song at
+point is used if there is no marked song.
 
 Playlist buffers are refreshed automatically when the MPD server
 refreshes them.
@@ -196,12 +189,12 @@ MPDel defines several faces to customize the playlists:
 | *Face name*                        | *Description*         |
 |------------------------------------+-----------------------|
 | ~mpdel-playlist-current-song-face~ | currently-played song |
-| ~mpdel-playlist-name-face~         | song names            |
-| ~mpdel-playlist-track-face~        | track numbers         |
-| ~mpdel-playlist-album-face~        | album names           |
-| ~mpdel-playlist-disk-face~         | disk numbers          |
-| ~mpdel-playlist-date-face~         | dates                 |
-| ~mpdel-playlist-artist-face~       | artist names          |
+| ~mpdel-tablist-song-name-face~     | song names            |
+| ~mpdel-tablist-track-face~         | track numbers         |
+| ~mpdel-tablist-album-face~         | album names           |
+| ~mpdel-tablist-disk-face~          | disk numbers          |
+| ~mpdel-tablist-date-face~          | dates                 |
+| ~mpdel-tablist-artist-face~        | artist names          |
 
 *** Hooks
 

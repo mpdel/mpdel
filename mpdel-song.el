@@ -80,15 +80,19 @@ When non-nil, the buffer keeps showing the current song, even
 when the song changes.")
 
 
+;;; `navigel' configuration
+
+(cl-defmethod navigel-open ((song libmpdel-song) _target &context (navigel-app mpdel))
+  (mpdel-song-open song))
+
+(cl-defmethod navigel-entity-at-point (&context (navigel-app mpdel) (major-mode mpdel-song-mode))
+  mpdel-song-song)
+
+
 ;;; Helper functions
 
 (defvar mpdel-song--timer nil
   "Store timer to refresh the seek buffer.")
-
-(defun mpdel-song-buffer-song (&optional buffer)
-  "Return song displayed in BUFFER, current one if nil."
-  (with-current-buffer (or buffer (current-buffer))
-    mpdel-song-song))
 
 (defun mpdel-song--start-timer ()
   "Start refresh timer."
@@ -142,6 +146,7 @@ In particular, it must contain key symbol `elapsed' and symbol
   (with-current-buffer buffer
     (let ((inhibit-read-only t))
       (erase-buffer)
+      (setq mpdel-song-song (libmpdel-current-song))
       (mpdel-song--display-play-state)
       (mpdel-song--display-metadata)
       (mpdel-song--display-play-time data))))
@@ -187,8 +192,10 @@ playback."
       (when current-song-p
         (add-hook 'libmpdel-player-changed-hook refresh-fn)
         (add-hook 'kill-buffer-hook #'mpdel-song--stop-timer nil t)
-        (add-hook 'kill-buffer-hook (lambda () (remove-hook 'libmpdel-player-changed-hook refresh-fn))))
+        (add-hook 'kill-buffer-hook (lambda () (remove-hook 'libmpdel-player-changed-hook refresh-fn)) nil t))
       (pop-to-buffer (current-buffer)))))
+
+(define-key mpdel-core-map (kbd "v") #'mpdel-song-open)
 
 (defun mpdel-song-play ()
   "Start playing the song of the current buffer."
@@ -204,6 +211,51 @@ refreshing itself to display playback position."
   (interactive)
   (quit-window t))
 
+(defun mpdel-song-small-increment ()
+  "Move forward by value of variable `mpdel-song-small-increment'."
+  (interactive)
+  (mpdel-song--seek mpdel-song-small-increment))
+
+(define-key mpdel-core-map (kbd "F") #'mpdel-song-small-increment)
+
+(defun mpdel-song-normal-increment ()
+  "Move forward by value of variable `mpdel-song-normal-increment'."
+  (interactive)
+  (mpdel-song--seek mpdel-song-normal-increment))
+
+(define-key mpdel-core-map (kbd "f") #'mpdel-song-normal-increment)
+
+(defun mpdel-song-large-increment ()
+  "Move forward by value of variable `mpdel-song-large-increment'."
+  (interactive)
+  (mpdel-song--seek mpdel-song-large-increment))
+
+(define-key mpdel-core-map (kbd "M-f") #'mpdel-song-large-increment)
+
+(defun mpdel-song-small-decrement ()
+  "Move backward by value of variable `mpdel-song-small-decrement'."
+  (interactive)
+  (mpdel-song--seek mpdel-song-small-decrement))
+
+(define-key mpdel-core-map (kbd "B") #'mpdel-song-small-decrement)
+
+(defun mpdel-song-normal-decrement ()
+  "Move backward by value of variable `mpdel-song-normal-decrement'."
+  (interactive)
+  (mpdel-song--seek mpdel-song-normal-decrement))
+
+(define-key mpdel-core-map (kbd "b") #'mpdel-song-normal-decrement)
+
+(defun mpdel-song-large-decrement ()
+  "Move backward by value of variable `mpdel-song-large-decrement'."
+  (interactive)
+  (mpdel-song--seek mpdel-song-large-decrement))
+
+(define-key mpdel-core-map (kbd "M-b") #'mpdel-song-large-decrement)
+
+
+;;; Major-mode
+
 (defvar mpdel-song-mode-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent
@@ -212,10 +264,12 @@ refreshing itself to display playback position."
     (define-key map (kbd "g") #'mpdel-song-refresh)
     (define-key map (kbd "p") #'mpdel-song-play)
     (define-key map (kbd "q") #'mpdel-song-quit-window)
-    map))
+    map)
+  "Keybindgs for `mpdel-song-mode'.")
 
 (define-derived-mode mpdel-song-mode special-mode "MPDEL song"
-  "Guide the user to seek inside current song.")
+  "Guide the user to seek inside current song."
+  (setq-local navigel-app 'mpdel))
 
 (provide 'mpdel-song)
 ;;; mpdel-song.el ends here
