@@ -45,13 +45,13 @@
 
 ;;; `navigel' major-mode configuration
 
-(cl-defmethod navigel-entity-tablist-mode ((_entity (eql current-playlist)) &context (navigel-app mpdel))
+(navigel-method mpdel navigel-entity-tablist-mode ((_entity (eql current-playlist)))
   (mpdel-playlist-current-playlist-mode))
 
-(cl-defmethod navigel-entity-tablist-mode ((_entity libmpdel-stored-playlist) &context (navigel-app mpdel))
+(navigel-method mpdel navigel-entity-tablist-mode ((_entity libmpdel-stored-playlist))
   (mpdel-playlist-stored-playlist-mode))
 
-(cl-defmethod navigel-delete ((songs list) &context (navigel-app mpdel) (major-mode mpdel-playlist-mode) &optional _callback)
+(navigel-method mpdel navigel-delete ((songs list) &context (major-mode mpdel-playlist-mode) &optional _callback)
   (libmpdel-playlist-delete songs navigel-entity))
 
 

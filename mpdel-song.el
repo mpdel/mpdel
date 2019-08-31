@@ -82,10 +82,10 @@ when the song changes.")
 
 ;;; `navigel' configuration
 
-(cl-defmethod navigel-open ((song libmpdel-song) _target &context (navigel-app mpdel))
+(navigel-method mpdel navigel-open ((song libmpdel-song) _target)
   (mpdel-song-open song))
 
-(cl-defmethod navigel-entity-at-point (&context (navigel-app mpdel) (major-mode mpdel-song-mode))
+(navigel-method mpdel navigel-entity-at-point (&context (major-mode mpdel-song-mode))
   mpdel-song-song)
 
 
