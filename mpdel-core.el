@@ -33,16 +33,16 @@
 
 ;;; `navigel' general configuration
 
-(cl-defmethod navigel-name (entity &context (navigel-app mpdel))
+(navigel-method mpdel navigel-name (entity)
   (libmpdel-entity-name entity))
 
-(cl-defmethod navigel-children (entity callback &context (navigel-app mpdel))
+(navigel-method mpdel navigel-children (entity callback   )
   (libmpdel-list entity callback))
 
-(cl-defmethod navigel-equal (entity1 entity2 &context (navigel-app mpdel))
+(navigel-method mpdel navigel-equal (entity1 entity2)
   (libmpdel-equal entity1 entity2))
 
-(cl-defmethod navigel-parent (entity &context (navigel-app mpdel))
+(navigel-method mpdel navigel-parent (entity)
   (libmpdel-entity-parent entity))
 
 

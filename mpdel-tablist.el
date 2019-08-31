@@ -66,16 +66,16 @@
 
 ;;; `navigel' major-mode configuration
 
-(cl-defmethod navigel-entity-tablist-mode ((_entity (eql artists)) &context (navigel-app mpdel))
+(navigel-method mpdel navigel-entity-tablist-mode ((_entity (eql artists)))
   (mpdel-tablist-mode))
 
-(cl-defmethod navigel-entity-tablist-mode ((_entity libmpdel-search-criteria) &context (navigel-app mpdel))
+(navigel-method mpdel navigel-entity-tablist-mode ((_entity libmpdel-search-criteria))
   (mpdel-tablist-mode))
 
-(cl-defmethod navigel-entity-tablist-mode ((_entity libmpdel-album) &context (navigel-app mpdel))
+(navigel-method mpdel navigel-entity-tablist-mode ((_entity libmpdel-artist))
   (mpdel-tablist-mode))
 
-(cl-defmethod navigel-entity-tablist-mode ((_entity libmpdel-album) &context (navigel-app mpdel))
+(navigel-method mpdel navigel-entity-tablist-mode ((_entity libmpdel-album))
   (mpdel-tablist-mode))
 
 
@@ -96,11 +96,11 @@
           (list "Date" 5 t)
           (list "Artist" 0 t)))
 
-(cl-defmethod navigel-entity-to-columns ((entity libmpdel-album) &context (navigel-app mpdel))
+(navigel-method mpdel navigel-entity-to-columns ((entity libmpdel-album))
   (vector (libmpdel-entity-name entity)
           (libmpdel-artist-name entity)))
 
-(cl-defmethod navigel-entity-to-columns ((song libmpdel-song))
+(navigel-method mpdel navigel-entity-to-columns ((song libmpdel-song))
   (vector
    (propertize (or (libmpdel-entity-name song) "") 'face 'mpdel-tablist-song-name-face)
    (propertize (or (libmpdel-song-track song) "") 'face 'mpdel-tablist-track-face)
@@ -109,19 +109,19 @@
    (propertize (or (libmpdel-entity-date song) "") 'face 'mpdel-tablist-date-face)
    (propertize (or (libmpdel-artist-name song) "") 'face 'mpdel-tablist-artist-face)))
 
-(cl-defmethod navigel-tablist-format ((_entity libmpdel-artist) &context (navigel-app mpdel))
+(navigel-method mpdel navigel-tablist-format ((_entity libmpdel-artist))
   (mpdel-tablist--album-format))
 
-(cl-defmethod navigel-tablist-format ((_entity libmpdel-album) &context (navigel-app mpdel))
+(navigel-method mpdel navigel-tablist-format ((_entity libmpdel-album))
   (mpdel-tablist--song-format))
 
-(cl-defmethod navigel-tablist-format ((_entity libmpdel-search-criteria) &context (navigel-app mpdel))
+(navigel-method mpdel navigel-tablist-format ((_entity libmpdel-search-criteria))
   (mpdel-tablist--song-format))
 
-(cl-defmethod navigel-tablist-format ((_entity (eql current-playlist)) &context (navigel-app mpdel))
+(navigel-method mpdel navigel-tablist-format ((_entity (eql current-playlist)))
   (mpdel-tablist--song-format))
 
-(cl-defmethod navigel-tablist-format ((_entity libmpdel-stored-playlist) &context (navigel-app mpdel))
+(navigel-method mpdel navigel-tablist-format ((_entity libmpdel-stored-playlist))
   (mpdel-tablist--song-format))
 
 
