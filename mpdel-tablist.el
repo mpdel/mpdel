@@ -72,7 +72,7 @@
 (navigel-method mpdel navigel-entity-tablist-mode ((_entity libmpdel-search-criteria))
   (mpdel-tablist-mode))
 
-(navigel-method mpdel navigel-entity-tablist-mode ((_entity libmpdel-album))
+(navigel-method mpdel navigel-entity-tablist-mode ((_entity libmpdel-artist))
   (mpdel-tablist-mode))
 
 (navigel-method mpdel navigel-entity-tablist-mode ((_entity libmpdel-album))
