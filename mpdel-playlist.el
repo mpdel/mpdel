@@ -105,6 +105,13 @@
 
 (define-key mpdel-core-map (kbd "L") #'mpdel-playlist-open-stored-playlist)
 
+(defun mpdel-playlist-play ()
+  "Start playing the song at point."
+  (interactive)
+  (if (derived-mode-p 'mpdel-playlist-current-playlist-mode)
+      (libmpdel-play-song (navigel-entity-at-point))
+    (mpdel-core-insert-current-playlist)))
+
 (defun mpdel-playlist-move-up ()
   "Move selected songs up in the current playlist."
   (interactive)
@@ -143,6 +150,7 @@ Ask for stored playlist name."
     (define-key map (kbd "<M-up>") #'mpdel-playlist-move-up)
     (define-key map (kbd "<M-down>") #'mpdel-playlist-move-down)
     (define-key map (kbd "C-x C-s") #'mpdel-playlist-save)
+    (define-key map (kbd "p") #'mpdel-playlist-play)
     map)
   "Keybindings for `mpdel-playlist-current-playlist-mode'.")
 
