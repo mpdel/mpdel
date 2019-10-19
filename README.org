@@ -214,6 +214,12 @@ If your music files are hosted on the computer where MPDel is running,
 you can configure ~libmpdel-music-directory~ to navigate to a music
 file with ~C-x C-j~ from any MPDel buffer.
 
+** Filter Expressions
+
+The command ~mpdel-core-search-by-filter~ can be used to search for
+songs using a [[https://www.musicpd.org/doc/html/protocol.html#filters][MPD filter expression]].
+
+This requires a MPD version >= 0.21.
 ** License
 
 See [[file:COPYING][COPYING]]. Copyright (c) 2018 Damien Cassou.

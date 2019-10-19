@@ -72,6 +72,9 @@
 (navigel-method mpdel navigel-entity-tablist-mode ((_entity libmpdel-search-criteria))
   (mpdel-tablist-mode))
 
+(navigel-method mpdel navigel-entity-tablist-mode ((_entity libmpdel-filter))
+  (mpdel-tablist-mode))
+
 (navigel-method mpdel navigel-entity-tablist-mode ((_entity libmpdel-artist))
   (mpdel-tablist-mode))
 
@@ -116,6 +119,9 @@
   (mpdel-tablist--song-format))
 
 (navigel-method mpdel navigel-tablist-format ((_entity libmpdel-search-criteria))
+  (mpdel-tablist--song-format))
+
+(navigel-method mpdel navigel-tablist-format ((_entity libmpdel-filter))
   (mpdel-tablist--song-format))
 
 (navigel-method mpdel navigel-tablist-format ((_entity (eql current-playlist)))
