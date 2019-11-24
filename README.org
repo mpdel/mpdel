@@ -25,10 +25,10 @@ up…) and to display and control the current playlist as well as your
 stored playlists (e.g., "my favorites", "wake me up", "make me dance",
 …).
 
-This is a screenshot of the current playlist with the
-currently-playing song:
+This is a screenshot of the MPDel music browser and the current
+playlist buffer with the currently-playing song:
 
-[[file:media/mpdel-playlist.png]]
+[[file:media/mpdel-browser.png]]
 
 MPDel can show information about the currently playing song or any
 other song:
@@ -143,6 +143,23 @@ point is used if there is no marked song.
 Playlist buffers are refreshed automatically when the MPD server
 refreshes them.
 
+*** Browser
+
+The MPDel Browser offers an alternative way of navigating through your
+music collection, based on your local music directory structure.  To
+access the browser's top-level buffer, press ~C-x Z :~ (or call the
+interactive command ~mpdel-browser-open~).  By default, the top level
+buffer gives you access to your music directory, as well as the artist
+and albums navigators, playlists and available searches.  Pressing ~RET~
+on any of these buttons will open the corresponding item; in
+particular, pressing ~Music directory~ will allow you to browser your
+music files following their directory layout (this works also for MPD
+servers such as modipy that can connect to remote music services that
+export a virtual music directory structure).
+
+In browser buffers, the regular mpdel keybindings also present in the
+navigator or playlists are active.
+
 *** Song
 
 Song buffers display information about a song, either the currently
@@ -158,6 +175,14 @@ By default, MPDel just works and you don't have to customize
 anything. Nevertheless, there are a few customization options if you
 are that kind of person (and you probably are 😄).
 
+*** Browser
+
+It is possible to customize the layout of the browser's top-level
+buffer via the variable ~mpdel-browser-top-level-entries~, and to filter
+or rearrange how children buffers show their contents with
+~mpdel-browser-list-clean-up-function~.  Please see the customization
+group ~mpdel-browser~ for more details.
+
 *** Communication with MPD
 
 If you have only one MPD server, you can tell libmpdel how to
@@ -170,7 +195,7 @@ with ~M-x libmpdel-connect-profile~.
 
 As discussed above, you might want to configure ~mpdel-prefix-key~ to
 control which global keybinding gives you access to MPDel. This prefix
-key is active when ~mpdel-mode~ is active. 
+key is active when ~mpdel-mode~ is active.
 
 There are several keybinding tables (i.e., keymaps) to modify to your
 taste:

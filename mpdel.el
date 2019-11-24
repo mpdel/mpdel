@@ -34,6 +34,7 @@
 (require 'mpdel-song)
 (require 'mpdel-playlist)
 (require 'mpdel-tablist)
+(require 'mpdel-browser)
 
 
 ;;; Customization
