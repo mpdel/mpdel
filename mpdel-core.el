@@ -112,6 +112,12 @@ If no entity is selected, restart playing the current song."
   (mpdel-core-open 'stored-playlists))
 
 ;;;###autoload
+(defun mpdel-core-open-albums ()
+  "Display all albums in the MPD database."
+  (interactive)
+  (mpdel-core-open 'albums))
+
+;;;###autoload
 (defun mpdel-core-search-by-artist (name)
   "Display all songs whose artist's name match NAME.
 Interactively, ask for NAME."
