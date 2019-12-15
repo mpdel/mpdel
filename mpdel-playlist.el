@@ -103,8 +103,6 @@
   (interactive)
   (libmpdel-funcall-on-stored-playlist #'mpdel-core-open))
 
-(define-key mpdel-core-map (kbd "L") #'mpdel-playlist-open-stored-playlist)
-
 (defun mpdel-playlist-play ()
   "Start playing the song at point."
   (interactive)

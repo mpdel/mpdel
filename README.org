@@ -75,7 +75,7 @@ is active:
 | ~C-x Z M-p~ | play previous song                                        |
 | ~C-x Z p~   | restart playing current song                              |
 | ~C-x Z l~   | open the current playlist                                 |
-| ~C-x Z L~   | open a stored playlist                                    |
+| ~C-x Z L~   | show stored playlists                                     |
 | ~C-x Z n~   | navigate your database from artists                       |
 | ~C-x Z v~   | view current song                                         |
 | ~C-x Z s r~ | search songs by artist name                               |

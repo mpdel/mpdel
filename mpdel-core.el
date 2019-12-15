@@ -106,6 +106,12 @@ If no entity is selected, restart playing the current song."
   (mpdel-core-open 'artists))
 
 ;;;###autoload
+(defun mpdel-core-open-stored-playlists ()
+  "Display all stored playlists in MPD."
+  (interactive)
+  (mpdel-core-open 'stored-playlists))
+
+;;;###autoload
 (defun mpdel-core-search-by-artist (name)
   "Display all songs whose artist's name match NAME.
 Interactively, ask for NAME."
@@ -151,6 +157,7 @@ Documentation: https://www.musicpd.org/doc/html/protocol.html#filters"
     (define-key map (kbd "p") #'mpdel-core-insert-current-playlist)
     (define-key map (kbd "C-x C-j") #'mpdel-core-dired)
     (define-key map (kbd "n") #'mpdel-core-open-artists)
+    (define-key map (kbd "L") #'mpdel-core-open-stored-playlists)
     (define-key map (kbd "s s") #'mpdel-core-search-by-title)
     (define-key map (kbd "s l") #'mpdel-core-search-by-album)
     (define-key map (kbd "s r") #'mpdel-core-search-by-artist)
