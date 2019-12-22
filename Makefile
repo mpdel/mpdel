@@ -1,6 +1,6 @@
-ELPA_DEPENDENCIES=package-lint libmpdel navigel tablist
+ELPA_DEPENDENCIES=package-lint let-alist libmpdel navigel tablist
 
-ELPA_ARCHIVES=melpa
+ELPA_ARCHIVES=melpa-stable gnu
 
 LINT_CHECKDOC_FILES=$(wildcard *.el)
 LINT_PACKAGE_LINT_FILES=$(wildcard *.el)
@@ -14,7 +14,7 @@ makel.mk:
 		curl \
 		--fail --silent --show-error --insecure --location \
 		--retry 9 --retry-delay 9 \
-		-O https://gitlab.petton.fr/DamienCassou/makel/raw/v0.5.1/makel.mk; \
+		-O https://gitlab.petton.fr/DamienCassou/makel/raw/v0.5.3/makel.mk; \
 	fi
 
 # Include emake.mk if present
