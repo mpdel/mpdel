@@ -36,7 +36,7 @@
 (navigel-method mpdel navigel-name (entity)
   (libmpdel-entity-name entity))
 
-(navigel-method mpdel navigel-children (entity callback   )
+(navigel-method mpdel navigel-children (entity callback)
   (libmpdel-list entity callback))
 
 (navigel-method mpdel navigel-equal (entity1 entity2)
@@ -112,6 +112,18 @@ If no entity is selected, restart playing the current song."
   (mpdel-core-open 'stored-playlists))
 
 ;;;###autoload
+(defun mpdel-core-open-albums ()
+  "Display all albums in the MPD database."
+  (interactive)
+  (mpdel-core-open 'albums))
+
+;;;###autoload
+(defun mpdel-core-open-directories ()
+  "Display all top-level directories in the MPD database."
+  (interactive)
+  (mpdel-core-open 'directories))
+
+;;;###autoload
 (defun mpdel-core-search-by-artist (name)
   "Display all songs whose artist's name match NAME.
 Interactively, ask for NAME."
@@ -170,3 +182,7 @@ Documentation: https://www.musicpd.org/doc/html/protocol.html#filters"
 
 (provide 'mpdel-core)
 ;;; mpdel-core.el ends here
+
+;; Local Variables:
+;; checkdoc-symbol-words: ("top-level")
+;; End:

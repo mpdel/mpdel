@@ -69,6 +69,9 @@
 (navigel-method mpdel navigel-entity-tablist-mode ((_entity (eql artists)))
   (mpdel-tablist-mode))
 
+(navigel-method mpdel navigel-entity-tablist-mode ((_entity (eql albums)))
+  (mpdel-tablist-mode))
+
 (navigel-method mpdel navigel-entity-tablist-mode ((_entity libmpdel-search-criteria))
   (mpdel-tablist-mode))
 
