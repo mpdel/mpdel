@@ -263,7 +263,7 @@ This listing is constructed using `mpdel-browser-top-level-entries'."
         (string= "Music directory" name))))
 
 (cl-defmethod navigel-parent-to-open (entity &context (major-mode mpdel-browser-mode))
-  "Find parent of ENTITY when in a buffer with MAJOR-MODE mpdel-browser-mode."
+  "Find parent of ENTITY when in a buffer with MAJOR-MODE `mpdel-browser-mode'."
   (cons (car (cl-find-if #'mpdel-browser--entry-is-parent-directory-p
                          tabulated-list-entries
                          :key #'car-safe))

@@ -145,20 +145,17 @@ refreshes them.
 
 *** Browser
 
-The MPDel Browser offers an alternative way of navigating through your
-music collection, based on your local music directory structure.  To
-access the browser's top-level buffer, press ~C-x Z :~ (or call the
-interactive command ~mpdel-browser-open~).  By default, the top level
-buffer gives you access to your music directory, as well as the artist
-and albums navigators, playlists and available searches.  Pressing ~RET~
-on any of these buttons will open the corresponding item; in
-particular, pressing ~Music directory~ will allow you to browser your
-music files following their directory layout (this works also for MPD
-servers such as modipy that can connect to remote music services that
-export a virtual music directory structure).
+The MPDel Browser offers an overview of MPDel entry points (see above
+for a screenshot).  To access the browser's top-level buffer, press
+~C-x Z :~ (or call the interactive command ~mpdel-browser-open~).  By
+default, the top level buffer gives you access to your music
+directory, as well as the artist and albums navigators, playlists and
+available searches.  Pressing ~RET~ on any line will open the
+corresponding item. In particular, ~Music directory~ will let you to
+navigate across directories: beyond local directories, some MPD
+servers, such as Mopidi, map remote services to virtual directories.
 
-In browser buffers, the regular mpdel keybindings also present in the
-navigator or playlists are active.
+Regular MPDel keybindings work in the browser too.
 
 *** Song
 
