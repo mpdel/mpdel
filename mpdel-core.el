@@ -1,6 +1,6 @@
 ;;; mpdel-core.el --- Provide code to be reused by mpdel modes  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2018-2019  Damien Cassou
+;; Copyright (C) 2018-2020  Damien Cassou
 
 ;; Author: Damien Cassou <damien@cassou.me>
 ;; Keywords: multimedia
@@ -166,14 +166,16 @@ Documentation: https://www.musicpd.org/doc/html/protocol.html#filters"
     (define-key map (kbd "A") #'mpdel-core-add-to-stored-playlist)
     (define-key map (kbd "r") #'mpdel-core-replace-current-playlist)
     (define-key map (kbd "R") #'mpdel-core-replace-stored-playlist)
-    (define-key map (kbd "p") #'mpdel-core-insert-current-playlist)
+    (define-key map (kbd "P") #'mpdel-core-insert-current-playlist)
     (define-key map (kbd "C-x C-j") #'mpdel-core-dired)
-    (define-key map (kbd "n") #'mpdel-core-open-artists)
+    (define-key map (kbd "N") #'mpdel-core-open-artists)
     (define-key map (kbd "L") #'mpdel-core-open-stored-playlists)
     (define-key map (kbd "s s") #'mpdel-core-search-by-title)
     (define-key map (kbd "s l") #'mpdel-core-search-by-album)
     (define-key map (kbd "s r") #'mpdel-core-search-by-artist)
     (define-key map (kbd "^") #'navigel-open-parent)
+    (define-key map (kbd "n") #'next-line)
+    (define-key map (kbd "p") #'previous-line)
     map)
   "Keybindings for all MPDel buffers.")
 

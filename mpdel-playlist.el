@@ -1,6 +1,6 @@
 ;;; mpdel-playlist.el --- Display and manipulate MPD playlists  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2017-2019  Damien Cassou
+;; Copyright (C) 2017-2020  Damien Cassou
 
 ;; Author: Damien Cassou <damien@cassou.me>
 ;; Keywords: multimedia
@@ -148,7 +148,7 @@ Ask for stored playlist name."
     (define-key map (kbd "<M-up>") #'mpdel-playlist-move-up)
     (define-key map (kbd "<M-down>") #'mpdel-playlist-move-down)
     (define-key map (kbd "C-x C-s") #'mpdel-playlist-save)
-    (define-key map (kbd "p") #'mpdel-playlist-play)
+    (define-key map (kbd "P") #'mpdel-playlist-play)
     map)
   "Keybindings for `mpdel-playlist-current-playlist-mode'.")
 
