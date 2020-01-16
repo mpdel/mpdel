@@ -69,18 +69,19 @@ The following MPDel keybindings are available globally if ~mpdel-mode~
 is active:
 
 | *Binding*   | *Action*                                                  |
-|-------------+-----------------------------------------------------------|
-| ~C-x Z SPC~ | toggle between play and pause                             |
-| ~C-x Z M-n~ | play next song                                            |
-| ~C-x Z M-p~ | play previous song                                        |
-| ~C-x Z p~   | restart playing current song                              |
-| ~C-x Z l~   | open the current playlist                                 |
-| ~C-x Z L~   | show stored playlists                                     |
-| ~C-x Z n~   | navigate your database from artists                       |
-| ~C-x Z v~   | view current song                                         |
-| ~C-x Z s r~ | search songs by artist name                               |
-| ~C-x Z s l~ | search songs by album name                                |
-| ~C-x Z s s~ | search songs by song title                                |
+|-----------+---------------------------------------------------------|
+| ~C-x Z SPC~ | toggle between play and pause                           |
+| ~C-x Z M-n~ | play next song                                          |
+| ~C-x Z M-p~ | play previous song                                      |
+| ~C-x Z P~   | restart playing current song                            |
+| ~C-x Z l~   | open the current playlist                               |
+| ~C-x Z L~   | show stored playlists                                   |
+| ~C-x Z N~   | navigate your database from artists                     |
+| ~C-x Z :~   | navigate your database from the browser                 |
+| ~C-x Z v~   | view current song                                       |
+| ~C-x Z s r~ | search songs by artist name                             |
+| ~C-x Z s l~ | search songs by album name                              |
+| ~C-x Z s s~ | search songs by song title                              |
 | ~C-x Z f~   | go forward current song by ~mpdel-song-normal-increment~  |
 | ~C-x Z F~   | go forward current song by ~mpdel-song-small-increment~   |
 | ~C-x Z M-f~ | go forward current song by ~mpdel-song-large-increment~   |
@@ -93,24 +94,26 @@ buffer (e.g., press ~M-n~ in a playlist buffer to play the next song)
 to do the same.  Additionally, the following keybindings are available
 in all MPDel buffers where they make sense:
 
-| *Binding* | *Action*                             |
-|-----------+--------------------------------------|
+| *Binding* | *Action*                               |
+|---------+--------------------------------------|
 | ~a~       | add item to current playlist         |
 | ~A~       | add item to a stored playlist        |
 | ~r~       | replace current playlist with item   |
 | ~R~       | replace a stored playlist with item  |
-| ~p~       | play selected items immediately      |
+| ~P~       | play selected items immediately      |
 | ~v~       | view currently played song           |
 | ~RET~     | open a buffer showing item at point  |
 | ~^~       | open item's parent                   |
 | ~C-x C-j~ | open a dired buffer on item at point |
+| ~n~       | move to next line                    |
+| ~p~       | move to previous line                |
 
 Opening a dired buffer on the item at point requires configuring
 ~libmpdel-music-directory~ first.
 
 *** Navigator
 
-The keybinding ~C-x Z n~ (or just ~n~ in any MPDel buffer) opens a
+The keybinding ~C-x Z N~ (or just ~N~ in any MPDel buffer) opens a
 navigator on your database. You first get a list of all artists. From
 there, you can press ~a~, ~A~, ~r~ or ~R~ (see above) to add the item
 at point to a playlist. You can also press ~RET~ (the ~enter~ key) to
@@ -129,8 +132,8 @@ buffer lists songs and can be edited.
 Here is a list of keybindings available for the current playlist
 buffer:
 
-| *Binding* | *Action*                                 |
-|-----------+------------------------------------------|
+| *Binding* | *Action*                                   |
+|---------+------------------------------------------|
 | ~C-x C-s~ | save current playlist in a new one       |
 | ~m~       | mark the song at point                   |
 | ~k~       | remove marked song(s) from the playlist  |
