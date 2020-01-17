@@ -258,24 +258,14 @@ This listing is constructed using `mpdel-browser-top-level-entries'."
 (navigel-method mpdel navigel-entity-tablist-mode ((_e (eql stored-playlists)))
   (mpdel-browser-mode))
 
-(defun mpdel-browser--entry-is-parent-directory-p (entity)
-  "Check whether the given ENTITY is a parent directory."
-  (let ((name (when (libmpdel-directory-p entity)
-                (libmpdel-entity-name entity))))
-    ;; Browser buffers showing children of 'directories or the point
-    ;; to their parent via a tablist entry called "Music directory",
-    ;; while real directory children use the conventional "..".
-    (or (eql 'directories entity)
-        (eql 'browser entity)
-        (string= ".." name)
-        (string= "Music directory" name))))
-
-(cl-defmethod navigel-parent-to-open (entity &context (major-mode mpdel-browser-mode))
+(cl-defmethod navigel-parent-to-open (_e &context (major-mode mpdel-browser-mode))
   "Find parent of ENTITY when in a buffer with MAJOR-MODE `mpdel-browser-mode'."
-  (cons (car (cl-find-if #'mpdel-browser--entry-is-parent-directory-p
-                         tabulated-list-entries
-                         :key #'car-safe))
-        entity))
+  (list (or (navigel-parent navigel-entity) 'browser)))
+
+(cl-defmethod navigel-parent-to-open
+  (_e &context (major-mode mpdel-playlist-current-playlist-mode))
+  "Find parent of ENTITY when in a buffer with MAJOR-MODE `mpdel-playlist-current-playlist-mode'."
+  '(browser . current-playlist))
 
 (define-key mpdel-core-map (kbd ":") #'mpdel-browser-open)
 
