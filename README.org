@@ -94,8 +94,8 @@ buffer (e.g., press ~M-n~ in a playlist buffer to play the next song)
 to do the same.  Additionally, the following keybindings are available
 in all MPDel buffers where they make sense:
 
-| *Binding* | *Action*                               |
-|---------+--------------------------------------|
+| *Binding* | *Action*                             |
+|-----------+--------------------------------------|
 | ~a~       | add item to current playlist         |
 | ~A~       | add item to a stored playlist        |
 | ~r~       | replace current playlist with item   |
@@ -107,6 +107,8 @@ in all MPDel buffers where they make sense:
 | ~C-x C-j~ | open a dired buffer on item at point |
 | ~n~       | move to next line                    |
 | ~p~       | move to previous line                |
+| ~+~       | increase playback volume             |
+| ~-~       | decrease playback volume             |
 
 Opening a dired buffer on the item at point requires configuring
 ~libmpdel-music-directory~ first.
