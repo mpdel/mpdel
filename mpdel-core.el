@@ -45,6 +45,11 @@
 (navigel-method mpdel navigel-parent (entity)
   (libmpdel-entity-parent entity))
 
+(defcustom mpdel-core-volume-step 5
+  "Amount to increase / decrease the playback volume by."
+  :type 'integer
+  :group 'mpdel-core)
+
 
 ;;; Public functions
 
@@ -154,6 +159,36 @@ Documentation: https://www.musicpd.org/doc/html/protocol.html#filters"
   (interactive (list (read-from-minibuffer "Search with filter: ")))
   (mpdel-core-open (libmpdel-filter-create :text filter)))
 
+(defun mpdel-core-volume-adjust (amount)
+  "Adjust the playback volume by AMOUNT."
+  (let* ((volume (string-to-number (libmpdel-volume)))
+         (new-volume (max 0 (min 100 (+ volume amount)))))
+    (libmpdel-playback-set-volume new-volume)))
+
+;;;###autoload
+(defun mpdel-core-volume-increase (&optional amount)
+  "Increase the playback volume by AMOUNT.
+If AMOUNT is nil, `mpdel-core-volume-step' is used instead.
+Called interactively, AMOUNT can be passed as a prefix argument."
+  (interactive "P")
+  (cond
+   ((null amount) (mpdel-core-volume-adjust mpdel-core-volume-step))
+   ((listp amount)
+    (mpdel-core-volume-adjust (* (car amount) mpdel-core-volume-step)))
+   (t (mpdel-core-volume-adjust amount))))
+
+;;;###autoload
+(defun mpdel-core-volume-decrease (&optional amount)
+  "Decrease the playback volume by AMOUNT.
+If AMOUNT is nil, `mpdel-core-volume-step' is used instead.
+Called interactively, AMOUNT can be passed as a prefix argument."
+  (interactive "P")
+  (cond
+   ((null amount) (mpdel-core-volume-adjust (- mpdel-core-volume-step)))
+   ((listp amount)
+    (mpdel-core-volume-adjust (- (* (car amount) mpdel-core-volume-step))))
+   (t (mpdel-core-volume-adjust (- amount)))))
+
 
 ;;; Mode
 
@@ -176,6 +211,8 @@ Documentation: https://www.musicpd.org/doc/html/protocol.html#filters"
     (define-key map (kbd "^") #'navigel-open-parent)
     (define-key map (kbd "n") #'next-line)
     (define-key map (kbd "p") #'previous-line)
+    (define-key map (kbd "+") #'mpdel-core-volume-increase)
+    (define-key map (kbd "-") #'mpdel-core-volume-decrease)
     map)
   "Keybindings for all MPDel buffers.")
 
