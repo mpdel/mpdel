@@ -213,6 +213,7 @@ Called interactively, AMOUNT can be passed as a prefix argument."
     (define-key map (kbd "p") #'previous-line)
     (define-key map (kbd "+") #'mpdel-core-volume-increase)
     (define-key map (kbd "-") #'mpdel-core-volume-decrease)
+    (define-key map (kbd "C") #'libmpdel-connect-profile)
     map)
   "Keybindings for all MPDel buffers.")
 

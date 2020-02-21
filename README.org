@@ -109,6 +109,7 @@ in all MPDel buffers where they make sense:
 | ~p~       | move to previous line                |
 | ~+~       | increase playback volume             |
 | ~-~       | decrease playback volume             |
+| ~C~       | connect to a different profile       |
 
 Opening a dired buffer on the item at point requires configuring
 ~libmpdel-music-directory~ first.
