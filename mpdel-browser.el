@@ -4,7 +4,7 @@
 
 ;; Author: Jose A Ortega Ruiz <jao@gnu.org>
 ;; Keywords: multimedia
-;; Url: https://gitlab.petton.fr/mpdel/mpdel
+;; Url: https://gitea.petton.fr/mpdel/mpdel
 ;; Package-requires: ((emacs "25.1"))
 ;; Version: 1.0.0
 
