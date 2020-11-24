@@ -57,6 +57,7 @@ Each entry is shown as a selectable line with the entry's
 description; selecting it with the keyboard or mouse will list
 its contents in a new buffer."
   :type '(repeat (choice (const :tag "Directories" directories)
+                         (string :tag "Directory")
                          (const :tag "All albums" albums)
                          (const :tag "All artists" artists)
                          (const :tag "Stored playlists" stored-playlists)
@@ -184,6 +185,13 @@ orderings."
 (mpdel-browser--defsearch artist)
 (mpdel-browser--defsearch title)
 (mpdel-browser--defsearch filter)
+
+(cl-defmethod libmpdel-entity-name ((path string))
+  path)
+
+(navigel-method mpdel navigel-open ((path string) target)
+  (let ((navigel-app 'mpdel))
+    (navigel-open (libmpdel--directory-create :path path) target)))
 
 (cl-defmethod libmpdel-entity-name ((_e (eql browser)))
   "The name of the top level browser entity."
