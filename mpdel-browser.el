@@ -258,6 +258,9 @@ This listing is constructed using `mpdel-browser-top-level-entries'."
 (navigel-method mpdel navigel-entity-tablist-mode ((_e (eql stored-playlists)))
   (mpdel-browser-mode))
 
+(navigel-method mpdel navigel-delete ((stored-playlists list) &context (major-mode mpdel-browser-mode) &optional _callback)
+  (libmpdel-stored-playlists-delete stored-playlists))
+
 (cl-defmethod navigel-parent-to-open (_e &context (major-mode mpdel-browser-mode))
   "Find parent of ENTITY when in a buffer with MAJOR-MODE `mpdel-browser-mode'."
   (list (or (navigel-parent navigel-entity) 'browser)))
