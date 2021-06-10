@@ -108,7 +108,8 @@
 
 (navigel-method mpdel navigel-entity-to-columns ((song libmpdel-song))
   (vector
-   (propertize (or (libmpdel-entity-name song) "") 'face 'mpdel-tablist-song-name-face)
+   (propertize (or (libmpdel-entity-name song)
+                   (libmpdel-song-file song) "") 'face 'mpdel-tablist-song-name-face)
    (propertize (or (libmpdel-song-track song) "") 'face 'mpdel-tablist-track-face)
    (propertize (or (libmpdel-album-name song) "") 'face 'mpdel-tablist-album-face)
    (propertize (or (libmpdel-song-disc song) "") 'face 'mpdel-tablist-disk-face)
