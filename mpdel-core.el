@@ -102,7 +102,7 @@ If no entity is selected, restart playing the current song."
 (defun mpdel-core-dired ()
   "Open `dired' on the entity at point."
   (interactive)
-  (libmpdel-dired (navigel-entity-at-point)))
+  (libmpdel-dired (car (mpdel-core-selected-entities))))
 
 ;;;###autoload
 (defun mpdel-core-open-artists ()
