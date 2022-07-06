@@ -4,7 +4,7 @@
 
 ;; Author: Damien Cassou <damien@cassou.me>
 ;; Keywords: multimedia
-;; Url: https://gitea.petton.fr/mpdel/mpdel
+;; Url: https://github.com/mpdel/mpdel
 ;; Package-requires: ((emacs "25.1"))
 ;; Version: 1.0.0
 
@@ -100,7 +100,7 @@ If no entity is selected, restart playing the current song."
       (libmpdel-current-playlist-insert entities))))
 
 (defun mpdel-core-dired ()
-  "Open dired on the entity at point."
+  "Open `dired' on the entity at point."
   (interactive)
   (libmpdel-dired (navigel-entity-at-point)))
 

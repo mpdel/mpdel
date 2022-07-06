@@ -14,7 +14,7 @@ makel.mk:
 		curl \
 		--fail --silent --show-error --insecure --location \
 		--retry 9 --retry-delay 9 \
-		-O https://gitea.petton.fr/DamienCassou/makel/raw/v0.5.3/makel.mk; \
+		-O https://gitea.petton.fr/DamienCassou/makel/raw/v0.8.0/makel.mk; \
 	fi
 
 # Include emake.mk if present
