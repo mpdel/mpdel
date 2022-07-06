@@ -1,20 +1,20 @@
 * MPDel
 
-  #+BEGIN_HTML
-      <p>
-        <a href="https://stable.melpa.org/#/mpdel">
-          <img alt="MELPA Stable" src="https://stable.melpa.org/packages/mpdel-badge.svg"/>
-        </a>
+#+BEGIN_HTML
+    <p>
+      <a href="https://stable.melpa.org/#/mpdel">
+        <img alt="MELPA Stable" src="https://stable.melpa.org/packages/mpdel-badge.svg"/>
+      </a>
 
-        <a href="https://melpa.org/#/mpdel">
-          <img alt="MELPA" src="https://melpa.org/packages/mpdel-badge.svg"/>
-        </a>
+      <a href="https://melpa.org/#/mpdel">
+        <img alt="MELPA" src="https://melpa.org/packages/mpdel-badge.svg"/>
+      </a>
 
-        <a href="https://gitea.petton.fr/mpdel/mpdel/commits/master">
-          <img alt="pipeline status" src="https://gitea.petton.fr/mpdel/mpdel/badges/master/pipeline.svg" />
-        </a>
-      </p>
-  #+END_HTML
+      <a href="https://github.com/mpdel/mpdel/actions">
+        <img alt="pipeline status" src="https://github.com/mpdel/mpdel/actions/workflows/test.yml/badge.svg" />
+      </a>
+    </p>
+#+END_HTML
 
 ** Summary
 
@@ -35,7 +35,7 @@ other song:
 
 [[file:media/mpdel-song.png]]
 
-With the additional package [[https://gitea.petton.fr/mpdel/ivy-mpdel.git][ivy-mpdel]], you can navigate your music
+With the additional package [[https://github.com/mpdel/ivy-mpdel.git][ivy-mpdel]], you can navigate your music
 database and add songs to playlists with completion:
 
 [[file:media/ivy-mpdel.png]]
@@ -43,7 +43,7 @@ database and add songs to playlists with completion:
 ** Installing
 
 Get mpdel from [[https://melpa.org/#/mpdel][melpa]] or [[https://stable.melpa.org/#/mpdel][melpa stable]]. You also need to install
-[[https://gitea.petton.fr/mpdel/libmpdel][libmpdel]].
+[[https://github.com/mpdel/libmpdel][libmpdel]].
 
 You need to install and (quickly) configure an [[https://www.musicpd.org/][MPD server]] if you don't
 have any yet. Don't worry, that's simple and you won't regret it.
