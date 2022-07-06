@@ -71,7 +71,7 @@ its contents in a new buffer."
 (defcustom mpdel-browser-list-clean-up-function #'identity
   "Function called with the list of entries to be displayed, for clean-up.
 
-The function is called with the list of retreived entries, and
+The function is called with the list of retrieved entries, and
 should return a new list of entries, possibly modified and
 re-ordered.  Use cases include elimination of duplicates (some
 backends accumulate renamed songs in their listings) or custom
@@ -93,7 +93,7 @@ orderings."
   (vector (list (or (libmpdel--directory-path parent) "") 60 t)))
 
 (defvar mpdel-browser--retrieving-format (vector (list "Retrieving ..." 60 t))
-  "Format of the tablist before the children of an entity are known.")
+  "Format of the tabulated list before the children of an entity are known.")
 
 (defun mpdel-browser--includes-songs-p (children)
   "Check whether there is any song among CHILDREN."
@@ -187,6 +187,7 @@ orderings."
 (mpdel-browser--defsearch filter)
 
 (cl-defmethod libmpdel-entity-name ((path string))
+  "Return the argument PATH, a string."
   path)
 
 (navigel-method mpdel navigel-open ((path string) target)
@@ -244,7 +245,7 @@ This listing is constructed using `mpdel-browser-top-level-entries'."
 ;;; Major mode
 
 (define-derived-mode mpdel-browser-mode mpdel-tablist-mode "MPDel Browser"
-  "Mode for browsing directories and their contents")
+  "Mode for browsing directories and their contents.")
 
 (navigel-method mpdel navigel-entity-tablist-mode ((_e (eql browser)))
   (mpdel-browser-mode))
@@ -267,7 +268,7 @@ This listing is constructed using `mpdel-browser-top-level-entries'."
 
 (cl-defmethod navigel-parent-to-open
   (_e &context (major-mode mpdel-playlist-current-playlist-mode))
-  "Find parent of ENTITY when in a buffer with MAJOR-MODE `mpdel-playlist-current-playlist-mode'."
+  "Indicate that the parent in MAJOR-MODE is the browser."
   '(browser . current-playlist))
 
 (define-key mpdel-core-map (kbd ":") #'mpdel-browser-open)
@@ -275,3 +276,6 @@ This listing is constructed using `mpdel-browser-top-level-entries'."
 
 (provide 'mpdel-browser)
 ;;; mpdel-browser.el ends here
+
+;; LocalWords:  selectable backends navigel
+;; LocalWords:  MPDel
