@@ -35,8 +35,8 @@ other song:
 
 [[file:media/mpdel-song.png]]
 
-With the additional package [[https://github.com/mpdel/ivy-mpdel.git][ivy-mpdel]], you can navigate your music
-database and add songs to playlists with completion:
+With the additional package [[https://github.com/mpdel/ivy-mpdel.git][ivy-mpdel]] or [[https://github.com/mpdel/mpdel-embark][mpdel-embark]] you can navigate
+your music database and add songs to playlists with completion:
 
 [[file:media/ivy-mpdel.png]]
 
