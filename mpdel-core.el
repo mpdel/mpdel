@@ -154,7 +154,7 @@ Interactively, ask for TITLE."
   "Display all songs matching the mpd filter expression FILTER.
 Interactively, ask for FILTER.
 
-Example: ((artist == 'name') AND (any contains 'text'))
+Example: ((artist == \\='name\\=') AND (any contains \\='text\\='))
 Documentation: https://www.musicpd.org/doc/html/protocol.html#filters"
   (interactive (list (read-from-minibuffer "Search with filter: ")))
   (mpdel-core-open (libmpdel-filter-create :text filter)))

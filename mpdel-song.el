@@ -140,7 +140,7 @@ when the song changes.")
 (defun mpdel-song--refresh-current-song (data buffer)
   "Write information about currently-played song in DATA to BUFFER.
 
-DATA is an alist returned by MPD server as answer to 'status'.
+DATA is an alist returned by MPD server as answer to status.
 In particular, it must contain key symbol `elapsed' and symbol
 `duration'."
   (with-current-buffer buffer
