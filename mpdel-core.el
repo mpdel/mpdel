@@ -81,12 +81,14 @@ list with this entity.  Otherwise, return nil."
 (defun mpdel-core-replace-current-playlist ()
   "Replace current playlist with selected entities."
   (interactive)
-  (libmpdel-current-playlist-replace (mpdel-core-selected-entities)))
+  (when (y-or-n-p "Really replace current playlist? ")
+    (libmpdel-current-playlist-replace (mpdel-core-selected-entities))))
 
 (defun mpdel-core-replace-stored-playlist ()
   "Replace a stored playlist with selected entities."
   (interactive)
-  (libmpdel-stored-playlist-replace (mpdel-core-selected-entities)))
+  (when (y-or-n-p "Really replace stored playlist? ")
+    (libmpdel-stored-playlist-replace (mpdel-core-selected-entities))))
 
 (defun mpdel-core-insert-current-playlist ()
   "Insert selected entities after currently-played song.
