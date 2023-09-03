@@ -1,6 +1,6 @@
 ;;; mpdel-core.el --- Provide code to be reused by mpdel modes  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2018-2020  Damien Cassou
+;; Copyright (C) 2018-2023  Damien Cassou
 
 ;; Author: Damien Cassou <damien@cassou.me>
 ;; Keywords: multimedia
