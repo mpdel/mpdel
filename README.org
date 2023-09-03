@@ -250,7 +250,7 @@ songs using a [[https://www.musicpd.org/doc/html/protocol.html#filters][MPD filt
 This requires a MPD version >= 0.21.
 ** License
 
-See [[file:COPYING][COPYING]]. Copyright (c) 2018 Damien Cassou.
+See [[file:COPYING][COPYING]]. Copyright (c) 2018-2023  Damien Cassou.
 
   #+BEGIN_HTML
   <a href="https://liberapay.com/DamienCassou/donate">

@@ -1,6 +1,6 @@
 ;;; mpdel.el --- Play and control your MPD music  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2018-2019  Damien Cassou
+;; Copyright (C) 2018-2023  Damien Cassou
 
 ;; Author: Damien Cassou <damien@cassou.me>
 ;; Keywords: multimedia
