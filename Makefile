@@ -1,6 +1,6 @@
 ELPA_DEPENDENCIES=package-lint let-alist libmpdel navigel tablist
 
-ELPA_ARCHIVES=melpa-stable gnu
+ELPA_ARCHIVES=melpa gnu
 
 LINT_CHECKDOC_FILES=$(wildcard *.el)
 LINT_PACKAGE_LINT_FILES=$(wildcard *.el)
