@@ -17,5 +17,5 @@ makel.mk:
 		-O https://gitea.petton.fr/DamienCassou/makel/raw/v0.8.0/makel.mk; \
 	fi
 
-# Include emake.mk if present
+# Include makel.mk if present
 -include makel.mk
