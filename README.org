@@ -65,6 +65,9 @@ prefix is configurable with ~mpdel-prefix-key~:
   (setq mpdel-prefix-key (kbd "C-. z"))
 #+END_SRC
 
+This line must come before the ~(require 'mpdel)~ line as the prefix
+key must be set before mpdel is loaded.
+
 The following MPDel keybindings are available globally if ~mpdel-mode~
 is active:
 
