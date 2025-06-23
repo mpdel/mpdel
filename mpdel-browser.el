@@ -48,9 +48,9 @@
 
 (defcustom mpdel-browser-top-level-entries
   '(directories empty-line
-    albums artists empty-line
+    albums artists genres empty-line
     stored-playlists current-playlist empty-line
-    search-album search-title search-artist search-filter)
+    search-album search-title search-artist search-genre search-filter)
   "A list of the entries to show in the browser's top level buffer.
 
 Each entry is shown as a selectable line with the entry's
@@ -59,12 +59,14 @@ its contents in a new buffer."
   :type '(repeat (choice (const :tag "Directories" directories)
                          (string :tag "Directory")
                          (const :tag "All albums" albums)
+                         (const :tag "All genres" genres)
                          (const :tag "All artists" artists)
                          (const :tag "Stored playlists" stored-playlists)
                          (const :tag "Current playlist" current-playlist)
                          (const :tag "Search by artist" search-artist)
                          (const :tag "Search by album" search-album)
                          (const :tag "Search by title" search-title)
+                         (const :tag "Search by genre" search-genre)
                          (const :tag "Search using filter" search-filter)
                          (const :tag "Separator" empty-line))))
 
@@ -184,6 +186,7 @@ orderings."
 (mpdel-browser--defsearch album)
 (mpdel-browser--defsearch artist)
 (mpdel-browser--defsearch title)
+(mpdel-browser--defsearch genre)
 (mpdel-browser--defsearch filter)
 
 (cl-defmethod libmpdel-entity-name ((path string))
