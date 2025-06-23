@@ -72,6 +72,9 @@
 (navigel-method mpdel navigel-entity-tablist-mode ((_entity (eql albums)))
   (mpdel-tablist-mode))
 
+(navigel-method mpdel navigel-entity-tablist-mode ((_entity (eql genres)))
+  (mpdel-tablist-mode))
+
 (navigel-method mpdel navigel-entity-tablist-mode ((_entity libmpdel-search-criteria))
   (mpdel-tablist-mode))
 
@@ -84,6 +87,8 @@
 (navigel-method mpdel navigel-entity-tablist-mode ((_entity libmpdel-album))
   (mpdel-tablist-mode))
 
+(navigel-method mpdel navigel-entity-tablist-mode ((_entity libmpdel-genre))
+  (mpdel-tablist-mode))
 
 
 ;;; `navigel' tabulated list configuration
@@ -101,6 +106,10 @@
           (list "Disk" 4 t)
           (list "Date" 12 t)
           (list "Artist" 0 t)))
+
+(defun mpdel-tablist--genre-format ()
+  "Return `tabulated-list-format' value for genres."
+  (vector (list "Name" 0 t)))
 
 (navigel-method mpdel navigel-entity-to-columns ((entity libmpdel-album))
   (vector (libmpdel-entity-name entity)
@@ -121,6 +130,9 @@
 (navigel-method mpdel navigel-tablist-format ((_entity libmpdel-album))
   (mpdel-tablist--song-format))
 
+(navigel-method mpdel navigel-tablist-format ((_entity libmpdel-genre))
+  (mpdel-tablist--song-format))
+
 (navigel-method mpdel navigel-tablist-format ((_entity libmpdel-search-criteria))
   (mpdel-tablist--song-format))
 
@@ -129,6 +141,9 @@
 
 (navigel-method mpdel navigel-tablist-format ((_entity (eql current-playlist)))
   (mpdel-tablist--song-format))
+
+(navigel-method mpdel navigel-tablist-format ((_entity (eql genres)))
+  (mpdel-tablist--genre-format))
 
 (navigel-method mpdel navigel-tablist-format ((_entity libmpdel-stored-playlist))
   (mpdel-tablist--song-format))

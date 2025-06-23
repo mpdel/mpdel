@@ -123,6 +123,12 @@ If no entity is selected, restart playing the current song."
   (mpdel-core-open 'albums))
 
 ;;;###autoload
+(defun mpdel-core-open-genres ()
+  "Display all genres in the MPD database."
+  (interactive)
+  (mpdel-core-open 'genres))
+
+;;;###autoload
 (defun mpdel-core-open-directories ()
   "Display all top-level directories in the MPD database."
   (interactive)
