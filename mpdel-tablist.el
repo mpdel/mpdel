@@ -147,6 +147,9 @@
 (navigel-method mpdel navigel-tablist-format ((_entity (eql genres)))
   (mpdel-tablist--genre-format))
 
+(navigel-method mpdel navigel-tablist-format ((_entity (eql albums)))
+  (mpdel-tablist--album-format))
+
 (navigel-method mpdel navigel-tablist-format ((_entity libmpdel-stored-playlist))
   (mpdel-tablist--song-format))
 
