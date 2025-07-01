@@ -115,7 +115,7 @@
 (navigel-method mpdel navigel-entity-to-columns ((entity libmpdel-album))
   (vector (libmpdel-entity-name entity)
           (libmpdel-entity-date entity)
-          (libmpdel-artist-name entity)))
+          (libmpdel-artists-name entity)))
 
 (navigel-method mpdel navigel-entity-to-columns ((song libmpdel-song))
   (vector
