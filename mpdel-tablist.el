@@ -113,9 +113,9 @@
   (vector (list "Name" 0 t)))
 
 (navigel-method mpdel navigel-entity-to-columns ((entity libmpdel-album))
-  (vector (libmpdel-entity-name entity)
-          (libmpdel-entity-date entity)
-          (libmpdel-artists-name entity)))
+  (vector (or (libmpdel-entity-name entity) "")
+          (or (libmpdel-entity-date entity) "")
+          (or (libmpdel-artists-name entity) "")))
 
 (navigel-method mpdel navigel-entity-to-columns ((song libmpdel-song))
   (vector
