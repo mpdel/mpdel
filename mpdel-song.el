@@ -126,16 +126,32 @@ when the song changes.")
            (libmpdel-time-to-string (cdr (assq 'elapsed data)))
            (libmpdel-time-to-string (cdr (assq 'duration data))))))
 
+(defun mpdel-song--join-indented (entities)
+  "Produce an indented list of the names of libmpdel-entities ENTITIES."
+  (string-join
+   (mapcar (lambda (entity)
+             (concat "\t- " (libmpdel-entity-name entity)))
+           entities)
+   "\n"))
+
 (defun mpdel-song--display-metadata ()
   "Give information about current song metadata."
   (let* ((song mpdel-song-song)
          (title (or (libmpdel-entity-name song) ""))
          (album (or (libmpdel-album-name song) ""))
-         (artist (or (libmpdel-artist-name song) "")))
-    (insert (format "Title: %s\nArtist: %s\nAlbum: %s\n"
+         (date (or (libmpdel--song-date song) ""))
+         (track (or (libmpdel--song-track song) ""))
+         (artists (mpdel-song--join-indented (libmpdel-artists song)))
+         (genres (mpdel-song--join-indented (libmpdel-genres song)))
+         (performers (mpdel-song--join-indented (libmpdel-performers song))))
+    (insert (format "Title: %s\nArtist:\n%s\nAlbum: %s\nTrack: %s\nDate: %s\nGenre:\n%s\nPerformers:\n%s\n"
                     title
-                    artist
-                    album))))
+                    artists
+                    album
+                    track
+                    date
+                    genres
+                    performers))))
 
 (defun mpdel-song--refresh-current-song (data buffer)
   "Write information about currently-played song in DATA to BUFFER.
