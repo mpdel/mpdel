@@ -99,7 +99,7 @@
           (list "#" 6 nil)
           (list "Album" 30 t)
           (list "Disk" 4 t)
-          (list "Date" 5 t)
+          (list "Date" 12 t)
           (list "Artist" 0 t)))
 
 (navigel-method mpdel navigel-entity-to-columns ((entity libmpdel-album))
