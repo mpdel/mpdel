@@ -96,6 +96,7 @@
 (defun mpdel-tablist--album-format ()
   "Return `tabulated-list-format' value for albums."
   (vector (list "Name" 40 t)
+          (list "Date" 12 t)
           (list "Artist" 0 t)))
 
 (defun mpdel-tablist--song-format ()
@@ -113,6 +114,7 @@
 
 (navigel-method mpdel navigel-entity-to-columns ((entity libmpdel-album))
   (vector (libmpdel-entity-name entity)
+          (libmpdel-entity-date entity)
           (libmpdel-artist-name entity)))
 
 (navigel-method mpdel navigel-entity-to-columns ((song libmpdel-song))
