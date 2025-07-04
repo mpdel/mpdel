@@ -99,7 +99,7 @@
           (list "#" 6 nil)
           (list "Album" 30 t)
           (list "Disk" 4 t)
-          (list "Date" 5 t)
+          (list "Date" 12 t)
           (list "Artist" 0 t)))
 
 (navigel-method mpdel navigel-entity-to-columns ((entity libmpdel-album))
@@ -113,7 +113,7 @@
    (propertize (or (libmpdel-album-name song) "") 'face 'mpdel-tablist-album-face)
    (propertize (or (libmpdel-song-disc song) "") 'face 'mpdel-tablist-disk-face)
    (propertize (or (libmpdel-entity-date song) "") 'face 'mpdel-tablist-date-face)
-   (propertize (or (libmpdel-artist-name song) "") 'face 'mpdel-tablist-artist-face)))
+   (propertize (or (libmpdel-artists-name song) "") 'face 'mpdel-tablist-artist-face)))
 
 (navigel-method mpdel navigel-tablist-format ((_entity libmpdel-artist))
   (mpdel-tablist--album-format))
