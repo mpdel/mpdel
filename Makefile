@@ -2,7 +2,7 @@ ELPA_DEPENDENCIES=package-lint let-alist libmpdel navigel tablist
 
 ELPA_ARCHIVES=melpa gnu
 
-LINT_CHECKDOC_FILES = mpdel-browser.el mpdel-core.el mpdel.el mpdel-playlist.el mpdel-song.el mpdel-tablist.el
+LINT_CHECKDOC_FILES = mpdel-browser.el mpdel-core.el mpdel.el mpdel-playlist.el mpdel-song.el mpdel-tablist.el mpdel-transient.el
 LINT_PACKAGE_LINT_FILES = ${LINT_CHECKDOC_FILES}
 LINT_COMPILE_FILES = ${LINT_CHECKDOC_FILES}
 
