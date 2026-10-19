@@ -156,6 +156,13 @@ Interactively, ask for TITLE."
   (mpdel-core-open (libmpdel-search-criteria-create :type "title" :what title)))
 
 ;;;###autoload
+(defun mpdel-core-search-by-genre (name)
+  "Display all songs whose genre matches NAME.
+Interactively, ask for NAME."
+  (interactive (list (read-from-minibuffer "Search for genre: ")))
+  (mpdel-core-open (libmpdel-search-criteria-create :type "genre" :what name)))
+
+;;;###autoload
 (defun mpdel-core-search-by-filter (filter)
   "Display all songs matching the mpd filter expression FILTER.
 Interactively, ask for FILTER.
@@ -214,6 +221,8 @@ Called interactively, AMOUNT can be passed as a prefix argument."
     (define-key map (kbd "s s") #'mpdel-core-search-by-title)
     (define-key map (kbd "s l") #'mpdel-core-search-by-album)
     (define-key map (kbd "s r") #'mpdel-core-search-by-artist)
+    (define-key map (kbd "s g") #'mpdel-core-search-by-genre)
+    (define-key map (kbd "s f") #'mpdel-core-search-by-filter)
     (define-key map (kbd "^") #'navigel-open-parent)
     (define-key map (kbd "n") #'next-line)
     (define-key map (kbd "p") #'previous-line)

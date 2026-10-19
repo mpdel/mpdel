@@ -85,6 +85,8 @@ is active:
 | ~C-x Z s r~ | search songs by artist name                               |
 | ~C-x Z s l~ | search songs by album name                                |
 | ~C-x Z s s~ | search songs by song title                                |
+| ~C-x Z s g~ | search songs by genre                                     |
+| ~C-x Z s f~ | search using an MPD filter expression                     |
 | ~C-x Z f~   | go forward current song by ~mpdel-song-normal-increment~  |
 | ~C-x Z F~   | go forward current song by ~mpdel-song-small-increment~   |
 | ~C-x Z M-f~ | go forward current song by ~mpdel-song-large-increment~   |
