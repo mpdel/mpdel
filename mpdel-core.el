@@ -88,6 +88,12 @@ list with this entity.  Otherwise, return nil."
   (interactive)
   (libmpdel-stored-playlist-replace (mpdel-core-selected-entities)))
 
+;;;###autoload
+(defun mpdel-core-restart-song ()
+  "Restart playback of the current song."
+  (interactive)
+  (libmpdel-playback-seek "0"))
+
 (defun mpdel-core-insert-current-playlist ()
   "Insert selected entities after currently-played song.
 Start playing the first.
@@ -96,7 +102,7 @@ If no entity is selected, restart playing the current song."
   (interactive)
   (let ((entities (mpdel-core-selected-entities)))
     (if (not entities)
-        (libmpdel-playback-seek "0")
+        (mpdel-core-restart-song)
       (libmpdel-current-playlist-insert entities))))
 
 (defun mpdel-core-dired ()
