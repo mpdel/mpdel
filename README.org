@@ -77,6 +77,7 @@ is active:
 | ~C-x Z M-n~ | play next song                                            |
 | ~C-x Z M-p~ | play previous song                                        |
 | ~C-x Z P~   | restart playing current song                              |
+| ~C-x Z ?~   | open the MPDel command menu                               |
 | ~C-x Z l~   | open the current playlist                                 |
 | ~C-x Z L~   | show stored playlists                                     |
 | ~C-x Z N~   | navigate your database from artists                       |
@@ -118,6 +119,19 @@ in all MPDel buffers where they make sense:
 
 Opening a dired buffer on the item at point requires configuring
 ~libmpdel-music-directory~ first.
+
+*** Transient menu
+
+Press ~?~ in an MPDel buffer or ~C-x Z ?~ when ~mpdel-mode~ is active to open the
+MPDel command menu.  The command is also available as ~M-x mpdel-transient~.
+
+The menu provides playback, volume, seeking, browsing, search, and playlist
+commands.  Use its submenus for playback modes, playlist editing, marking items,
+and MPD server commands.  Commands that act on an item at point are shown in
+MPDel list buffers; playlist-specific commands are shown in the corresponding
+playlist buffers.
+
+The menu does not change the existing keybindings.
 
 *** Navigator
 
