@@ -124,6 +124,13 @@
     (when songs
       (libmpdel-playlist-move-down songs))))
 
+;;;###autoload
+(defun mpdel-playlist-clear-current ()
+  "Clear the current MPD playlist after confirmation."
+  (interactive)
+  (when (yes-or-no-p "Clear the current MPD playlist? ")
+    (libmpdel-playlist-clear 'current-playlist)))
+
 (defun mpdel-playlist-save ()
   "Save current playlist into a new stored playlist.
 Ask for stored playlist name."
