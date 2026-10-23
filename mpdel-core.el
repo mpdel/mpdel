@@ -88,6 +88,12 @@ list with this entity.  Otherwise, return nil."
   (interactive)
   (libmpdel-stored-playlist-replace (mpdel-core-selected-entities)))
 
+;;;###autoload
+(defun mpdel-core-restart-song ()
+  "Restart playback of the current song."
+  (interactive)
+  (libmpdel-playback-seek "0"))
+
 (defun mpdel-core-insert-current-playlist ()
   "Insert selected entities after currently-played song.
 Start playing the first.
@@ -96,7 +102,7 @@ If no entity is selected, restart playing the current song."
   (interactive)
   (let ((entities (mpdel-core-selected-entities)))
     (if (not entities)
-        (libmpdel-playback-seek "0")
+        (mpdel-core-restart-song)
       (libmpdel-current-playlist-insert entities))))
 
 (defun mpdel-core-dired ()
@@ -154,6 +160,13 @@ Interactively, ask for NAME."
 Interactively, ask for TITLE."
   (interactive (list (read-from-minibuffer "Search for title: ")))
   (mpdel-core-open (libmpdel-search-criteria-create :type "title" :what title)))
+
+;;;###autoload
+(defun mpdel-core-search-by-genre (name)
+  "Display all songs whose genre matches NAME.
+Interactively, ask for NAME."
+  (interactive (list (read-from-minibuffer "Search for genre: ")))
+  (mpdel-core-open (libmpdel-search-criteria-create :type "genre" :what name)))
 
 ;;;###autoload
 (defun mpdel-core-search-by-filter (filter)
@@ -214,6 +227,8 @@ Called interactively, AMOUNT can be passed as a prefix argument."
     (define-key map (kbd "s s") #'mpdel-core-search-by-title)
     (define-key map (kbd "s l") #'mpdel-core-search-by-album)
     (define-key map (kbd "s r") #'mpdel-core-search-by-artist)
+    (define-key map (kbd "s g") #'mpdel-core-search-by-genre)
+    (define-key map (kbd "s f") #'mpdel-core-search-by-filter)
     (define-key map (kbd "^") #'navigel-open-parent)
     (define-key map (kbd "n") #'next-line)
     (define-key map (kbd "p") #'previous-line)

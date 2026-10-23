@@ -47,6 +47,12 @@
   :type 'key-sequence)
 
 
+;;; Transient
+(autoload 'mpdel-transient "mpdel-transient"
+  "Show MPDel commands using Transient." t)
+(define-key mpdel-core-map (kbd "?") #'mpdel-transient)
+
+
 ;;; Minor mode: Define the global minor mode so users can control MPD
 ;;; from non-MPDel buffers
 
