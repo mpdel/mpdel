@@ -179,9 +179,10 @@ orderings."
        (cl-defmethod libmpdel-entity-name ((_e (eql ,entity))) ,name)
        (navigel-method mpdel navigel-open ((_e (eql ,entity)) _t)
          (let ((what (read-from-minibuffer ,prompt)))
-           (navigel-open (libmpdel-search-criteria-create :type ,type
-                                                          :what what)
-                         nil))))))
+           (navigel-open
+            ,(if (eq thing 'filter) '(libmpdel-filter-create :text what)
+               `(libmpdel-search-criteria-create :type ,type :what what))
+            nil))))))
 
 (mpdel-browser--defsearch album)
 (mpdel-browser--defsearch artist)
